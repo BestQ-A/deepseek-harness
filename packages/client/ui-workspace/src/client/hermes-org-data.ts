@@ -6227,7 +6227,7 @@ export const HERMES_INITIAL_SESSIONS: Record<string, HermesSessionSummary[]> = {
 
 export const HERMES_INITIAL_GATEWAY = {
   "ok": true,
-  "updatedAt": "2026-10-24T09:05:02.925Z",
+  "updatedAt": "2026-10-24T10:03:53.262Z",
   "stats": {
     "totalReceived": 19,
     "totalDispatched": 3,
@@ -6241,8 +6241,8 @@ export const HERMES_INITIAL_GATEWAY = {
       "profile": "life",
       "agentId": null,
       "eventKey": "im.message.receive_v1",
-      "pid": 75532,
-      "startedAt": "2026-10-24T09:05:02.916Z",
+      "pid": 63340,
+      "startedAt": "2026-10-24T10:03:53.251Z",
       "alive": true
     },
     {
@@ -6250,8 +6250,8 @@ export const HERMES_INITIAL_GATEWAY = {
       "profile": "company",
       "agentId": null,
       "eventKey": "im.message.receive_v1",
-      "pid": 91516,
-      "startedAt": "2026-10-24T09:05:02.925Z",
+      "pid": 13720,
+      "startedAt": "2026-10-24T10:03:53.262Z",
       "alive": true
     }
   ],
@@ -6261,18 +6261,18 @@ export const HERMES_INITIAL_GATEWAY = {
       "profile": "life",
       "agentId": null,
       "eventKey": "im.message.receive_v1",
-      "pid": 75532,
+      "pid": 63340,
       "status": "running",
-      "startedAt": "2026-10-24T09:05:02.916Z"
+      "startedAt": "2026-10-24T10:03:53.251Z"
     },
     "company:im.message.receive_v1": {
       "key": "company:im.message.receive_v1",
       "profile": "company",
       "agentId": null,
       "eventKey": "im.message.receive_v1",
-      "pid": 91516,
+      "pid": 13720,
       "status": "running",
-      "startedAt": "2026-10-24T09:05:02.925Z"
+      "startedAt": "2026-10-24T10:03:53.262Z"
     }
   },
   "recentEvents": [
@@ -6703,10 +6703,10 @@ export const HERMES_INITIAL_GATEWAY = {
         "hasLarkRoleScript": false,
         "larkRoleScript": null,
         "defaultChatId": null,
-        "dshSessionId": "session-abf7550c-e330-4642-8048-14975b027933",
+        "dshSessionId": "session-aed11ed7-27a8-4b27-af3c-67588efbcfa9",
         "dispatchMode": "dsh_session",
         "autoSyncToFeishu": true,
-        "lastSyncedAt": "2026-10-24T09:32:01.058Z"
+        "lastSyncedAt": "2026-10-24T10:07:09.053Z"
       },
       {
         "agentId": "bl-admin-procurement",
@@ -8394,6 +8394,59 @@ export const HERMES_INITIAL_GATEWAY = {
 
 export const HERMES_INITIAL_LOOP6 = [
   {
+    "receiptId": "evt-20261024-dsh-agy-acp-session-adapter",
+    "createdAt": "2026-10-24T10:08:26.592Z",
+    "route": {
+      "isOptix": false,
+      "recommendedProfile": "life",
+      "effectiveProfile": "life",
+      "reason": "事项归属个人 / 伴学 / 万界 / 本机资产，路由至 --profile life",
+      "agent": {
+        "id": "default",
+        "title": "👑 终极管家",
+        "sectionId": "sec-local",
+        "sectionPath": "本机",
+        "projectRoot": "C:/Users/Administrator/Documents/1_personal"
+      }
+    },
+    "steps": {
+      "step1Anchor": "打通本机免 API Key 的 AGY 239K 订阅算力池与 Devin Windsurf ACP 持久 JSON-RPC 算力池，直接按 DSH Session ID 增量续接，消除单轮截断与重复上下文消耗",
+      "step2ToolAsset": "沉淀 C:/Users/Administrator/.dsh/plugins/dsh-hermes-bridge/lib/agy-acp-session.js、hermes_agy_acp_session 原生工具、/hermes agy|acp 命令与右栏 AGY/ACP 监控面板",
+      "step3Verification": "实机双轮盲测：AGY (7c47d34d-9b5b-465b-8247-455d6e7af419) 与 Devin ACP (discreet-meal) 首轮 Full 记住口令、次轮 Delta 100% 召回；已推送 GitHub BestQ-A 双仓库",
+      "step4DocxXmlPath": "C:/Users/Administrator/.dsh/hermes-bridge/loop6-receipts/evt-20261024-dsh-agy-acp-session-adapter.docx.xml",
+      "step5FeishuTrace": {
+        "doc": {
+          "ok": true,
+          "dryRun": true,
+          "profile": "life",
+          "output": "{\n  \"ok\": true,\n  \"identity\": \"user\",\n  \"dry_run\": true,\n  \"data\": {\n    \"api\": [\n      {\n        \"desc\": \"OpenAPI: create document\",\n        \"method\": \"POST\",\n        \"url\": \"/open-apis/docs_ai/v1/documents\",\n        \"body\": {\n          \"content\": \"\\u003ctitle\\u003eDSH 集成 AGY 与 Devin/Hermes ACP 按 Session 持久绑定适配器 (双轨增量续接)\\u003c/title\\u003e\\n\\u003ctitle\\u003eDSH 集成 AGY 与 Devin/Hermes ACP 按 Session 持久绑定适配器 (双轨增量续接)\\u003c/title\\u003e\\n\\u003ch1\\u003e一、六步自我强化闭环总览\\u003c/h1\\u003e\\n\\u003cp\\u003e1. 起点（自我锚定）：打通本机免 API Key 的 AGY 239K 订阅算力池与 Devin Windsurf ACP 持久 JSON-RPC 算力池，直接按 DSH Session ID 增量续接，消除单轮截断与重复上下文消耗\\u003c/p\\u003e\\n\\u003cp\\u003e2. 工具内化（自我武装）：沉淀 C:/Users/Administrator/.dsh/plugins/dsh-hermes-bridge/lib/agy-acp-session.js、hermes_agy_acp_session 原生工具、/hermes agy|acp 命令与右栏 AGY/ACP 监控面板\\u003c/p\\u003e\\n\\u003cp\\u003e3. 全局真闭环（自我把关）：实机双轮盲测：AGY (7c47d34d-9b5b-465b-8247-455d6e7af419) 与 Devin ACP (discreet-meal) 首轮 Full 记住口令、次轮 Delta 100% 召回；已推送 GitHub BestQ-A 双仓库\\u003c/p\\u003e\\n\\u003ch1\\u003e二、BEFORE vs AFTER vs DIFF 可视化架构对比\\u003c/h1\\u003e\\n\\u003ctable\\u003e\\n  \\u003ctr\\u003e\\n    \\u003ctd\\u003eBEFORE（改造前痛点）\\u003c/td\\u003e\\n    \\u003ctd\\u003eAFTER（改造后成效）\\u003c/td\\u003e\\n    \\u003ctd\\u003eKEY DIFF（核心技术跨越）\\u003c/td\\u003e\\n  \\u003c/tr\\u003e\\n  \\u003ctr\\u003e\\n    \\u003ctd\\u003eDSH 仅能调用标准 HTTP 模型渠道，无法直接复用本机 agy.exe 与 devin.exe acp 订阅算力\\u003c/td\\u003e\\n    \\u003ctd\\u003e利用 GenerateOptions.sessionId 将每个 DSH Session 一对一绑定到 agyConversationId 与 acpSessionId\\u003c/td\\u003e\\n    \\u003ctd\\u003e新增 lib/agy-acp-session.js (700+ 行)，挂载 ctx.llm.registerAdapter([\\u0026apos;agy\\u0026apos;, \\u0026apos;devin-acp\\u0026apos;])\\u003c/td\\u003e\\n  \\u003c/tr\\u003e\\n  \\u003ctr\\u003e\\n    \\u003ctd\\u003e官方 subagent-acp 与旧版 devin-acp 每轮销毁会话，无法按 Session 保持多轮上下文\\u003c/td\\u003e\\n    \\u003ctd\\u003e首轮发送 Full + \\u0026lt;tool_call\\u0026gt; 契约，第 2 轮起自动校验前缀并仅发送 Delta 增量消息\\u003c/td\\u003e\\n    \\u003ctd\\u003e右栏战将参谋板新增一键切换 AGY/ACP 按钮与实时 Session 绑定演练台\\u003c/td\\u003e\\n  \\u003c/tr\\u003e\\n  \\u003ctr\\u003e\\n    \\u003ctd\\u003e—\\u003c/td\\u003e\\n    \\u003ctd\\u003e同时支持作为 DSH Session 底层 LLM Provider (agy / devin-acp) 与持久外部 ACP 会话\\u003c/td\\u003e\\n    \\u003ctd\\u003e—\\u003c/td\\u003e\\n  \\u003c/tr\\u003e\\n\\u003c/table\\u003e\\n\\u003ch1\\u003e三、量化工程指标核验表\\u003c/h1\\u003e\\n\\u003ctable\\u003e\\n  \\u003ctr\\u003e\\n    \\u003ctd\\u003e工程维度\\u003c/td\\u003e\\n    \\u003ctd\\u003eBEFORE\\u003c/td\\u003e\\n    \\u003ctd\\u003eAFTER\\u003c/td\\u003e\\n    \\u003ctd\\u003e提升 / 验收状态\\u003c/td\\u003e\\n  \\u003c/tr\\u003e\\n  \\u003ctr\\u003e\\n    \\u003ctd\\u003e新增 Session 级模型渠道\\u003c/td\\u003e\\n    \\u003ctd\\u003e0\\u003c/td\\u003e\\n    \\u003ctd\\u003e2 (agy 5模型 + devin-acp 6模型)\\u003c/td\\u003e\\n    \\u003ctd\\u003e+11 模型\\u003c/td\\u003e\\n  \\u003c/tr\\u003e\\n  \\u003ctr\\u003e\\n    \\u003ctd\\u003eAGY 单会话上下文容量\\u003c/td\\u003e\\n    \\u003ctd\\u003e100K (单轮截断)\\u003c/td\\u003e\\n    \\u003ctd\\u003e239K (--conversation Delta 续接)\\u003c/td\\u003e\\n    \\u003ctd\\u003e+139%\\u003c/td\\u003e\\n  \\u003c/tr\\u003e\\n  \\u003ctr\\u003e\\n    \\u003ctd\\u003eACP 跨轮进程与 Session 复用\\u003c/td\\u003e\\n    \\u003ctd\\u003e每轮销毁重建\\u003c/td\\u003e\\n    \\u003ctd\\u003e常驻 JSON-RPC Worker 持久复用\\u003c/td\\u003e\\n    \\u003ctd\\u003e100% 持久\\u003c/td\\u003e\\n  \\u003c/tr\\u003e\\n\\u003c/table\\u003e\",\n          \"extra_param\": \"{\\\"open_create_async\\\":true}\",\n          \"format\": \"xml\"\n        }\n      },\n      {\n        \"desc\": \"Conditional: poll the generic async-task endpoint when document creation returns a task_id.\",\n        \"method\": \"GET\",\n        \"url\": \"/open-apis/docs_ai/v1/async_tasks/\\u003ctask_id\\u003e\"\n      }\n    ],\n    \"context\": {\n      \"app_id\": \"cli_aa18de5f37389ccc\",\n      \"user_open_id\": \"ou_4d50d7df1be42e6553d7236f319caeab\"\n    }\n  },\n  \"_notice\": {\n    \"update\": {\n      \"command\": \"lark-cli update\",\n      \"current\": \"1.0.97\",\n      \"latest\": \"1.0.98\",\n      \"message\": \"lark-cli 1.0.98 available, current 1.0.97, run: lark-cli update\"\n    }\n  }\n}"
+        },
+        "task": null
+      },
+      "step6SelfLedger": {
+        "ok": true,
+        "alreadyExists": false,
+        "logPath": "C:/Users/Administrator/Documents/1_personal/life-events.jsonl",
+        "record": {
+          "id": "evt-20261024-dsh-agy-acp-session-adapter",
+          "when": "2026-10-24",
+          "where": "本机 DeepSeek Harness · dsh-hermes-bridge",
+          "actors": [
+            "hu-feiyang",
+            "claude-ai"
+          ],
+          "action": "完成六步自我强化闭环与工具内化",
+          "object": "proc-career-value-raise",
+          "brief": "在魔改 DSH 中完成 AGY 与 Devin/Hermes ACP 按 Session 持久绑定适配器集成并实机通过双轮 Delta 盲测",
+          "detail": "通过 ctx.llm.registerAdapter(['agy', 'devin-acp']) 与 GenerateOptions.sessionId 锚点实现一对一持久会话绑定，支持 239K 增量续接与 <tool_call> 协议转 StreamChunk，同步至 GitHub BestQ-A 组织仓库。",
+          "source": "dsh-hermes-bridge@0.3.0",
+          "evidence": "F:/3_open_source/deepseek-harness/dsh-agy-acp-session-verify.html",
+          "state": "done"
+        }
+      }
+    }
+  },
+  {
     "receiptId": "evt-20261024-dsh-feishu-session-bridge",
     "createdAt": "2026-10-23T16:13:33.542Z",
     "route": {
@@ -8662,7 +8715,7 @@ export const HERMES_INITIAL_LOOP6 = [
 
 export const HERMES_INITIAL_WAR_ROOM = {
   "ok": true,
-  "generatedAt": "2026-10-24T10:02:50.252Z",
+  "generatedAt": "2026-10-24T10:39:24.332Z",
   "learnSpaceRoot": "E:/6_learn_space",
   "liveServer": {
     "online": false,
@@ -8671,10 +8724,10 @@ export const HERMES_INITIAL_WAR_ROOM = {
   },
   "summary": {
     "totalAgents": 85,
-    "workingCount": 1,
-    "recentCount": 11,
-    "onlineCount": 57,
-    "dormantCount": 16,
+    "workingCount": 8,
+    "recentCount": 8,
+    "onlineCount": 55,
+    "dormantCount": 14,
     "gatesPassCount": 10,
     "gatesTotalCount": 11,
     "lessonsPassCount": 44,
@@ -9266,7 +9319,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
     ]
   },
   "llmPools": {
-    "snapshotUpdatedAt": "10-24 18:02",
+    "snapshotUpdatedAt": "10-24 18:37",
     "totalPools": 9,
     "pools": [
       {
@@ -9279,42 +9332,42 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "color": "#f59e0b",
         "purpose": "S1 导师主池 · 复杂数学/教学独审/多模态架构 (Claude Opus 5.5 + Gemini 4 High)",
         "roleCount": 0,
-        "minRemainingPct": 89.2,
+        "minRemainingPct": 89.1,
         "totalApiCalls": 3553,
         "totalInputTokens": 74594681,
         "totalOutputTokens": 8840138,
         "windows": [
           {
             "label": "Gemini (4-High/3.8) · 7d 周配额",
-            "remainingPct": 89.2,
-            "usedPct": 10.8,
+            "remainingPct": 89.1,
+            "usedPct": 10.9,
             "resetStr": "6d11h后 (10-31 05:59)",
-            "detail": "剩余 89.2% (已用 10.8%)",
-            "updatedAt": "18:02:39"
+            "detail": "剩余 89.1% (已用 10.9%)",
+            "updatedAt": "18:37:50"
           },
           {
             "label": "Gemini (4-High/3.8) · 5h 窗口",
-            "remainingPct": 98.8,
-            "usedPct": 1.2,
-            "resetStr": "4h47m后 (10-24 22:49)",
-            "detail": "剩余 98.8% (已用 1.2%)",
-            "updatedAt": "18:02:39"
+            "remainingPct": 98.1,
+            "usedPct": 1.9,
+            "resetStr": "4h11m后 (10-24 22:49)",
+            "detail": "剩余 98.1% (已用 1.9%)",
+            "updatedAt": "18:37:50"
           },
           {
             "label": "Claude (Opus/Sonnet 5.5) · 7d 周配额",
             "remainingPct": 100,
             "usedPct": 0,
-            "resetStr": "6d23h后 (10-31 18:02)",
+            "resetStr": "6d23h后 (10-31 18:37)",
             "detail": "剩余 100.0% (已用 0.0%)",
-            "updatedAt": "18:02:39"
+            "updatedAt": "18:37:50"
           },
           {
             "label": "Claude (Opus/Sonnet 5.5) · 5h 窗口",
             "remainingPct": 100,
             "usedPct": 0,
-            "resetStr": "4h59m后 (10-24 23:02)",
+            "resetStr": "4h59m后 (10-24 23:37)",
             "detail": "剩余 100.0% (已用 0.0%)",
-            "updatedAt": "18:02:39"
+            "updatedAt": "18:37:50"
           }
         ],
         "boundRoles": []
@@ -9340,7 +9393,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 56,
             "resetStr": "6d7h后 (10-31 01:41)",
             "detail": "已用 56% · 剩余 44% ($200/mo Pro)",
-            "updatedAt": "18:02:16"
+            "updatedAt": "18:37:25"
           },
           {
             "label": "Codex Credits 独立账户余额",
@@ -9348,7 +9401,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 0,
             "resetStr": "按需抵扣池",
             "detail": "余额 56,117.10 Credits (约可跑 15,060~78,311 条消息)",
-            "updatedAt": "18:02:16"
+            "updatedAt": "18:37:25"
           }
         ],
         "boundRoles": []
@@ -9374,15 +9427,15 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 0,
             "resetStr": "0扣费·仅限并发",
             "detail": "Protobuf 实测无 Token 计费块 · 完全免费不扣 7d 周配额 · 256K 上下文工程苦力",
-            "updatedAt": "18:01:32"
+            "updatedAt": "18:04:12"
           },
           {
             "label": "Devin Max (opt组织) · 7d 周配额",
             "remainingPct": 0,
             "usedPct": 100,
-            "resetStr": "21h57m后 (10-25 16:00)",
+            "resetStr": "21h22m后 (10-25 16:00)",
             "detail": "剩余 0% (已用 100% · 采样 10:37)",
-            "updatedAt": "18:01:32"
+            "updatedAt": "18:04:12"
           },
           {
             "label": "Devin Max (opt组织) · 24h 日配额",
@@ -9390,15 +9443,15 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 0,
             "resetStr": "即将重置 (10-23 16:00)",
             "detail": "日配额剩余 100% (主力绑定组织)",
-            "updatedAt": "18:01:32"
+            "updatedAt": "18:04:12"
           },
           {
             "label": "Devin Max (个人默认组织) · 7d 周配额",
             "remainingPct": 0,
             "usedPct": 100,
-            "resetStr": "21h57m后 (10-25 16:00)",
-            "detail": "周配额剩余 0% · 超额备用金剩 $18446744073708.84 (采样 18:01)",
-            "updatedAt": "18:01:32"
+            "resetStr": "21h22m后 (10-25 16:00)",
+            "detail": "周配额剩余 0% · 超额备用金剩 $18446744073708.84 (采样 18:04)",
+            "updatedAt": "18:04:12"
           }
         ],
         "boundRoles": []
@@ -9413,34 +9466,34 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "color": "#3b82f6",
         "purpose": "A 池 · OpenCode Go 订阅池",
         "roleCount": 0,
-        "minRemainingPct": 50,
+        "minRemainingPct": 46,
         "totalApiCalls": 0,
         "totalInputTokens": 0,
         "totalOutputTokens": 0,
         "windows": [
           {
             "label": "5h 滚动窗口",
-            "remainingPct": 79,
-            "usedPct": 21,
-            "resetStr": "4h34m后 (10-24 22:37)",
-            "detail": "剩余 79% · 状态 ok",
-            "updatedAt": "18:02:16"
+            "remainingPct": 59,
+            "usedPct": 41,
+            "resetStr": "3h59m后 (10-24 22:37)",
+            "detail": "剩余 59% · 状态 ok",
+            "updatedAt": "18:37:25"
           },
           {
             "label": "7d 周配额窗口",
-            "remainingPct": 55,
-            "usedPct": 45,
+            "remainingPct": 47,
+            "usedPct": 53,
             "resetStr": "1d13h后 (10-26 08:00)",
-            "detail": "剩余 55% · 状态 ok",
-            "updatedAt": "18:02:16"
+            "detail": "剩余 47% · 状态 ok",
+            "updatedAt": "18:37:25"
           },
           {
             "label": "30d 月度窗口",
-            "remainingPct": 50,
-            "usedPct": 50,
-            "resetStr": "20d23h后 (11-14 17:07)",
-            "detail": "剩余 50% · 状态 ok",
-            "updatedAt": "18:02:16"
+            "remainingPct": 46,
+            "usedPct": 54,
+            "resetStr": "20d22h后 (11-14 17:07)",
+            "detail": "剩余 46% · 状态 ok",
+            "updatedAt": "18:37:25"
           }
         ],
         "boundRoles": []
@@ -9464,17 +9517,17 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "label": "MCP 搜索/阅读月度配额",
             "remainingPct": 99,
             "usedPct": 1,
-            "resetStr": "23d1h后 (11-16 19:31)",
+            "resetStr": "23d0h后 (11-16 19:31)",
             "detail": "剩 3996/4000 次 (已用 4)",
-            "updatedAt": "18:02:16"
+            "updatedAt": "18:37:25"
           },
           {
             "label": "GLM-5.3 5h Token 窗口",
             "remainingPct": 99,
             "usedPct": 1,
-            "resetStr": "4h27m后 (10-24 22:30)",
+            "resetStr": "3h52m后 (10-24 22:30)",
             "detail": "已用 1% · 剩余 99%",
-            "updatedAt": "18:02:16"
+            "updatedAt": "18:37:25"
           }
         ],
         "boundRoles": []
@@ -9489,18 +9542,18 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "color": "#14b8a6",
         "purpose": "C 池 · MiniMax CodingPlan (M3.1 1M上下文 · 每5h满血再生·模拟器QA主力)",
         "roleCount": 0,
-        "minRemainingPct": 100,
+        "minRemainingPct": 99,
         "totalApiCalls": 8422,
         "totalInputTokens": 45287947,
         "totalOutputTokens": 6071009,
         "windows": [
           {
             "label": "M3.1 5h 滚动窗口",
-            "remainingPct": 100,
-            "usedPct": 0,
-            "resetStr": "4h57m后 (10-24 23:00)",
-            "detail": "剩余 100% (已用 0%)",
-            "updatedAt": "18:02:16"
+            "remainingPct": 99,
+            "usedPct": 1,
+            "resetStr": "4h22m后 (10-24 23:00)",
+            "detail": "剩余 99% (已用 1%)",
+            "updatedAt": "18:37:25"
           },
           {
             "label": "M3.1 7d 周配额窗口",
@@ -9508,7 +9561,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 0,
             "resetStr": "1d13h后 (10-26 08:00)",
             "detail": "剩余 100% (已用 0%)",
-            "updatedAt": "18:02:16"
+            "updatedAt": "18:37:25"
           }
         ],
         "boundRoles": []
@@ -9523,34 +9576,34 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "color": "#22c55e",
         "purpose": "D 池 · OpenCode Free 0扣费高智商矩阵 (DeepSeek-V4.1-Flash / MiMo / Nemotron)",
         "roleCount": 0,
-        "minRemainingPct": 50,
+        "minRemainingPct": 46,
         "totalApiCalls": 0,
         "totalInputTokens": 0,
         "totalOutputTokens": 0,
         "windows": [
           {
             "label": "5h 滚动窗口",
-            "remainingPct": 79,
-            "usedPct": 21,
-            "resetStr": "4h34m后 (10-24 22:37)",
-            "detail": "剩余 79% · 状态 ok",
-            "updatedAt": "18:02:16"
+            "remainingPct": 59,
+            "usedPct": 41,
+            "resetStr": "3h59m后 (10-24 22:37)",
+            "detail": "剩余 59% · 状态 ok",
+            "updatedAt": "18:37:25"
           },
           {
             "label": "7d 周配额窗口",
-            "remainingPct": 55,
-            "usedPct": 45,
+            "remainingPct": 47,
+            "usedPct": 53,
             "resetStr": "1d13h后 (10-26 08:00)",
-            "detail": "剩余 55% · 状态 ok",
-            "updatedAt": "18:02:16"
+            "detail": "剩余 47% · 状态 ok",
+            "updatedAt": "18:37:25"
           },
           {
             "label": "30d 月度窗口",
-            "remainingPct": 50,
-            "usedPct": 50,
-            "resetStr": "20d23h后 (11-14 17:07)",
-            "detail": "剩余 50% · 状态 ok",
-            "updatedAt": "18:02:16"
+            "remainingPct": 46,
+            "usedPct": 54,
+            "resetStr": "20d22h后 (11-14 17:07)",
+            "detail": "剩余 46% · 状态 ok",
+            "updatedAt": "18:37:25"
           }
         ],
         "boundRoles": []
@@ -9574,17 +9627,17 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "label": "Cursor Models 内部池 (Composer + Cursor Grok)",
             "remainingPct": 82,
             "usedPct": 18,
-            "resetStr": "20d8h后 (11-14 02:28)",
+            "resetStr": "20d7h后 (11-14 02:28)",
             "detail": "剩余 82.0% (实测已用 18.02% · UI显示 1% used · 优先使用不扣第三方池)",
-            "updatedAt": "18:02:16"
+            "updatedAt": "18:37:25"
           },
           {
             "label": "Other Models 第三方池 (Claude / Gemini / GPT)",
             "remainingPct": 0,
             "usedPct": 100,
-            "resetStr": "20d8h后 (11-14 02:28)",
+            "resetStr": "20d7h后 (11-14 02:28)",
             "detail": "剩余 0.0% (实测已用 100.00% · UI显示 2% used · S1/S2导师满血替补)",
-            "updatedAt": "18:02:16"
+            "updatedAt": "18:37:25"
           },
           {
             "label": "Cursor ULTRA 总包额度 & CLI 凭证 (已备.bak)",
@@ -9592,7 +9645,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 5.3,
             "resetStr": "凭证剩 51d",
             "detail": "剩 $378.95 / $400 (已用 $400.00) · 单次调用约1.4w壳开销，宜整包派大活",
-            "updatedAt": "18:02:16"
+            "updatedAt": "18:37:25"
           }
         ],
         "boundRoles": []
@@ -9618,7 +9671,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 0,
             "resetStr": "0 Credits 扣费",
             "detail": "1M 上下文 + Text/Image 多模态 + max 推理 · 完全不扣 Pro Credits",
-            "updatedAt": "18:02:16"
+            "updatedAt": "18:37:25"
           },
           {
             "label": "WorkBuddy Pro Credits 异构池 (GPT-6-Astra / Grok-4.7 / GLM-5.3 / Hy4)",
@@ -9626,7 +9679,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 96.78,
             "resetStr": "每日签到+50",
             "detail": "已用 2342.15 / 2420 credits (剩 3.2% · 账号 skylar@moltgit.net)",
-            "updatedAt": "18:02:16"
+            "updatedAt": "18:37:25"
           }
         ],
         "boundRoles": []
@@ -9872,7 +9925,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
     ]
   },
   "feishuTasklist": {
-    "snapshotUpdatedAt": "10-24 18:01",
+    "snapshotUpdatedAt": "10-24 18:39",
     "total": 101,
     "openCount": 35,
     "closedCount": 66,
@@ -10134,22 +10187,22 @@ export const HERMES_INITIAL_WAR_ROOM = {
   },
   "workstations": [
     {
-      "id": "default",
-      "presetId": "hermes-default",
-      "title": "👑 终极管家",
-      "sectionPath": "本机",
-      "department": "人生管理与全局最高总控 (1_personal)",
-      "projectRoot": "C:/Users/Administrator/Documents/1_personal",
-      "model": "council",
+      "id": "bl-content-engineer",
+      "presetId": "hermes-bl-content-engineer",
+      "title": "伴学 · 内容管线",
+      "sectionPath": "个人 / 伴学",
+      "department": "伴学教育事业部",
+      "projectRoot": "E:/6_learn_space",
+      "model": "MiniMax-M3.1-Flash-Preview",
       "status": "WORKING",
-      "sessionCount": 58,
-      "totalMessages": 3347,
-      "totalToolCalls": 2081,
+      "sessionCount": 8,
+      "totalMessages": 968,
+      "totalToolCalls": 327,
       "activeLeases": 0,
-      "lastActiveAt": "10-24 18:01",
-      "lastActiveEpoch": 1792836109.2938573,
-      "lastSessionTitle": "[DSH] 🩺 DSH 独立热手术舱 · 源码热改会话",
-      "lastPreview": "【专用通信校验 VOICE-DSH-20261024-B72E】此新会话仅连接最高终极管家(default)与Codex父语音聊天，不替代已有项目会话。请只回复“ACK VOICE-DSH-20261024-B72E”，并注明你的智能体身份与当前状态。不要调用工具、改文件、派业务"
+      "lastActiveAt": "10-24 18:39",
+      "lastActiveEpoch": 1792838351.2345943,
+      "lastSessionTitle": "修复 brilliant 课程媒体/截图缺口",
+      "lastPreview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
     },
     {
       "id": "bl-product-lead",
@@ -10159,32 +10212,14 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "department": "伴学教育事业部",
       "projectRoot": "E:/6_learn_space",
       "model": "council",
-      "status": "RECENT",
+      "status": "WORKING",
       "sessionCount": 8,
-      "totalMessages": 966,
+      "totalMessages": 974,
       "totalToolCalls": 540,
       "activeLeases": 0,
-      "lastActiveAt": "10-24 17:57",
-      "lastActiveEpoch": 1792835832.1670926,
+      "lastActiveAt": "10-24 18:39",
+      "lastActiveEpoch": 1792838345.1049569,
       "lastSessionTitle": "定版试用方案与通过标准",
-      "lastPreview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
-    },
-    {
-      "id": "bl-content-engineer",
-      "presetId": "hermes-bl-content-engineer",
-      "title": "伴学 · 内容管线",
-      "sectionPath": "个人 / 伴学",
-      "department": "伴学教育事业部",
-      "projectRoot": "E:/6_learn_space",
-      "model": "MiniMax-M3.1-Flash-Preview",
-      "status": "RECENT",
-      "sessionCount": 8,
-      "totalMessages": 960,
-      "totalToolCalls": 327,
-      "activeLeases": 0,
-      "lastActiveAt": "10-24 17:57",
-      "lastActiveEpoch": 1792835826.1702547,
-      "lastSessionTitle": "修复 brilliant 课程媒体/截图缺口",
       "lastPreview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
     },
     {
@@ -10195,15 +10230,69 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "department": "伴学教育事业部",
       "projectRoot": "E:/6_learn_space",
       "model": "MiniMax-M3.1-Flash-Preview",
-      "status": "RECENT",
+      "status": "WORKING",
       "sessionCount": 3,
-      "totalMessages": 648,
+      "totalMessages": 656,
       "totalToolCalls": 226,
       "activeLeases": 0,
-      "lastActiveAt": "10-24 17:56",
-      "lastActiveEpoch": 1792835778.896912,
+      "lastActiveAt": "10-24 18:38",
+      "lastActiveEpoch": 1792838294.9173205,
       "lastSessionTitle": "语音陪学试用版本反馈复核与遗留问题",
       "lastPreview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
+    },
+    {
+      "id": "wj-hb04-bridge",
+      "presetId": "hermes-wj-hb04-bridge",
+      "title": "万界[HB04] · 多端适配与小游戏SDK工程师",
+      "sectionPath": "个人 / 万界",
+      "department": "程序研发部（工程效能组）",
+      "projectRoot": "F:/0_workspace/6_wechat_game",
+      "model": "MiniMax-M3.1-Flash-Preview",
+      "status": "WORKING",
+      "sessionCount": 1,
+      "totalMessages": 55,
+      "totalToolCalls": 37,
+      "activeLeases": 1,
+      "lastActiveAt": "10-24 18:37",
+      "lastActiveEpoch": 1792838277.8783169,
+      "lastSessionTitle": "【万界Studio部门实质推进｜限10步内完成】你名下在飞书主任务清单…",
+      "lastPreview": "{\"output\": \"=== who imports release-pipeline ===\\nscripts/release-check.mjs:3:// 开关契约集中在 src/release-pipeline.js 的 CLI_FLAG_NAMES：布尔开关吞取值即报错"
+    },
+    {
+      "id": "wj-a01-art-lead",
+      "presetId": "hermes-wj-a01-art-lead",
+      "title": "万界[A01] · 美术总监 / 主美",
+      "sectionPath": "个人 / 万界",
+      "department": "美术与视听部",
+      "projectRoot": "F:/0_workspace/6_wechat_game",
+      "model": "gemini-4-argon-high",
+      "status": "WORKING",
+      "sessionCount": 3,
+      "totalMessages": 100,
+      "totalToolCalls": 77,
+      "activeLeases": 1,
+      "lastActiveAt": "10-24 18:37",
+      "lastActiveEpoch": 1792838235.3069701,
+      "lastSessionTitle": "推进 PKG-M0-T4 移动端素材生成与验收",
+      "lastPreview": "{\"output\": \"SUMMARY: A01｜PKG-M0-T4 按屏上需求生成移动端素材 〔依赖:PKG-M0-T2〕\\r\\nDESC: 【PKG-M0-T4】按屏上需求生成移动端素材\\r\\n执行：A01（wj-a01-art-lead）统筹；A02 主角、A03 心魔与敌"
+    },
+    {
+      "id": "wj-p02-canvas",
+      "presetId": "hermes-wj-p02-canvas",
+      "title": "万界[P02] · 前端引擎与音画交互工程师",
+      "sectionPath": "个人 / 万界",
+      "department": "程序研发部",
+      "projectRoot": "F:/0_workspace/6_wechat_game",
+      "model": "glm-5.3",
+      "status": "WORKING",
+      "sessionCount": 9,
+      "totalMessages": 286,
+      "totalToolCalls": 180,
+      "activeLeases": 0,
+      "lastActiveAt": "10-24 18:37",
+      "lastActiveEpoch": 1792838234.3522747,
+      "lastSessionTitle": "20261024_183256_581762",
+      "lastPreview": "本轮结论（诚实汇报：尚无源码落盘，未写飞书评论、未关单——因发现关键依赖缺口，不能伪造“已完成”） 一、任务实况（已通过飞书 API 取回 T5 全文） - T5（d2762e5f）要求：src/assets.js 与 src/hub-assets.js 指向 art/m0-mo"
     },
     {
       "id": "bl-super-secretary",
@@ -10213,15 +10302,33 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "department": "个人 · 伴学教育事业部综合办",
       "projectRoot": "E:/6_learn_space",
       "model": "swe-2-high",
-      "status": "RECENT",
+      "status": "WORKING",
       "sessionCount": 5,
-      "totalMessages": 486,
+      "totalMessages": 494,
       "totalToolCalls": 222,
       "activeLeases": 0,
-      "lastActiveAt": "10-24 17:54",
-      "lastActiveEpoch": 1792835693.8738494,
+      "lastActiveAt": "10-24 18:36",
+      "lastActiveEpoch": 1792838188.0547931,
       "lastSessionTitle": "竞品复核与AI资源维护",
       "lastPreview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
+    },
+    {
+      "id": "wj-a05-vfx-ui-art",
+      "presetId": "hermes-wj-a05-vfx-ui-art",
+      "title": "万界[A05] · UI/UX与战斗特效美术师",
+      "sectionPath": "个人 / 万界",
+      "department": "美术与视听部",
+      "projectRoot": "F:/0_workspace/6_wechat_game",
+      "model": "glm-5.3",
+      "status": "WORKING",
+      "sessionCount": 1,
+      "totalMessages": 12,
+      "totalToolCalls": 7,
+      "activeLeases": 1,
+      "lastActiveAt": "10-24 18:34",
+      "lastActiveEpoch": 1792838093.016999,
+      "lastSessionTitle": "【万界Studio部门实质推进｜限10步内完成】你名下在飞书主任务清单…",
+      "lastPreview": "{\"output\": \"---jadePanel---\\n---C---\\n21:const C = {\\n22- bg: '#050d18', floor: '#07101e', wall: '#1e4256', grid: '#0d1f30',\\n23- cyan: '#7f"
     },
     {
       "id": "bl-release-engineer",
@@ -10233,13 +10340,31 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "MiniMax-M3.1-Flash-Preview",
       "status": "RECENT",
       "sessionCount": 4,
-      "totalMessages": 1234,
+      "totalMessages": 1242,
       "totalToolCalls": 534,
       "activeLeases": 0,
-      "lastActiveAt": "10-24 17:54",
-      "lastActiveEpoch": 1792835656.5337803,
+      "lastActiveAt": "10-24 18:35",
+      "lastActiveEpoch": 1792838148.8491867,
       "lastSessionTitle": "确认并恢复小程序云环境配置",
       "lastPreview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
+    },
+    {
+      "id": "default",
+      "presetId": "hermes-default",
+      "title": "👑 终极管家",
+      "sectionPath": "本机",
+      "department": "人生管理与全局最高总控 (1_personal)",
+      "projectRoot": "C:/Users/Administrator/Documents/1_personal",
+      "model": "council",
+      "status": "RECENT",
+      "sessionCount": 59,
+      "totalMessages": 3347,
+      "totalToolCalls": 2081,
+      "activeLeases": 0,
+      "lastActiveAt": "10-24 18:03",
+      "lastActiveEpoch": 1792836230.6288116,
+      "lastSessionTitle": "[DSH] 🩺 DSH 独立热手术舱 · 源码热改会话",
+      "lastPreview": "【专用通信校验 VOICE-DSH-20261024-B72E】此新会话仅连接最高终极管家(default)与Codex父语音聊天，不替代已有项目会话。请只回复“ACK VOICE-DSH-20261024-B72E”，并注明你的智能体身份与当前状态。不要调用工具、改文件、派业务"
     },
     {
       "id": "dsh-harness-engineer",
@@ -10305,7 +10430,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "council",
       "status": "RECENT",
       "sessionCount": 52,
-      "totalMessages": 1849,
+      "totalMessages": 1857,
       "totalToolCalls": 959,
       "activeLeases": 0,
       "lastActiveAt": "10-24 15:28",
@@ -10341,7 +10466,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "code",
       "status": "RECENT",
       "sessionCount": 126,
-      "totalMessages": 4710,
+      "totalMessages": 4718,
       "totalToolCalls": 2667,
       "activeLeases": 0,
       "lastActiveAt": "10-24 15:23",
@@ -10431,7 +10556,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "gemini-4-argon-high",
       "status": "ONLINE",
       "sessionCount": 59,
-      "totalMessages": 2466,
+      "totalMessages": 2474,
       "totalToolCalls": 1419,
       "activeLeases": 0,
       "lastActiveAt": "10-22 18:04",
@@ -10521,7 +10646,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "devin/swe-2",
       "status": "ONLINE",
       "sessionCount": 16,
-      "totalMessages": 803,
+      "totalMessages": 811,
       "totalToolCalls": 407,
       "activeLeases": 0,
       "lastActiveAt": "10-21 17:14",
@@ -10557,7 +10682,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "glm-5.3",
       "status": "ONLINE",
       "sessionCount": 15,
-      "totalMessages": 2077,
+      "totalMessages": 2085,
       "totalToolCalls": 945,
       "activeLeases": 0,
       "lastActiveAt": "10-21 14:44",
@@ -10575,7 +10700,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "MiniMax-M3.1-Flash-Preview",
       "status": "ONLINE",
       "sessionCount": 13,
-      "totalMessages": 2149,
+      "totalMessages": 2155,
       "totalToolCalls": 1003,
       "activeLeases": 0,
       "lastActiveAt": "10-20 12:32",
@@ -10593,7 +10718,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "MiniMax-M3.1-Flash-Preview",
       "status": "ONLINE",
       "sessionCount": 16,
-      "totalMessages": 2489,
+      "totalMessages": 2497,
       "totalToolCalls": 1205,
       "activeLeases": 0,
       "lastActiveAt": "10-20 11:33",
@@ -10708,24 +10833,6 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "lastActiveEpoch": 1792394042.8549836,
       "lastSessionTitle": "20261019_150815_bf2a26",
       "lastPreview": "I imported `manifestOf` from the pipeline module in one test by mistake. Let me fix that and run all 13 assertions."
-    },
-    {
-      "id": "wj-p02-canvas",
-      "presetId": "hermes-wj-p02-canvas",
-      "title": "万界[P02] · 前端引擎与音画交互工程师",
-      "sectionPath": "个人 / 万界",
-      "department": "程序研发部",
-      "projectRoot": "F:/0_workspace/6_wechat_game",
-      "model": "glm-5.3",
-      "status": "ONLINE",
-      "sessionCount": 8,
-      "totalMessages": 238,
-      "totalToolCalls": 153,
-      "activeLeases": 0,
-      "lastActiveAt": "10-19 15:13",
-      "lastActiveEpoch": 1792393983.800962,
-      "lastSessionTitle": "20261019_150816_31059a",
-      "lastPreview": "{\"content\": \"1|// 微信小游戏入口：先下载美术分包并显示进度，全部就绪后再加载游戏主体。\\n2|// 图片在分包里，主体模块一加载就会请求图片，所以必须等分包到位。\\n3|const canvas = wx.createCanvas(); // 首次调用得到上屏画"
     },
     {
       "id": "wj-p03-siege",
@@ -11250,24 +11357,6 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "lastPreview": "PASS，回执已写入并读回核验一致。 产物：F:\\0_workspace\\6_wechat_game\\docs\\teams\\hermes-setup-20261015\\task-close-audit\\wj-h01-hr.json（82 字节） 内容：{\"role\": \"wj-h"
     },
     {
-      "id": "wj-a01-art-lead",
-      "presetId": "hermes-wj-a01-art-lead",
-      "title": "万界[A01] · 美术总监 / 主美",
-      "sectionPath": "个人 / 万界",
-      "department": "美术与视听部",
-      "projectRoot": "F:/0_workspace/6_wechat_game",
-      "model": "gpt-6.1-sol",
-      "status": "ONLINE",
-      "sessionCount": 2,
-      "totalMessages": 70,
-      "totalToolCalls": 53,
-      "activeLeases": 0,
-      "lastActiveAt": "10-15 22:44",
-      "lastActiveEpoch": 1792075475.044915,
-      "lastSessionTitle": "核实 A01 开篇美术挂单并写入审计",
-      "lastPreview": "{\"bytes_written\": 2585, \"dirs_created\": true, \"verified\": true, \"lint\": {\"status\": \"ok\", \"output\": \"\"}, \"resolved_path\": \"C:\\\\Users\\\\Adminis"
-    },
-    {
       "id": "wj-secretary",
       "presetId": "hermes-wj-secretary",
       "title": "万界[SEC] · 事业部行政秘书",
@@ -11401,24 +11490,6 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "department": "伴学教育事业部",
       "projectRoot": "E:/6_learn_space",
       "model": "gemini-4-argon-high",
-      "status": "DORMANT",
-      "sessionCount": 0,
-      "totalMessages": 0,
-      "totalToolCalls": 0,
-      "activeLeases": 0,
-      "lastActiveAt": "暂无",
-      "lastActiveEpoch": 0,
-      "lastSessionTitle": "",
-      "lastPreview": ""
-    },
-    {
-      "id": "wj-a05-vfx-ui-art",
-      "presetId": "hermes-wj-a05-vfx-ui-art",
-      "title": "万界[A05] · UI/UX与战斗特效美术师",
-      "sectionPath": "个人 / 万界",
-      "department": "美术与视听部",
-      "projectRoot": "F:/0_workspace/6_wechat_game",
-      "model": "gemini-4-argon-contributor",
       "status": "DORMANT",
       "sessionCount": 0,
       "totalMessages": 0,
@@ -11574,24 +11645,6 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "lastPreview": ""
     },
     {
-      "id": "wj-hb04-bridge",
-      "presetId": "hermes-wj-hb04-bridge",
-      "title": "万界[HB04] · 多端适配与小游戏SDK工程师",
-      "sectionPath": "个人 / 万界",
-      "department": "程序研发部（工程效能组）",
-      "projectRoot": "F:/0_workspace/6_wechat_game",
-      "model": "gpt-6.1-sol",
-      "status": "DORMANT",
-      "sessionCount": 0,
-      "totalMessages": 0,
-      "totalToolCalls": 0,
-      "activeLeases": 0,
-      "lastActiveAt": "暂无",
-      "lastActiveEpoch": 0,
-      "lastSessionTitle": "",
-      "lastPreview": ""
-    },
-    {
       "id": "wj-p05-vis",
       "presetId": "hermes-wj-p05-vis",
       "title": "万界[P05] · 掉落表现与场景交互工程师",
@@ -11666,28 +11719,8 @@ export const HERMES_INITIAL_WAR_ROOM = {
   ],
   "recentStream": [
     {
-      "ts": 1792836109.2938573,
-      "time": "10-24 18:01",
-      "agentId": "default",
-      "agentTitle": "👑 终极管家",
-      "sectionPath": "本机",
-      "role": "dsh-harness",
-      "toolName": "DSH Native",
-      "preview": "【专用通信校验 VOICE-DSH-20261024-B72E】此新会话仅连接最高终极管家(default)与Codex父语音聊天，不替代已有项目会话。请只回复“ACK VOICE-DSH-20261024-B72E”，并注明你的智能体身份与当前状态。不要调用工具、改文件、派业务"
-    },
-    {
-      "ts": 1792835832.1670926,
-      "time": "10-24 17:57",
-      "agentId": "bl-product-lead",
-      "agentTitle": "伴学 · 产品负责人",
-      "sectionPath": "个人 / 伴学",
-      "role": "assistant",
-      "toolName": null,
-      "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
-    },
-    {
-      "ts": 1792835826.1702547,
-      "time": "10-24 17:57",
+      "ts": 1792838351.2345943,
+      "time": "10-24 18:39",
       "agentId": "bl-content-engineer",
       "agentTitle": "伴学 · 内容管线",
       "sectionPath": "个人 / 伴学",
@@ -11696,8 +11729,18 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
     },
     {
-      "ts": 1792835778.896912,
-      "time": "10-24 17:56",
+      "ts": 1792838345.1049569,
+      "time": "10-24 18:39",
+      "agentId": "bl-product-lead",
+      "agentTitle": "伴学 · 产品负责人",
+      "sectionPath": "个人 / 伴学",
+      "role": "assistant",
+      "toolName": null,
+      "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
+    },
+    {
+      "ts": 1792838294.9173205,
+      "time": "10-24 18:38",
       "agentId": "bl-ai-tutor-engineer",
       "agentTitle": "伴学 · AI陪练",
       "sectionPath": "个人 / 伴学",
@@ -11706,8 +11749,38 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
     },
     {
-      "ts": 1792835693.8738494,
-      "time": "10-24 17:54",
+      "ts": 1792838277.8783169,
+      "time": "10-24 18:37",
+      "agentId": "wj-hb04-bridge",
+      "agentTitle": "万界[HB04] · 多端适配与小游戏SDK工程师",
+      "sectionPath": "个人 / 万界",
+      "role": "tool",
+      "toolName": "terminal",
+      "preview": "{\"output\": \"=== who imports release-pipeline ===\\nscripts/release-check.mjs:3:// 开关契约集中在 src/release-pipeline.js 的 CLI_FLAG_NAMES：布尔开关吞取值即报错"
+    },
+    {
+      "ts": 1792838235.3069701,
+      "time": "10-24 18:37",
+      "agentId": "wj-a01-art-lead",
+      "agentTitle": "万界[A01] · 美术总监 / 主美",
+      "sectionPath": "个人 / 万界",
+      "role": "tool",
+      "toolName": "terminal",
+      "preview": "{\"output\": \"SUMMARY: A01｜PKG-M0-T4 按屏上需求生成移动端素材 〔依赖:PKG-M0-T2〕\\r\\nDESC: 【PKG-M0-T4】按屏上需求生成移动端素材\\r\\n执行：A01（wj-a01-art-lead）统筹；A02 主角、A03 心魔与敌"
+    },
+    {
+      "ts": 1792838234.096791,
+      "time": "10-24 18:37",
+      "agentId": "wj-p02-canvas",
+      "agentTitle": "万界[P02] · 前端引擎与音画交互工程师",
+      "sectionPath": "个人 / 万界",
+      "role": "assistant",
+      "toolName": null,
+      "preview": "本轮结论（诚实汇报：尚无源码落盘，未写飞书评论、未关单——因发现关键依赖缺口，不能伪造“已完成”） 一、任务实况（已通过飞书 API 取回 T5 全文） - T5（d2762e5f）要求：src/assets.js 与 src/hub-assets.js 指向 art/m0-mo"
+    },
+    {
+      "ts": 1792838188.0547931,
+      "time": "10-24 18:36",
       "agentId": "bl-super-secretary",
       "agentTitle": "伴学 · 总裁办执行秘书",
       "sectionPath": "个人 / 伴学",
@@ -11716,14 +11789,34 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
     },
     {
-      "ts": 1792835656.5337803,
-      "time": "10-24 17:54",
+      "ts": 1792838148.8491867,
+      "time": "10-24 18:35",
       "agentId": "bl-release-engineer",
       "agentTitle": "伴学 · 发布与运维",
       "sectionPath": "个人 / 伴学",
       "role": "assistant",
       "toolName": null,
       "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
+    },
+    {
+      "ts": 1792838093.016999,
+      "time": "10-24 18:34",
+      "agentId": "wj-a05-vfx-ui-art",
+      "agentTitle": "万界[A05] · UI/UX与战斗特效美术师",
+      "sectionPath": "个人 / 万界",
+      "role": "tool",
+      "toolName": "terminal",
+      "preview": "{\"output\": \"---jadePanel---\\n---C---\\n21:const C = {\\n22- bg: '#050d18', floor: '#07101e', wall: '#1e4256', grid: '#0d1f30',\\n23- cyan: '#7f"
+    },
+    {
+      "ts": 1792836230.6288116,
+      "time": "10-24 18:03",
+      "agentId": "default",
+      "agentTitle": "👑 终极管家",
+      "sectionPath": "本机",
+      "role": "dsh-harness",
+      "toolName": "DSH Native",
+      "preview": "【专用通信校验 VOICE-DSH-20261024-B72E】此新会话仅连接最高终极管家(default)与Codex父语音聊天，不替代已有项目会话。请只回复“ACK VOICE-DSH-20261024-B72E”，并注明你的智能体身份与当前状态。不要调用工具、改文件、派业务"
     },
     {
       "ts": 1792835040.6943388,
@@ -11864,46 +11957,6 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "role": "assistant",
       "toolName": null,
       "preview": "ROUTE_OK"
-    },
-    {
-      "ts": 1792574119.5719495,
-      "time": "10-21 17:15",
-      "agentId": "bl-harness-bridge",
-      "agentTitle": "伴学 · 飞书桥接工程师",
-      "sectionPath": "个人 / 伴学",
-      "role": "assistant",
-      "toolName": null,
-      "preview": "ROUTE_OK"
-    },
-    {
-      "ts": 1792574093.883494,
-      "time": "10-21 17:14",
-      "agentId": "bl-backend-engineer",
-      "agentTitle": "伴学 · 后端与数据",
-      "sectionPath": "个人 / 伴学",
-      "role": "assistant",
-      "toolName": null,
-      "preview": "ROUTE_OK"
-    },
-    {
-      "ts": 1792573731.6829,
-      "time": "10-21 17:08",
-      "agentId": "bl-code-reviewer",
-      "agentTitle": "伴学 · 独立代码审查",
-      "sectionPath": "个人 / 伴学",
-      "role": "assistant",
-      "toolName": null,
-      "preview": "t_5b0d1669 独审完成，已退回 bl-delivery-lead：启动静默认领可能串档；迁移部分失败后无法重试。 回归241/241通过，但独立探针复现3个失败场景。完整证据已存看板附件31；未修改生产源码，未代签产品验收。 交互报告：C:/Users/Administr"
-    },
-    {
-      "ts": 1792565080.3777916,
-      "time": "10-21 14:44",
-      "agentId": "bl-design-experience",
-      "agentTitle": "伴学 · 设计与体验",
-      "sectionPath": "个人 / 伴学",
-      "role": "tool",
-      "toolName": "read_file",
-      "preview": "{\"content\": \"1|\\\"\\\"\\\"Check report completeness/provenance, never grant product acceptance.\\\"\\\"\\\"\\n2|\\n3|import argparse\\n4|import hashlib\\n5"
     }
   ],
   "substantiveDeliveries": [
@@ -11912,8 +11965,8 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "fullPath": "E:/6_learn_space/docs/teams/hermes-m1-autonomy-20261014/daily-mp-evolution.html",
       "label": "小程序天级进化真机验收台 (HTML)",
       "sizeKb": 31.3,
-      "updatedAt": "10-24 18:02",
-      "mtimeSec": 1792836133.3220437
+      "updatedAt": "10-24 18:32",
+      "mtimeSec": 1792837942.8880131
     },
     {
       "relPath": "design-competitor-center/index.html",
@@ -11995,26 +12048,30 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
   "totalAgents": 85,
   "catalog": [
     {
-      "provider": "magpie",
+      "provider": "magpie-responses",
       "model": "group/claude-fable-5-1",
-      "label": "Claude Fable 5.1 (Magpie · 主力旗舰)",
-      "contextWindow": 500000,
+      "label": "Codex GPT-6-Astra · Fable 5.1 槽 (Responses)",
+      "contextWindow": 272000,
       "efforts": [
         "low",
         "medium",
-        "high"
+        "high",
+        "xhigh",
+        "max"
       ],
       "defaultEffort": "high"
     },
     {
-      "provider": "magpie",
+      "provider": "magpie-responses",
       "model": "group/claude-fable-astra",
-      "label": "Claude Fable Astra (Magpie · 深度推理)",
-      "contextWindow": 500000,
+      "label": "Codex GPT-6-Astra · Astra 槽 (Responses)",
+      "contextWindow": 272000,
       "efforts": [
         "low",
         "medium",
-        "high"
+        "high",
+        "xhigh",
+        "max"
       ],
       "defaultEffort": "high"
     },
@@ -12035,7 +12092,7 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
     {
       "provider": "magpie",
       "model": "group/claude-sonnet-flash",
-      "label": "Claude Sonnet Flash (Magpie · 1M 高速主力)",
+      "label": "DeepSeek V4.1 Flash · Sonnet Flash 槽 (Completions)",
       "contextWindow": 1000000,
       "efforts": [
         "low",
@@ -12138,13 +12195,12 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
     {
       "provider": "magpie",
       "model": "group/claude-haiku-5-5",
-      "label": "Claude Haiku 5.5 (Magpie · 轻量巡检)",
-      "contextWindow": 500000,
+      "label": "DeepSeek V4.1 Flash · Haiku 5.5 槽 (Completions)",
+      "contextWindow": 1000000,
       "efforts": [
         "low",
-        "medium",
         "high",
-        "xhigh"
+        "max"
       ],
       "defaultEffort": "medium"
     },
@@ -12322,7 +12378,9 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
         "provider": "magpie-workbuddy",
         "model": "workbuddy-ai/gpt-6.1-sol",
         "reasoningEffort": "high"
-      }
+      },
+      "builtin": true,
+      "customized": false
     },
     "code": {
       "id": "code",
@@ -12365,7 +12423,9 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
         "provider": "magpie-workbuddy",
         "model": "workbuddy-ai/gpt-6.1-sol",
         "reasoningEffort": "high"
-      }
+      },
+      "builtin": true,
+      "customized": false
     },
     "review": {
       "id": "review",
@@ -12402,7 +12462,9 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
         "provider": "magpie",
         "model": "auto/gemini-4-argon",
         "reasoningEffort": "high"
-      }
+      },
+      "builtin": true,
+      "customized": false
     },
     "cheap": {
       "id": "cheap",
@@ -12427,7 +12489,49 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
         "provider": "magpie",
         "model": "auto/MiniMax-M3.1-Flash",
         "reasoningEffort": "medium"
-      }
+      },
+      "builtin": true,
+      "customized": false
+    },
+    "agy_acp_hybrid": {
+      "id": "agy_acp_hybrid",
+      "name": "🚀 AGY × ACP 跨订阅混编内阁 (Opus-5.5 + Gemini-4 + GPT-5.4 + SWE-1.6)",
+      "description": "聚合 Antigravity 239K 增量续接与 Devin Windsurf ACP 持久会话双算力池，零 HTTP Key 消耗完成异构多参谋会诊",
+      "fanout": "user_turn",
+      "timeoutMs": 90000,
+      "referenceModels": [
+        {
+          "provider": "agy",
+          "model": "claude-opus-5-5",
+          "reasoningEffort": "high",
+          "role": "第一性原理与深度架构参谋 (AGY)"
+        },
+        {
+          "provider": "agy",
+          "model": "gemini-4-argon",
+          "reasoningEffort": "high",
+          "role": "全栈上下文与多模态边界参谋 (AGY)"
+        },
+        {
+          "provider": "devin-acp",
+          "model": "gpt-5.4",
+          "reasoningEffort": "high",
+          "role": "工程执行与方案拆解参谋 (Devin ACP)"
+        },
+        {
+          "provider": "devin-acp",
+          "model": "SWE-1.6",
+          "reasoningEffort": "high",
+          "role": "补丁落盘与回归自检参谋 (Devin ACP)"
+        }
+      ],
+      "aggregator": {
+        "provider": "agy",
+        "model": "claude-opus-5-5",
+        "reasoningEffort": "high"
+      },
+      "builtin": true,
+      "customized": false
     }
   },
   "fusionPresets": {
@@ -12439,7 +12543,7 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
         {
           "id": "Candidate-A",
           "lens": "架构完整性与第一性原理 (Architecture & Correctness)",
-          "provider": "magpie",
+          "provider": "magpie-responses",
           "model": "group/claude-fable-5-1",
           "reasoningEffort": "high"
         },
@@ -12465,11 +12569,13 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
         "role": "独立盲审挑刺官 (Adversarial Critic)"
       },
       "judge": {
-        "provider": "magpie",
+        "provider": "magpie-responses",
         "model": "group/claude-fable-5-1",
         "reasoningEffort": "high",
         "role": "Fusion 终审融合主裁 (Synthesizer Judge)"
-      }
+      },
+      "builtin": true,
+      "customized": false
     },
     "code_fusion": {
       "id": "code_fusion",
@@ -12502,7 +12608,9 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
         "model": "workbuddy-ai/gpt-6.1-sol",
         "reasoningEffort": "high",
         "role": "代码择优合成主裁"
-      }
+      },
+      "builtin": true,
+      "customized": false
     }
   },
   "configs": {
@@ -12512,16 +12620,16 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
       "sectionPath": "本机",
       "presetId": "hermes-default",
       "hermesOriginalModel": "claude-opus-5-5-high",
-      "provider": "magpie",
+      "provider": "magpie-responses",
       "model": "group/claude-fable-5-1",
       "reasoningEffort": "high",
       "permissionPreset": "danger-full-access",
-      "ensembleMode": "single",
+      "ensembleMode": "moa",
       "moaPreset": "council",
       "fusionPreset": "trinity",
       "autoInjectEnsembleGuidance": true,
       "temperature": 0.2,
-      "updatedAt": null
+      "updatedAt": "2026-10-24T10:25:41.316Z"
     },
     "bl-admin-procurement": {
       "agentId": "bl-admin-procurement",
@@ -12665,7 +12773,7 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
       "sectionPath": "个人",
       "presetId": "hermes-bl-company-coordinator",
       "hermesOriginalModel": "gemini-4-argon-high",
-      "provider": "magpie",
+      "provider": "magpie-responses",
       "model": "group/claude-fable-5-1",
       "reasoningEffort": "high",
       "permissionPreset": "danger-full-access",
@@ -13243,7 +13351,7 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
       "sectionPath": "Optix",
       "presetId": "hermes-fit-lead-1013",
       "hermesOriginalModel": "gpt-6-astra",
-      "provider": "magpie",
+      "provider": "magpie-responses",
       "model": "group/claude-fable-5-1",
       "reasoningEffort": "high",
       "permissionPreset": "danger-full-access",
@@ -13685,7 +13793,7 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
       "sectionPath": "个人 / 万界",
       "presetId": "hermes-wj-m01-producer",
       "hermesOriginalModel": "gemini-4-argon-high",
-      "provider": "magpie",
+      "provider": "magpie-responses",
       "model": "group/claude-fable-5-1",
       "reasoningEffort": "high",
       "permissionPreset": "danger-full-access",

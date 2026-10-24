@@ -842,10 +842,20 @@ export function HermesSidebarOrgTree({
     }
   }, [])
 
-  useEffect(() => {
+  const refreshSidebarOrgAndConfigs = useCallback(() => {
     void callHermesBridgeApi({ op: 'orgTree' }).then((res) => {
       if (res?.ok && res.tree?.roots) {
-        setTreeData(res.tree as HermesOrgTreeData)
+        setTreeData((prev) => {
+          const next = res.tree as HermesOrgTreeData
+          if (
+            prev.totalAgents === next.totalAgents
+            && prev.updatedAt === next.updatedAt
+            && prev.generatedAt === next.generatedAt
+          ) {
+            return prev
+          }
+          return next
+        })
       }
     })
     void callHermesBridgeApi({ op: 'agentConfigs' }).then((res) => {
@@ -853,6 +863,10 @@ export function HermesSidebarOrgTree({
         setAgentConfigsData(res)
       }
     })
+  }, [])
+
+  useEffect(() => {
+    refreshSidebarOrgAndConfigs()
     void callHermesBridgeApi({ op: 'surgeryPodStatus' }).then((res) => {
       if (res?.ok) {
         setSurgeryStatus(res)
@@ -865,7 +879,28 @@ export function HermesSidebarOrgTree({
       void callHermesBridgeApi({ op: 'gatewayStart', profile: 'company', eventKey: 'im.message.receive_v1', autoDispatch: true, dryRun: false })
     }
     void callHermesBridgeApi({ op: 'warRoomStartServer' })
-  }, [])
+
+    if (typeof window === 'undefined') return
+    const onFocusOrVisible = () => {
+      if (typeof document === 'undefined' || document.visibilityState === 'visible') {
+        refreshSidebarOrgAndConfigs()
+      }
+    }
+    window.addEventListener('focus', onFocusOrVisible)
+    window.addEventListener('dsh-hermes-org-updated', refreshSidebarOrgAndConfigs)
+    document.addEventListener('visibilitychange', onFocusOrVisible)
+    const timer = window.setInterval(() => {
+      if (typeof document === 'undefined' || document.visibilityState === 'visible') {
+        refreshSidebarOrgAndConfigs()
+      }
+    }, 12_000)
+    return () => {
+      window.removeEventListener('focus', onFocusOrVisible)
+      window.removeEventListener('dsh-hermes-org-updated', refreshSidebarOrgAndConfigs)
+      document.removeEventListener('visibilitychange', onFocusOrVisible)
+      window.clearInterval(timer)
+    }
+  }, [refreshSidebarOrgAndConfigs])
 
   const allAgents = useMemo(() => {
     const list: HermesAgentNode[] = []
@@ -1873,11 +1908,20 @@ export function HermesCommandCenterPage({
         setActiveTab(tab)
       }
     }
+    const onSelectAgentEvt = (e: Event) => {
+      const id = (e as CustomEvent<{ agentId?: string }>).detail?.agentId
+      if (id) {
+        const found = findAgentById(id)
+        if (found) setSelectedAgent(found)
+      }
+    }
     window.addEventListener('dsh-hermes-open-tab', onOpenTab)
+    window.addEventListener('dsh-hermes-select-agent', onSelectAgentEvt)
     return () => {
       window.removeEventListener('dsh-hermes-open-tab', onOpenTab)
+      window.removeEventListener('dsh-hermes-select-agent', onSelectAgentEvt)
     }
-  }, [])
+  }, [findAgentById])
 
   const currentAgentCfg = useMemo(() => {
     return agentConfigsState?.configs?.[selectedAgent.id] ?? {
@@ -1891,6 +1935,145 @@ export function HermesCommandCenterPage({
       fusionPreset: 'trinity',
     }
   }, [agentConfigsState, selectedAgent.id])
+
+  const [recipeStudioTab, setRecipeStudioTab] = useState<'moa' | 'fusion'>('moa')
+  const [moaDraft, setMoaDraft] = useState<Record<string, any>>(() => {
+    const p = HERMES_INITIAL_AGENT_CONFIGS?.moaPresets?.council ?? {
+      id: 'council',
+      name: '🏛️ Council 战略内阁 (Hermes 默认 MoA)',
+      description: '4 路异构参谋并行献策，由主帅汇总成高密度行动指南',
+      fanout: 'user_turn',
+      timeoutMs: 60000,
+      referenceModels: [],
+      aggregator: { provider: 'magpie-workbuddy', model: 'workbuddy-ai/gpt-6.1-sol', reasoningEffort: 'high' },
+    }
+    return structuredClone(p)
+  })
+  const [moaDirty, setMoaDirty] = useState(false)
+  const [newMoaPresetId, setNewMoaPresetId] = useState('')
+  const [showNewMoaInput, setShowNewMoaInput] = useState(false)
+
+  const [fusionDraft, setFusionDraft] = useState<Record<string, any>>(() => {
+    const p = HERMES_INITIAL_AGENT_CONFIGS?.fusionPresets?.trinity ?? {
+      id: 'trinity',
+      name: '🔥 Devin Fusion · 三路主创对抗融合',
+      description: 'Stage 1 三路独立候选 -> Stage 2 交叉盲审挑刺 -> Stage 3 主裁择优合成',
+      candidates: [],
+      critic: { provider: 'magpie-workbuddy', model: 'workbuddy-ai/grok-4.7', reasoningEffort: 'high' },
+      judge: { provider: 'magpie', model: 'group/claude-fable-5-1', reasoningEffort: 'high' },
+    }
+    return structuredClone(p)
+  })
+  const [fusionDirty, setFusionDirty] = useState(false)
+
+  const activeMoaPresetId = String(currentAgentCfg.moaPreset || 'council')
+  const activeFusionPresetId = String(currentAgentCfg.fusionPreset || 'trinity')
+
+  useEffect(() => {
+    const src = agentConfigsState?.moaPresets?.[activeMoaPresetId] ?? agentConfigsState?.moaPresets?.council
+    if (src) {
+      setMoaDraft(structuredClone(src))
+      setMoaDirty(false)
+    }
+  }, [activeMoaPresetId, agentConfigsState?.moaPresets])
+
+  useEffect(() => {
+    const src = agentConfigsState?.fusionPresets?.[activeFusionPresetId] ?? agentConfigsState?.fusionPresets?.trinity
+    if (src) {
+      setFusionDraft(structuredClone(src))
+      setFusionDirty(false)
+    }
+  }, [activeFusionPresetId, agentConfigsState?.fusionPresets])
+
+  const catalogByChannel = useMemo(() => {
+    const rawCatalog = (agentConfigsState?.catalog ?? []) as Array<{
+      provider: string
+      model: string
+      label: string
+    }>
+    const groups: Array<{ provider: string; title: string; items: Array<{ provider: string; model: string; label: string }> }> = [
+      { provider: 'agy', title: '🚀 AGY · Antigravity 按Session增量续接 (239K)', items: [] },
+      { provider: 'devin-acp', title: '🛡️ Devin ACP · 按Session持久JSON-RPC (200K)', items: [] },
+      { provider: 'magpie', title: '🏢 Magpie 内部旗舰网关', items: [] },
+      { provider: 'magpie-workbuddy', title: '🌐 WorkBuddy AI (国际版) / Magpie', items: [] },
+    ]
+    for (const item of rawCatalog) {
+      let g = groups.find(x => x.provider === item.provider)
+      if (!g) {
+        g = { provider: item.provider, title: item.provider, items: [] }
+        groups.push(g)
+      }
+      g.items.push(item)
+    }
+    return groups.filter(g => g.items.length > 0)
+  }, [agentConfigsState?.catalog])
+
+  const handleSaveMoaPresetDraft = async (customNewId?: string) => {
+    const targetId = (customNewId ?? String(moaDraft.id || activeMoaPresetId)).trim().replace(/[^a-zA-Z0-9_-]/g, '_')
+    if (!targetId) return
+    const payload = {
+      ...moaDraft,
+      id: targetId,
+      name: customNewId && !String(moaDraft.name).includes(targetId)
+        ? `${String(moaDraft.name)} (${targetId})`
+        : moaDraft.name,
+    }
+    const res = await callHermesBridgeApi({
+      op: 'saveMoaPreset',
+      ...payload,
+    })
+    if (res?.ok && res.state) {
+      setAgentConfigsState(res.state)
+      setMoaDirty(false)
+      setShowNewMoaInput(false)
+      setNewMoaPresetId('')
+      if (customNewId) {
+        await handleUpdateSelectedAgentCfg({ ensembleMode: 'moa', moaPreset: targetId })
+      }
+      setBanner(`✓ 已持久化保存 MoA 配方「${String(res.preset?.name ?? targetId)}」（共 ${String(res.preset?.referenceModels?.length ?? 0)} 路参谋 + 聚合主帅 ${String(res.preset?.aggregator?.model ?? '')}）`)
+    } else {
+      setBanner(`保存 MoA 配方失败: ${String(res?.error ?? '未知错误')}`)
+    }
+  }
+
+  const handleResetMoaPresetDraft = async () => {
+    const res = await callHermesBridgeApi({
+      op: 'resetMoaPreset',
+      presetId: activeMoaPresetId,
+    })
+    if (res?.ok && res.state) {
+      setAgentConfigsState(res.state)
+      setMoaDirty(false)
+      setBanner(`✓ 已将 MoA 配方「${activeMoaPresetId}」恢复为系统默认设置`)
+    }
+  }
+
+  const handleSaveFusionPresetDraft = async () => {
+    const res = await callHermesBridgeApi({
+      op: 'saveFusionPreset',
+      ...fusionDraft,
+      id: activeFusionPresetId,
+    })
+    if (res?.ok && res.state) {
+      setAgentConfigsState(res.state)
+      setFusionDirty(false)
+      setBanner(`✓ 已持久化保存 Devin Fusion 配方「${String(res.preset?.name ?? activeFusionPresetId)}」`)
+    } else {
+      setBanner(`保存 Fusion 配方失败: ${String(res?.error ?? '未知错误')}`)
+    }
+  }
+
+  const handleResetFusionPresetDraft = async () => {
+    const res = await callHermesBridgeApi({
+      op: 'resetFusionPreset',
+      presetId: activeFusionPresetId,
+    })
+    if (res?.ok && res.state) {
+      setAgentConfigsState(res.state)
+      setFusionDirty(false)
+      setBanner(`✓ 已将 Devin Fusion 配方「${activeFusionPresetId}」恢复为系统默认设置`)
+    }
+  }
 
   const handleUpdateSelectedAgentCfg = async (patch: Record<string, unknown>) => {
     const persisted = readPersistedAgentSessionMap()
@@ -1923,6 +2106,11 @@ export function HermesCommandCenterPage({
     const text = ensemblePrompt.trim()
     if (!text || ensembleRunning) return
     setEnsembleRunning(true)
+    if (mode === 'moa' && moaDirty) {
+      await handleSaveMoaPresetDraft()
+    } else if (mode === 'fusion' && fusionDirty) {
+      await handleSaveFusionPresetDraft()
+    }
     const persisted = readPersistedAgentSessionMap()
     const targetSessionId = injectToSession
       ? (persisted[selectedAgent.id] ?? persisted[`hermes-${selectedAgent.id}`] ?? '')
@@ -1937,6 +2125,13 @@ export function HermesCommandCenterPage({
         op: mode === 'moa' ? 'runMoA' : 'runFusion',
         prompt: text,
         preset: mode === 'moa' ? (currentAgentCfg.moaPreset || 'council') : (currentAgentCfg.fusionPreset || 'trinity'),
+        ...(mode === 'moa'
+          ? {
+              customReferences: moaDraft?.referenceModels,
+              customAggregator: moaDraft?.aggregator,
+              timeoutMs: Number(moaDraft?.timeoutMs) || 60000,
+            }
+          : {}),
         agentId: selectedAgent.id,
         injectToSessionId: targetSessionId,
       })
@@ -2617,45 +2812,90 @@ export function HermesCommandCenterPage({
         )}
 
         {activeTab === 'ensemble' && (
-          <div className={modelCss.ensembleLayout}>
-            {/* Left column: 83 Agents Selector */}
-            <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 760, overflow: 'hidden' }}>
-              <div style={{ fontWeight: 700, fontSize: 13.5 }}>
-                🤖 选择要配置参数的智能体 ({treeData.totalAgents} 岗)
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {/* Top Compact Agent Switcher Bar (synced with Left Sidebar, freeing 100% width for MoA Recipe Studio) */}
+            <div
+              style={{
+                ...cardStyle,
+                padding: '10px 14px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: 10,
+                background: 'linear-gradient(90deg, rgba(139,92,246,0.08), rgba(2,132,199,0.06))',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <span style={{ fontWeight: 800, fontSize: 12.5, color: '#8b5cf6' }}>
+                  🎖️ 当前配置战将 (与左栏实时联动):
+                </span>
+                <select
+                  value={selectedAgent.id}
+                  onChange={(e) => {
+                    const found = findAgentById(e.target.value)
+                    if (found) {
+                      setSelectedAgent(found)
+                      broadcastSelectedAgentToRightPanel(found)
+                    }
+                  }}
+                  style={{
+                    padding: '5px 10px',
+                    borderRadius: 7,
+                    border: '1.5px solid rgba(139,92,246,0.45)',
+                    background: 'var(--dsw-alias-bg-base)',
+                    color: 'var(--dsw-alias-label-primary)',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    minWidth: 260,
+                  }}
+                >
+                  {allOrgAgents.map(a => (
+                    <option key={a.id} value={a.id}>
+                      [{a.callsign || a.id}] {cleanAgentDisplayTitle(a)} ({a.sectionPath})
+                    </option>
+                  ))}
+                </select>
+                {[
+                  { id: 'default', label: '👑 终极管家' },
+                  { id: 'bl-company-coordinator', label: '🎓 伴学&万界总控' },
+                  { id: 'fit-lead-1013', label: '🏛️ Optix 负责人' },
+                  { id: 'wj-m01-producer', label: '🎮 万界制作人' },
+                ].map((quick) => {
+                  const isSel = selectedAgent.id === quick.id
+                  return (
+                    <button
+                      key={quick.id}
+                      type="button"
+                      onClick={() => {
+                        const found = findAgentById(quick.id)
+                        if (found) {
+                          setSelectedAgent(found)
+                          broadcastSelectedAgentToRightPanel(found)
+                        }
+                      }}
+                      style={{
+                        padding: '4px 9px',
+                        borderRadius: 6,
+                        border: isSel ? '1.5px solid #8b5cf6' : '1px solid rgba(148,163,184,0.32)',
+                        background: isSel ? 'rgba(139,92,246,0.18)' : 'transparent',
+                        color: 'var(--dsw-alias-label-primary)',
+                        fontSize: 11,
+                        fontWeight: isSel ? 700 : 500,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {quick.label}
+                    </button>
+                  )
+                })}
               </div>
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => { setQuery(e.target.value) }}
-                placeholder="筛选岗位 (如: 终极管家 / 伴学 / 万界 / Optix)…"
-                style={{
-                  width: '100%',
-                  boxSizing: 'border-box',
-                  padding: '6px 10px',
-                  borderRadius: 7,
-                  border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.3))',
-                  background: 'transparent',
-                  color: 'var(--dsw-alias-label-primary)',
-                  fontSize: 12,
-                }}
-              />
-              <div style={{ flex: 1, overflowY: 'auto', paddingRight: 4 }}>
-                {treeData.roots.map(rootNode => (
-                  <SidebarZoneBranch
-                    key={rootNode.id}
-                    node={rootNode}
-                    depth={0}
-                    query={query}
-                    selectedAgentId={selectedAgent.id}
-                    activeSessionByAgentId={new Map()}
-                    onSelectAgent={setSelectedAgent}
-                    onStartAgentSession={(agent, forceNew) => { startAgentSession(agent, undefined, forceNew) }}
-                  />
-                ))}
-              </div>
+              <span style={{ fontSize: 11, color: 'var(--dsw-alias-label-secondary)' }}>
+                💡 点击左侧边栏任意战将也会自动同步切换此处配置目标
+              </span>
             </div>
 
-            {/* Right column: Parameter Configurator + Hermes MoA & Devin Fusion Workbench */}
+            {/* Full-width Parameter Configurator + Interactive Hermes MoA & Devin Fusion Recipe Studio */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {/* Card 1: Per-Agent Model / Reasoning Effort / Ensemble Mode Configurator */}
               <div style={cardStyle}>
@@ -2786,162 +3026,839 @@ export function HermesCommandCenterPage({
                 </div>
               </div>
 
-              {/* Card 2: Hermes MoA vs Devin Fusion Architecture & Live Workbench */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                {/* Hermes MoA Box */}
-                <div
-                  style={{
-                    ...cardStyle,
-                    border: currentAgentCfg.ensembleMode === 'moa' ? '1.5px solid #8b5cf6' : cardStyle.border,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 8,
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: 14.5, fontWeight: 700, color: '#8b5cf6' }}>
-                      🐝 Hermes MoA (Mixture of Agents · 多参谋献策模式)
-                    </span>
-                    <select
-                      value={String(currentAgentCfg.moaPreset || 'council')}
-                      onChange={(e) => {
-                        void handleUpdateSelectedAgentCfg({ ensembleMode: 'moa', moaPreset: e.target.value })
-                      }}
+              {/* Card 2: Interactive Hermes MoA & Devin Fusion Recipe Settings Studio */}
+              <div
+                style={{
+                  ...cardStyle,
+                  border: recipeStudioTab === 'moa'
+                    ? '1.5px solid rgba(139,92,246,0.55)'
+                    : '1.5px solid rgba(239,68,68,0.55)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 12,
+                }}
+              >
+                {/* Studio Top Bar: Mode Switcher + Preset Selector + Save/Clone/Reset Actions */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, paddingBottom: 8, borderBottom: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.22))' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      onClick={() => { setRecipeStudioTab('moa') }}
                       style={{
-                        padding: '4px 8px',
+                        padding: '6px 12px',
+                        borderRadius: 8,
+                        border: recipeStudioTab === 'moa' ? '1.5px solid #8b5cf6' : '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.3))',
+                        background: recipeStudioTab === 'moa' ? 'rgba(139,92,246,0.16)' : 'transparent',
+                        color: recipeStudioTab === 'moa' ? '#8b5cf6' : 'var(--dsw-alias-label-primary)',
+                        fontWeight: 800,
+                        fontSize: 13,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      🐝 Hermes MoA 配方设置工作台 ({((moaDraft?.referenceModels ?? []) as any[]).filter(s => s?.enabled !== false).length} 参谋 + 1 主帅)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setRecipeStudioTab('fusion') }}
+                      style={{
+                        padding: '6px 12px',
+                        borderRadius: 8,
+                        border: recipeStudioTab === 'fusion' ? '1.5px solid #ef4444' : '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.3))',
+                        background: recipeStudioTab === 'fusion' ? 'rgba(239,68,68,0.14)' : 'transparent',
+                        color: recipeStudioTab === 'fusion' ? '#ef4444' : 'var(--dsw-alias-label-primary)',
+                        fontWeight: 800,
+                        fontSize: 13,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      🔥 Devin Fusion 三阶对抗配方设置 ({((fusionDraft?.candidates ?? []) as any[]).length} 主创 + 挑刺 + 主裁)
+                    </button>
+                  </div>
+
+                  {recipeStudioTab === 'moa' ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 11.5, fontWeight: 700, color: '#8b5cf6' }}>当前激活配方:</span>
+                      <select
+                        value={activeMoaPresetId}
+                        onChange={(e) => {
+                          void handleUpdateSelectedAgentCfg({ ensembleMode: 'moa', moaPreset: e.target.value })
+                        }}
+                        style={{
+                          padding: '5px 10px',
+                          borderRadius: 7,
+                          border: '1.5px solid rgba(139,92,246,0.5)',
+                          background: 'var(--dsw-alias-bg-base)',
+                          color: 'var(--dsw-alias-label-primary)',
+                          fontSize: 12,
+                          fontWeight: 700,
+                        }}
+                      >
+                        {Object.values(agentConfigsState?.moaPresets ?? {}).map((p: any) => (
+                          <option key={String(p.id)} value={String(p.id)}>
+                            {String(p.name || p.id)}{p.customized ? ' [已定制]' : ''}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={() => { void handleSaveMoaPresetDraft() }}
+                        style={{
+                          padding: '5px 11px',
+                          borderRadius: 7,
+                          border: 'none',
+                          background: moaDirty ? '#059669' : '#8b5cf6',
+                          color: '#fff',
+                          fontWeight: 700,
+                          fontSize: 11.5,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {moaDirty ? '💾 保存配方修改 *' : '💾 保存配方'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setShowNewMoaInput(v => !v) }}
+                        style={{
+                          padding: '5px 9px',
+                          borderRadius: 7,
+                          border: '1px solid rgba(139,92,246,0.45)',
+                          background: 'rgba(139,92,246,0.08)',
+                          color: 'var(--dsw-alias-label-primary)',
+                          fontWeight: 600,
+                          fontSize: 11.5,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        ➕ 另存为新配方
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { void handleResetMoaPresetDraft() }}
+                        title="恢复该配方出厂默认参谋阵容"
+                        style={{
+                          padding: '5px 9px',
+                          borderRadius: 7,
+                          border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.35))',
+                          background: 'transparent',
+                          color: 'var(--dsw-alias-label-secondary)',
+                          fontWeight: 600,
+                          fontSize: 11.5,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        🔄 恢复默认
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 11.5, fontWeight: 700, color: '#ef4444' }}>当前 Fusion 配方:</span>
+                      <select
+                        value={activeFusionPresetId}
+                        onChange={(e) => {
+                          void handleUpdateSelectedAgentCfg({ ensembleMode: 'fusion', fusionPreset: e.target.value })
+                        }}
+                        style={{
+                          padding: '5px 10px',
+                          borderRadius: 7,
+                          border: '1.5px solid rgba(239,68,68,0.5)',
+                          background: 'var(--dsw-alias-bg-base)',
+                          color: 'var(--dsw-alias-label-primary)',
+                          fontSize: 12,
+                          fontWeight: 700,
+                        }}
+                      >
+                        {Object.values(agentConfigsState?.fusionPresets ?? {}).map((p: any) => (
+                          <option key={String(p.id)} value={String(p.id)}>
+                            {String(p.name || p.id)}{p.customized ? ' [已定制]' : ''}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={() => { void handleSaveFusionPresetDraft() }}
+                        style={{
+                          padding: '5px 11px',
+                          borderRadius: 7,
+                          border: 'none',
+                          background: fusionDirty ? '#059669' : '#ef4444',
+                          color: '#fff',
+                          fontWeight: 700,
+                          fontSize: 11.5,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {fusionDirty ? '💾 保存 Fusion 配方 *' : '💾 保存配方'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { void handleResetFusionPresetDraft() }}
+                        style={{
+                          padding: '5px 9px',
+                          borderRadius: 7,
+                          border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.35))',
+                          background: 'transparent',
+                          color: 'var(--dsw-alias-label-secondary)',
+                          fontWeight: 600,
+                          fontSize: 11.5,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        🔄 恢复默认
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Optional Save-As New MoA Preset Bar */}
+                {recipeStudioTab === 'moa' && showNewMoaInput && (
+                  <div
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: 8,
+                      background: 'rgba(139,92,246,0.1)',
+                      border: '1px dashed rgba(139,92,246,0.5)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#8b5cf6' }}>🆕 新建自定义 MoA 配方 ID:</span>
+                    <input
+                      type="text"
+                      value={newMoaPresetId}
+                      onChange={(e) => { setNewMoaPresetId(e.target.value) }}
+                      placeholder="例如: arch_squad 或 banxue_math_moa"
+                      style={{
+                        padding: '5px 9px',
                         borderRadius: 6,
                         border: '1px solid rgba(139,92,246,0.45)',
                         background: 'var(--dsw-alias-bg-base)',
                         color: 'var(--dsw-alias-label-primary)',
-                        fontSize: 11.5,
-                        fontWeight: 600,
+                        fontSize: 12,
+                        width: 240,
                       }}
-                    >
-                      <option value="council">🏛️ council (4参谋内阁)</option>
-                      <option value="code">💻 code (5参谋代码攻坚)</option>
-                      <option value="review">🛡️ review (红队挑刺终审)</option>
-                      <option value="cheap">⚡ cheap (双模极速快参)</option>
-                    </select>
-                  </div>
-                  <div style={{ fontSize: 11.5, color: 'var(--dsw-alias-label-secondary)', lineHeight: 1.5 }}>
-                    同源移植自 Hermes <code>agent/moa_loop.py</code>：先由多路异构参谋模型（Grok-4.7、GLM-5.3、Sonnet-5.5、DeepSeek-V4.1 等）并行针对当前问题给出架构分析、盲点预警与工具策略，再由聚合主帅（GPT-6.1-Sol / Gemini-4-Argon）提炼为高密度行动指南注入 DSH 会话。
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 2 }}>
-                    {((agentConfigsState?.moaPresets?.[currentAgentCfg.moaPreset || 'council']?.referenceModels) ?? []).map((slot: any, idx: number) => (
-                      <div
-                        key={`moa-ref-${String(idx)}`}
-                        style={{
-                          padding: '4px 8px',
-                          borderRadius: 5,
-                          background: 'rgba(139,92,246,0.08)',
-                          fontSize: 11,
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                        }}
-                      >
-                        <span><strong>参谋 #{String(idx + 1)} ({String(slot.role)})</strong></span>
-                        <code>{String(slot.model)} [{String(slot.reasoningEffort)}]</code>
-                      </div>
-                    ))}
-                    <div
-                      style={{
-                        padding: '4px 8px',
-                        borderRadius: 5,
-                        background: 'rgba(2,132,199,0.12)',
-                        fontSize: 11,
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        fontWeight: 700,
-                      }}
-                    >
-                      <span>🎯 Aggregator 聚合主帅</span>
-                      <code>{String(agentConfigsState?.moaPresets?.[currentAgentCfg.moaPreset || 'council']?.aggregator?.model ?? 'workbuddy-ai/gpt-6.1-sol')}</code>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Devin Fusion Box */}
-                <div
-                  style={{
-                    ...cardStyle,
-                    border: currentAgentCfg.ensembleMode === 'fusion' ? '1.5px solid #ef4444' : cardStyle.border,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 8,
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: 14.5, fontWeight: 700, color: '#ef4444' }}>
-                      🔥 Devin Fusion (三阶段多模候选对抗 + 择优融合模式)
-                    </span>
-                    <select
-                      value={String(currentAgentCfg.fusionPreset || 'trinity')}
-                      onChange={(e) => {
-                        void handleUpdateSelectedAgentCfg({ ensembleMode: 'fusion', fusionPreset: e.target.value })
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (newMoaPresetId.trim()) {
+                          void handleSaveMoaPresetDraft(newMoaPresetId.trim())
+                        }
                       }}
                       style={{
-                        padding: '4px 8px',
+                        padding: '5px 12px',
                         borderRadius: 6,
-                        border: '1px solid rgba(239,68,68,0.45)',
-                        background: 'var(--dsw-alias-bg-base)',
-                        color: 'var(--dsw-alias-label-primary)',
-                        fontSize: 11.5,
-                        fontWeight: 600,
-                      }}
-                    >
-                      <option value="trinity">🔥 trinity (三路主创+Grok挑刺+Fable主裁)</option>
-                      <option value="code_fusion">⚔️ code_fusion (双路补丁竞速+盲裁合成)</option>
-                    </select>
-                  </div>
-                  <div style={{ fontSize: 11.5, color: 'var(--dsw-alias-label-secondary)', lineHeight: 1.5 }}>
-                    复刻 Devin Fusion 深度合成管线：<strong>Stage 1</strong> 由三路旗舰模型分别从「架构完备性」、「极简可逆补丁」、「工程落地闭环」独立产出完整候选方案 (A/B/C) → <strong>Stage 2</strong> 由独立红队挑刺官交叉盲审找漏洞 → <strong>Stage 3</strong> 由终审主裁取长补短输出零缺陷融合定稿与采纳矩阵。
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 2 }}>
-                    {((agentConfigsState?.fusionPresets?.[currentAgentCfg.fusionPreset || 'trinity']?.candidates) ?? []).map((cand: any) => (
-                      <div
-                        key={String(cand.id)}
-                        style={{
-                          padding: '4px 8px',
-                          borderRadius: 5,
-                          background: 'rgba(239,68,68,0.08)',
-                          fontSize: 11,
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                        }}
-                      >
-                        <span><strong>{String(cand.id)}: {String(cand.lens)}</strong></span>
-                        <code>{String(cand.model)}</code>
-                      </div>
-                    ))}
-                    <div
-                      style={{
-                        padding: '4px 8px',
-                        borderRadius: 5,
-                        background: 'rgba(245,158,11,0.12)',
-                        fontSize: 11,
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <span><strong>Stage 2 交叉盲审挑刺官</strong></span>
-                      <code>{String(agentConfigsState?.fusionPresets?.[currentAgentCfg.fusionPreset || 'trinity']?.critic?.model ?? 'workbuddy-ai/grok-4.7')}</code>
-                    </div>
-                    <div
-                      style={{
-                        padding: '4px 8px',
-                        borderRadius: 5,
-                        background: 'rgba(16,185,129,0.14)',
-                        fontSize: 11,
-                        display: 'flex',
-                        justifyContent: 'space-between',
+                        border: 'none',
+                        background: '#059669',
+                        color: '#fff',
                         fontWeight: 700,
+                        fontSize: 11.5,
+                        cursor: 'pointer',
                       }}
                     >
-                      <span>⚖️ Stage 3 终审融合主裁 (Judge)</span>
-                      <code>{String(agentConfigsState?.fusionPresets?.[currentAgentCfg.fusionPreset || 'trinity']?.judge?.model ?? 'group/claude-fable-5-1')}</code>
+                      ✓ 确认创建并绑定当前战将
+                    </button>
+                  </div>
+                )}
+
+                {recipeStudioTab === 'moa' ? (
+                  <>
+                    {/* Section 1: MoA Global Strategy Metadata */}
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1.4fr 1fr 0.8fr 1.8fr',
+                        gap: 10,
+                        padding: '8px 10px',
+                        borderRadius: 8,
+                        background: 'rgba(139,92,246,0.05)',
+                        border: '1px solid rgba(139,92,246,0.2)',
+                      }}
+                    >
+                      <label style={{ display: 'flex', flexDirection: 'column', gap: 3, fontSize: 11.5 }}>
+                        <span style={{ fontWeight: 700, color: '#8b5cf6' }}>配方显示名称</span>
+                        <input
+                          type="text"
+                          value={String(moaDraft?.name ?? '')}
+                          onChange={(e) => {
+                            setMoaDraft(prev => ({ ...prev, name: e.target.value }))
+                            setMoaDirty(true)
+                          }}
+                          style={{
+                            padding: '5px 8px',
+                            borderRadius: 6,
+                            border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.35))',
+                            background: 'var(--dsw-alias-bg-base)',
+                            color: 'var(--dsw-alias-label-primary)',
+                            fontSize: 11.5,
+                          }}
+                        />
+                      </label>
+                      <label style={{ display: 'flex', flexDirection: 'column', gap: 3, fontSize: 11.5 }}>
+                        <span style={{ fontWeight: 700, color: '#8b5cf6' }}>并发扇出时机 (Fanout)</span>
+                        <select
+                          value={String(moaDraft?.fanout || 'user_turn')}
+                          onChange={(e) => {
+                            setMoaDraft(prev => ({ ...prev, fanout: e.target.value }))
+                            setMoaDirty(true)
+                          }}
+                          style={{
+                            padding: '5px 8px',
+                            borderRadius: 6,
+                            border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.35))',
+                            background: 'var(--dsw-alias-bg-base)',
+                            color: 'var(--dsw-alias-label-primary)',
+                            fontSize: 11.5,
+                          }}
+                        >
+                          <option value="user_turn">🎯 user_turn (仅首轮用户提问并发 · 推荐)</option>
+                          <option value="every_step">🔁 every_step (含工具调用每步全程跟进)</option>
+                        </select>
+                      </label>
+                      <label style={{ display: 'flex', flexDirection: 'column', gap: 3, fontSize: 11.5 }}>
+                        <span style={{ fontWeight: 700, color: '#8b5cf6' }}>单路参谋超时</span>
+                        <select
+                          value={String(moaDraft?.timeoutMs || 60000)}
+                          onChange={(e) => {
+                            setMoaDraft(prev => ({ ...prev, timeoutMs: Number(e.target.value) }))
+                            setMoaDirty(true)
+                          }}
+                          style={{
+                            padding: '5px 8px',
+                            borderRadius: 6,
+                            border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.35))',
+                            background: 'var(--dsw-alias-bg-base)',
+                            color: 'var(--dsw-alias-label-primary)',
+                            fontSize: 11.5,
+                          }}
+                        >
+                          <option value="30000">⚡ 30秒 (极速)</option>
+                          <option value="60000">⏱️ 60秒 (标准)</option>
+                          <option value="90000">🧠 90秒 (深度推理)</option>
+                          <option value="120000">🛡️ 120秒 (长考)</option>
+                        </select>
+                      </label>
+                      <label style={{ display: 'flex', flexDirection: 'column', gap: 3, fontSize: 11.5 }}>
+                        <span style={{ fontWeight: 700, color: '#8b5cf6' }}>战术定位说明</span>
+                        <input
+                          type="text"
+                          value={String(moaDraft?.description ?? '')}
+                          onChange={(e) => {
+                            setMoaDraft(prev => ({ ...prev, description: e.target.value }))
+                            setMoaDirty(true)
+                          }}
+                          style={{
+                            padding: '5px 8px',
+                            borderRadius: 6,
+                            border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.35))',
+                            background: 'var(--dsw-alias-bg-base)',
+                            color: 'var(--dsw-alias-label-primary)',
+                            fontSize: 11.5,
+                          }}
+                        />
+                      </label>
+                    </div>
+
+                    {/* Section 2: Stage 1 Reference Advisors Interactive Table */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+                        <div style={{ fontSize: 12.5, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span>🤺 Stage 1 · 并行献策参谋团席位编排 (Reference Advisors)</span>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--dsw-alias-label-secondary)' }}>
+                            支持为每位参谋独立指定【专精视角】+【渠道/模型 (含 AGY / Devin ACP)】+【推理等级】
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
+                          {[
+                            { label: '+ 🚀 AGY Opus 5.5', provider: 'agy', model: 'claude-opus-5-5', role: '第一性原理与深度架构参谋 (AGY)' },
+                            { label: '+ 🛡️ ACP SWE-1.6', provider: 'devin-acp', model: 'SWE-1.6', role: '补丁实现与回归自检参谋 (Devin ACP)' },
+                            { label: '+ 🌐 Grok 4.7 挑刺', provider: 'magpie-workbuddy', model: 'workbuddy-ai/grok-4.7', role: '边界条件与反方证伪参谋' },
+                            { label: '+ ➕ 自定义参谋', provider: 'magpie-workbuddy', model: 'workbuddy-ai/glm-5.3', role: '专项技术攻坚参谋' },
+                          ].map((tpl) => (
+                            <button
+                              key={tpl.label}
+                              type="button"
+                              onClick={() => {
+                                setMoaDraft((prev) => {
+                                  const list = Array.isArray(prev?.referenceModels) ? [...prev.referenceModels] : []
+                                  list.push({
+                                    provider: tpl.provider,
+                                    model: tpl.model,
+                                    reasoningEffort: 'high',
+                                    role: tpl.role,
+                                    enabled: true,
+                                  })
+                                  return { ...prev, referenceModels: list }
+                                })
+                                setMoaDirty(true)
+                              }}
+                              style={{
+                                padding: '3px 8px',
+                                borderRadius: 6,
+                                border: '1px solid rgba(139,92,246,0.4)',
+                                background: 'rgba(139,92,246,0.1)',
+                                color: 'var(--dsw-alias-label-primary)',
+                                fontSize: 11,
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                              }}
+                            >
+                              {tpl.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Advisor Rows */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        {((moaDraft?.referenceModels ?? []) as any[]).map((slot: any, idx: number, arr: any[]) => {
+                          const isEnabled = slot.enabled !== false
+                          const compositeVal = `${String(slot.provider || 'magpie-workbuddy')}::${String(slot.model || '')}`
+                          return (
+                            <div
+                              key={`moa-editor-slot-${String(idx)}`}
+                              style={{
+                                display: 'grid',
+                                gridTemplateColumns: '78px 1.35fr 1.65fr 110px 88px',
+                                gap: 8,
+                                alignItems: 'center',
+                                padding: '6px 10px',
+                                borderRadius: 8,
+                                background: isEnabled ? 'rgba(139,92,246,0.08)' : 'rgba(148,163,184,0.06)',
+                                border: isEnabled ? '1px solid rgba(139,92,246,0.28)' : '1px dashed rgba(148,163,184,0.25)',
+                                opacity: isEnabled ? 1 : 0.58,
+                              }}
+                            >
+                              {/* Col 1: Enable Checkbox + Index */}
+                              <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11.5, fontWeight: 700, cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={isEnabled}
+                                  onChange={(e) => {
+                                    const checked = e.target.checked
+                                    setMoaDraft((prev) => {
+                                      const nextList = [...(prev.referenceModels ?? [])]
+                                      nextList[idx] = { ...nextList[idx], enabled: checked }
+                                      return { ...prev, referenceModels: nextList }
+                                    })
+                                    setMoaDirty(true)
+                                  }}
+                                />
+                                <span style={{ color: '#8b5cf6' }}>参谋 #{String(idx + 1)}</span>
+                              </label>
+
+                              {/* Col 2: Role / Lens Input */}
+                              <input
+                                type="text"
+                                value={String(slot.role ?? '')}
+                                placeholder="参谋专精视角 (如: 第一性原理挑刺 / 代码架构)"
+                                onChange={(e) => {
+                                  const val = e.target.value
+                                  setMoaDraft((prev) => {
+                                    const nextList = [...(prev.referenceModels ?? [])]
+                                    nextList[idx] = { ...nextList[idx], role: val }
+                                    return { ...prev, referenceModels: nextList }
+                                  })
+                                  setMoaDirty(true)
+                                }}
+                                style={{
+                                  padding: '5px 8px',
+                                  borderRadius: 6,
+                                  border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.32))',
+                                  background: 'var(--dsw-alias-bg-base)',
+                                  color: 'var(--dsw-alias-label-primary)',
+                                  fontSize: 11.5,
+                                  fontWeight: 600,
+                                }}
+                              />
+
+                              {/* Col 3: Grouped Provider + Model Selector */}
+                              <select
+                                value={compositeVal}
+                                onChange={(e) => {
+                                  const [nextProv, nextMod] = e.target.value.split('::')
+                                  setMoaDraft((prev) => {
+                                    const nextList = [...(prev.referenceModels ?? [])]
+                                    nextList[idx] = { ...nextList[idx], provider: nextProv, model: nextMod }
+                                    return { ...prev, referenceModels: nextList }
+                                  })
+                                  setMoaDirty(true)
+                                }}
+                                style={{
+                                  padding: '5px 8px',
+                                  borderRadius: 6,
+                                  border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.32))',
+                                  background: 'var(--dsw-alias-bg-base)',
+                                  color: 'var(--dsw-alias-label-primary)',
+                                  fontSize: 11.5,
+                                  fontFamily: 'monospace',
+                                }}
+                              >
+                                {catalogByChannel.map(grp => (
+                                  <optgroup key={grp.provider} label={grp.title}>
+                                    {grp.items.map(item => (
+                                      <option key={`${item.provider}::${item.model}`} value={`${item.provider}::${item.model}`}>
+                                        [{item.provider}] {item.label} ({item.model})
+                                      </option>
+                                    ))}
+                                  </optgroup>
+                                ))}
+                              </select>
+
+                              {/* Col 4: Reasoning Effort Selector */}
+                              <select
+                                value={String(slot.reasoningEffort || 'high')}
+                                onChange={(e) => {
+                                  const nextEff = e.target.value
+                                  setMoaDraft((prev) => {
+                                    const nextList = [...(prev.referenceModels ?? [])]
+                                    nextList[idx] = { ...nextList[idx], reasoningEffort: nextEff }
+                                    return { ...prev, referenceModels: nextList }
+                                  })
+                                  setMoaDirty(true)
+                                }}
+                                style={{
+                                  padding: '5px 6px',
+                                  borderRadius: 6,
+                                  border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.32))',
+                                  background: 'var(--dsw-alias-bg-base)',
+                                  color: 'var(--dsw-alias-label-primary)',
+                                  fontSize: 11,
+                                  fontWeight: 700,
+                                }}
+                              >
+                                {['low', 'medium', 'high', 'xhigh', 'max'].map(lvl => (
+                                  <option key={lvl} value={lvl}>Effort: {lvl.toUpperCase()}</option>
+                                ))}
+                              </select>
+
+                              {/* Col 5: Move Up / Move Down / Remove */}
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
+                                <button
+                                  type="button"
+                                  disabled={idx === 0}
+                                  title="上移参谋席位"
+                                  onClick={() => {
+                                    setMoaDraft((prev) => {
+                                      const nextList = [...(prev.referenceModels ?? [])]
+                                      const tmp = nextList[idx - 1]
+                                      nextList[idx - 1] = nextList[idx]
+                                      nextList[idx] = tmp
+                                      return { ...prev, referenceModels: nextList }
+                                    })
+                                    setMoaDirty(true)
+                                  }}
+                                  style={{
+                                    padding: '3px 6px',
+                                    borderRadius: 5,
+                                    border: '1px solid rgba(148,163,184,0.3)',
+                                    background: 'transparent',
+                                    color: 'var(--dsw-alias-label-primary)',
+                                    fontSize: 10.5,
+                                    cursor: idx === 0 ? 'not-allowed' : 'pointer',
+                                    opacity: idx === 0 ? 0.35 : 1,
+                                  }}
+                                >
+                                  ↑
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={idx === arr.length - 1}
+                                  title="下移参谋席位"
+                                  onClick={() => {
+                                    setMoaDraft((prev) => {
+                                      const nextList = [...(prev.referenceModels ?? [])]
+                                      const tmp = nextList[idx + 1]
+                                      nextList[idx + 1] = nextList[idx]
+                                      nextList[idx] = tmp
+                                      return { ...prev, referenceModels: nextList }
+                                    })
+                                    setMoaDirty(true)
+                                  }}
+                                  style={{
+                                    padding: '3px 6px',
+                                    borderRadius: 5,
+                                    border: '1px solid rgba(148,163,184,0.3)',
+                                    background: 'transparent',
+                                    color: 'var(--dsw-alias-label-primary)',
+                                    fontSize: 10.5,
+                                    cursor: idx === arr.length - 1 ? 'not-allowed' : 'pointer',
+                                    opacity: idx === arr.length - 1 ? 0.35 : 1,
+                                  }}
+                                >
+                                  ↓
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={arr.length <= 1}
+                                  title="移除该路参谋"
+                                  onClick={() => {
+                                    setMoaDraft((prev) => {
+                                      const nextList = (prev.referenceModels ?? []).filter((_: any, i: number) => i !== idx)
+                                      return { ...prev, referenceModels: nextList }
+                                    })
+                                    setMoaDirty(true)
+                                  }}
+                                  style={{
+                                    padding: '3px 6px',
+                                    borderRadius: 5,
+                                    border: '1px solid rgba(239,68,68,0.35)',
+                                    background: 'rgba(239,68,68,0.1)',
+                                    color: '#ef4444',
+                                    fontSize: 10.5,
+                                    cursor: arr.length <= 1 ? 'not-allowed' : 'pointer',
+                                    opacity: arr.length <= 1 ? 0.35 : 1,
+                                  }}
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Section 3: Stage 2 Aggregator Commander Settings */}
+                    <div
+                      style={{
+                        padding: '10px 12px',
+                        borderRadius: 9,
+                        background: 'rgba(2,132,199,0.1)',
+                        border: '1.5px solid rgba(2,132,199,0.4)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: 10,
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontSize: 13, fontWeight: 800, color: '#0284c7' }}>
+                          🎯 Stage 2 · Aggregator 聚合主帅 (负责裁决参谋分歧并输出行动蓝图)
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', flex: 1, justifyContent: 'flex-end' }}>
+                        <select
+                          value={`${String(moaDraft?.aggregator?.provider || 'magpie-workbuddy')}::${String(moaDraft?.aggregator?.model || 'workbuddy-ai/gpt-6.1-sol')}`}
+                          onChange={(e) => {
+                            const [aggProv, aggMod] = e.target.value.split('::')
+                            setMoaDraft(prev => ({
+                              ...prev,
+                              aggregator: {
+                                ...(prev?.aggregator ?? {}),
+                                provider: aggProv,
+                                model: aggMod,
+                              },
+                            }))
+                            setMoaDirty(true)
+                          }}
+                          style={{
+                            padding: '5px 10px',
+                            borderRadius: 7,
+                            border: '1px solid rgba(2,132,199,0.45)',
+                            background: 'var(--dsw-alias-bg-base)',
+                            color: 'var(--dsw-alias-label-primary)',
+                            fontSize: 12,
+                            fontWeight: 700,
+                            fontFamily: 'monospace',
+                            minWidth: 320,
+                          }}
+                        >
+                          {catalogByChannel.map(grp => (
+                            <optgroup key={grp.provider} label={grp.title}>
+                              {grp.items.map(item => (
+                                <option key={`agg-${item.provider}::${item.model}`} value={`${item.provider}::${item.model}`}>
+                                  [{item.provider}] {item.label} ({item.model})
+                                </option>
+                              ))}
+                            </optgroup>
+                          ))}
+                        </select>
+                        <select
+                          value={String(moaDraft?.aggregator?.reasoningEffort || 'high')}
+                          onChange={(e) => {
+                            const aggEff = e.target.value
+                            setMoaDraft(prev => ({
+                              ...prev,
+                              aggregator: {
+                                ...(prev?.aggregator ?? {}),
+                                reasoningEffort: aggEff,
+                              },
+                            }))
+                            setMoaDirty(true)
+                          }}
+                          style={{
+                            padding: '5px 8px',
+                            borderRadius: 7,
+                            border: '1px solid rgba(2,132,199,0.45)',
+                            background: 'var(--dsw-alias-bg-base)',
+                            color: 'var(--dsw-alias-label-primary)',
+                            fontSize: 11.5,
+                            fontWeight: 700,
+                          }}
+                        >
+                          {['low', 'medium', 'high', 'xhigh', 'max'].map(lvl => (
+                            <option key={lvl} value={lvl}>主帅 Effort: {lvl.toUpperCase()}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  /* Devin Fusion Recipe Editor */
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div style={{ fontSize: 12, color: 'var(--dsw-alias-label-secondary)' }}>
+                      配置 Stage 1 独立候选主创 (Candidates A/B/C)、Stage 2 交叉盲审挑刺官 (Critic) 与 Stage 3 终审融合主裁 (Judge)：
+                    </div>
+                    {((fusionDraft?.candidates ?? []) as any[]).map((cand: any, idx: number) => {
+                      const compositeVal = `${String(cand.provider || 'magpie')}::${String(cand.model || '')}`
+                      return (
+                        <div
+                          key={`fusion-cand-${String(idx)}`}
+                          style={{
+                            display: 'grid',
+                            gridTemplateColumns: '110px 1.3fr 1.6fr 120px',
+                            gap: 8,
+                            alignItems: 'center',
+                            padding: '6px 10px',
+                            borderRadius: 8,
+                            background: 'rgba(239,68,68,0.08)',
+                            border: '1px solid rgba(239,68,68,0.25)',
+                          }}
+                        >
+                          <strong style={{ fontSize: 11.5, color: '#ef4444' }}>{String(cand.id || `Candidate-${idx + 1}`)}</strong>
+                          <input
+                            type="text"
+                            value={String(cand.lens ?? '')}
+                            onChange={(e) => {
+                              const val = e.target.value
+                              setFusionDraft((prev) => {
+                                const nextCands = [...(prev.candidates ?? [])]
+                                nextCands[idx] = { ...nextCands[idx], lens: val }
+                                return { ...prev, candidates: nextCands }
+                              })
+                              setFusionDirty(true)
+                            }}
+                            style={{
+                              padding: '5px 8px',
+                              borderRadius: 6,
+                              border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.32))',
+                              background: 'var(--dsw-alias-bg-base)',
+                              color: 'var(--dsw-alias-label-primary)',
+                              fontSize: 11.5,
+                            }}
+                          />
+                          <select
+                            value={compositeVal}
+                            onChange={(e) => {
+                              const [cProv, cMod] = e.target.value.split('::')
+                              setFusionDraft((prev) => {
+                                const nextCands = [...(prev.candidates ?? [])]
+                                nextCands[idx] = { ...nextCands[idx], provider: cProv, model: cMod }
+                                return { ...prev, candidates: nextCands }
+                              })
+                              setFusionDirty(true)
+                            }}
+                            style={{
+                              padding: '5px 8px',
+                              borderRadius: 6,
+                              border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.32))',
+                              background: 'var(--dsw-alias-bg-base)',
+                              color: 'var(--dsw-alias-label-primary)',
+                              fontSize: 11.5,
+                              fontFamily: 'monospace',
+                            }}
+                          >
+                            {catalogByChannel.map(grp => (
+                              <optgroup key={grp.provider} label={grp.title}>
+                                {grp.items.map(item => (
+                                  <option key={`fc-${item.provider}::${item.model}`} value={`${item.provider}::${item.model}`}>
+                                    [{item.provider}] {item.label} ({item.model})
+                                  </option>
+                                ))}
+                              </optgroup>
+                            ))}
+                          </select>
+                          <select
+                            value={String(cand.reasoningEffort || 'high')}
+                            onChange={(e) => {
+                              const eff = e.target.value
+                              setFusionDraft((prev) => {
+                                const nextCands = [...(prev.candidates ?? [])]
+                                nextCands[idx] = { ...nextCands[idx], reasoningEffort: eff }
+                                return { ...prev, candidates: nextCands }
+                              })
+                              setFusionDirty(true)
+                            }}
+                            style={{
+                              padding: '5px 6px',
+                              borderRadius: 6,
+                              border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.32))',
+                              background: 'var(--dsw-alias-bg-base)',
+                              color: 'var(--dsw-alias-label-primary)',
+                              fontSize: 11,
+                              fontWeight: 700,
+                            }}
+                          >
+                            {['low', 'medium', 'high', 'xhigh', 'max'].map(lvl => (
+                              <option key={lvl} value={lvl}>Effort: {lvl.toUpperCase()}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )
+                    })}
+
+                    {/* Critic & Judge Row */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                      <div style={{ padding: '8px 10px', borderRadius: 8, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.35)', display: 'flex', flexDirection: 'column', gap: 5 }}>
+                        <strong style={{ fontSize: 12, color: '#d97706' }}>⚔️ Stage 2 · 交叉盲审挑刺官 (Adversarial Critic)</strong>
+                        <select
+                          value={`${String(fusionDraft?.critic?.provider || 'magpie-workbuddy')}::${String(fusionDraft?.critic?.model || 'workbuddy-ai/grok-4.7')}`}
+                          onChange={(e) => {
+                            const [p, m] = e.target.value.split('::')
+                            setFusionDraft(prev => ({ ...prev, critic: { ...(prev.critic ?? {}), provider: p, model: m } }))
+                            setFusionDirty(true)
+                          }}
+                          style={{ padding: '5px 8px', borderRadius: 6, fontSize: 11.5, fontFamily: 'monospace', background: 'var(--dsw-alias-bg-base)', color: 'var(--dsw-alias-label-primary)' }}
+                        >
+                          {catalogByChannel.map(grp => (
+                            <optgroup key={grp.provider} label={grp.title}>
+                              {grp.items.map(item => (
+                                <option key={`crit-${item.provider}::${item.model}`} value={`${item.provider}::${item.model}`}>
+                                  [{item.provider}] {item.label} ({item.model})
+                                </option>
+                              ))}
+                            </optgroup>
+                          ))}
+                        </select>
+                      </div>
+                      <div style={{ padding: '8px 10px', borderRadius: 8, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.35)', display: 'flex', flexDirection: 'column', gap: 5 }}>
+                        <strong style={{ fontSize: 12, color: '#059669' }}>⚖️ Stage 3 · 终审融合主裁 (Synthesizer Judge)</strong>
+                        <select
+                          value={`${String(fusionDraft?.judge?.provider || 'magpie')}::${String(fusionDraft?.judge?.model || 'group/claude-fable-5-1')}`}
+                          onChange={(e) => {
+                            const [p, m] = e.target.value.split('::')
+                            setFusionDraft(prev => ({ ...prev, judge: { ...(prev.judge ?? {}), provider: p, model: m } }))
+                            setFusionDirty(true)
+                          }}
+                          style={{ padding: '5px 8px', borderRadius: 6, fontSize: 11.5, fontFamily: 'monospace', background: 'var(--dsw-alias-bg-base)', color: 'var(--dsw-alias-label-primary)' }}
+                        >
+                          {catalogByChannel.map(grp => (
+                            <optgroup key={grp.provider} label={grp.title}>
+                              {grp.items.map(item => (
+                                <option key={`jdg-${item.provider}::${item.model}`} value={`${item.provider}::${item.model}`}>
+                                  [{item.provider}] {item.label} ({item.model})
+                                </option>
+                              ))}
+                            </optgroup>
+                          ))}
+                        </select>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Card 3: Interactive MoA & Fusion Execution Console */}
