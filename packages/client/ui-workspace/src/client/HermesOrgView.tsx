@@ -349,6 +349,200 @@ function broadcastSelectedAgentToRightPanel(agent: HermesAgentNode): void {
   }
 }
 
+const POOL_TIER_META = {
+  S1: {
+    badge: '🚀 S1 AGY订阅',
+    color: '#f59e0b',
+    bg: 'rgba(245,158,11,0.14)',
+    border: 'rgba(245,158,11,0.45)',
+    groupTitle: '🚀 S1 · Google Antigravity Pro 订阅池 ($200/mo · 按Session增量续接)',
+  },
+  S2: {
+    badge: '💎 S2 Codex订阅',
+    color: '#10b981',
+    bg: 'rgba(16,185,129,0.14)',
+    border: 'rgba(16,185,129,0.45)',
+    groupTitle: '💎 S2 · OpenAI Codex Pro 订阅池 ($200/mo + 56,117 Credits 独立池)',
+  },
+  S3: {
+    badge: '🛡️ S3 Devin/SWE-2',
+    color: '#06b6d4',
+    bg: 'rgba(6,182,212,0.14)',
+    border: 'rgba(6,182,212,0.45)',
+    groupTitle: '🛡️ S3 · Cognition Devin Max (SWE-2 0扣费免费工程池 + ACP 持久会话)',
+  },
+  S4: {
+    badge: '⚡ S4 Cursor 1M',
+    color: '#8b5cf6',
+    bg: 'rgba(139,92,246,0.14)',
+    border: 'rgba(139,92,246,0.45)',
+    groupTitle: '⚡ S4 · Cursor Ultra 订阅池 ($400额度 · 内部池 + 1M 百万上下文池)',
+  },
+  A: {
+    badge: '🌐 A池 OpenCode Go',
+    color: '#3b82f6',
+    bg: 'rgba(59,130,246,0.14)',
+    border: 'rgba(59,130,246,0.45)',
+    groupTitle: '🔥 A/B/C/D · 智谱 GLM-5.3 / MiniMax M3.1 满血再生 & OpenCode 0扣费矩阵',
+  },
+  B: {
+    badge: '🇨🇳 B池 智谱MAX',
+    color: '#ec4899',
+    bg: 'rgba(236,72,153,0.14)',
+    border: 'rgba(236,72,153,0.45)',
+    groupTitle: '🔥 A/B/C/D · 智谱 GLM-5.3 / MiniMax M3.1 满血再生 & OpenCode 0扣费矩阵',
+  },
+  C: {
+    badge: '⚡ C池 MiniMax 1M',
+    color: '#14b8a6',
+    bg: 'rgba(20,184,166,0.14)',
+    border: 'rgba(20,184,166,0.45)',
+    groupTitle: '🔥 A/B/C/D · 智谱 GLM-5.3 / MiniMax M3.1 满血再生 & OpenCode 0扣费矩阵',
+  },
+  D: {
+    badge: '🆓 D池 0扣费王牌',
+    color: '#22c55e',
+    bg: 'rgba(34,197,94,0.14)',
+    border: 'rgba(34,197,94,0.45)',
+    groupTitle: '🔥 A/B/C/D · 智谱 GLM-5.3 / MiniMax M3.1 满血再生 & OpenCode 0扣费矩阵',
+  },
+  E: {
+    badge: '🌐 E池 WorkBuddy/Magpie',
+    color: '#0284c7',
+    bg: 'rgba(2,132,199,0.14)',
+    border: 'rgba(2,132,199,0.45)',
+    groupTitle: '🌐 E · WorkBuddy AI Pro (1M免费无限桶 + 异构挑刺池) & Magpie 容灾路由',
+  },
+} as const
+
+type PoolTierKey = keyof typeof POOL_TIER_META
+
+function getPoolTierMeta(tier: string) {
+  return (POOL_TIER_META as Record<string, (typeof POOL_TIER_META)[PoolTierKey]>)[tier] ?? POOL_TIER_META.E
+}
+
+function inferCatalogItemTier(item: { provider: string; model: string; tier?: string }): PoolTierKey {
+  if (item.tier && item.tier in POOL_TIER_META) return item.tier as PoolTierKey
+  if (item.provider === 'agy') return 'S1'
+  if (item.provider === 'openai-codex' || item.provider === 'magpie-responses' || item.model.startsWith('codex/')) return 'S2'
+  if (item.provider === 'devin-acp' || item.model.startsWith('devin/')) return 'S3'
+  if (item.model.startsWith('cursor/')) return 'S4'
+  if (item.model.startsWith('zhipu/')) return 'B'
+  if (item.model.startsWith('minimax/')) return 'C'
+  if (item.model.startsWith('opencode-go/') || item.model.includes(':free') || item.model.endsWith('-free')) return 'D'
+  return 'E'
+}
+
+function inferPoolMetaForSlot(provider: string, model: string) {
+  return getPoolTierMeta(inferCatalogItemTier({ provider, model }))
+}
+
+function shortModelTag(modelStr: string): string {
+  const m = String(modelStr || '').trim()
+  if (!m) return '未设'
+  const slug = m.includes('/') ? m.split('/').pop()! : m
+  return slug
+    .replace(/^claude-/, '')
+    .replace(/-contributor$/, '')
+    .replace(/-lightning$/, '⚡')
+}
+
+function summarizeAgentModelMode(
+  agent: HermesAgentNode,
+  cfgRaw: Record<string, any> | undefined,
+  moaPresets?: Record<string, any>,
+  fusionPresets?: Record<string, any>,
+) {
+  const isLeader = agent.id === 'default' || agent.id === 'fit-lead-1013' || agent.id === 'bl-company-coordinator' || agent.id === 'wj-m01-producer'
+  const provider = String(cfgRaw?.provider || (isLeader ? 'magpie-responses' : 'magpie-workbuddy'))
+  const model = String(cfgRaw?.model || (isLeader ? 'group/claude-fable-5-1' : 'workbuddy-ai/glm-5.3'))
+  const reasoningEffort = String(cfgRaw?.reasoningEffort || 'high').toUpperCase()
+  const ensembleMode = String(cfgRaw?.ensembleMode || 'single') as 'single' | 'moa' | 'fusion'
+  const moaPresetKey = String(cfgRaw?.moaPreset || 'council')
+  const fusionPresetKey = String(cfgRaw?.fusionPreset || 'trinity')
+  const poolMeta = inferPoolMetaForSlot(provider, model)
+  const shortWeapon = shortModelTag(model)
+
+  if (ensembleMode === 'moa') {
+    const pObj = moaPresets?.[moaPresetKey]
+    const refList = Array.isArray(pObj?.referenceModels) ? pObj.referenceModels : []
+    const aggModel = shortModelTag(String(pObj?.aggregator?.model || model))
+    const presetLabels: Record<string, string> = {
+      council: '全明星内阁',
+      codex_elite: 'Codex订阅内阁',
+      agy_acp_hybrid: '三大订阅混编',
+      code: '代码攻坚团',
+      review: '红队挑刺团',
+      cheap: '0扣费快参',
+    }
+    const presetShort = presetLabels[moaPresetKey] || String(pObj?.name || moaPresetKey).replace(/^[^\s]+\s*/, '').slice(0, 8)
+    return {
+      ensembleMode,
+      modeIcon: '🐝',
+      modeChip: `🐝MoA·${presetShort}`,
+      modeFullLabel: `🐝 Hermes MoA · ${presetShort}`,
+      modeColor: '#d97706',
+      modeBg: 'rgba(245, 158, 11, 0.16)',
+      modeBorder: 'rgba(245, 158, 11, 0.48)',
+      presetKey: moaPresetKey,
+      presetShort,
+      lineupSummary: `${String(refList.length || 4)}参谋(${refList.slice(0, 3).map((r: any) => shortModelTag(r.model)).join('/')}${refList.length > 3 ? '…' : ''}) → 👑${aggModel}`,
+      provider,
+      model,
+      shortWeapon,
+      reasoningEffort,
+      poolMeta,
+    }
+  }
+
+  if (ensembleMode === 'fusion') {
+    const pObj = fusionPresets?.[fusionPresetKey]
+    const candList = Array.isArray(pObj?.candidates) ? pObj.candidates : []
+    const criticModel = shortModelTag(String(pObj?.critic?.model || 'grok-4.7'))
+    const judgeModel = shortModelTag(String(pObj?.judge?.model || model))
+    const presetLabels: Record<string, string> = {
+      trinity: '三位一体盲审',
+      code_fusion: '双轨补丁竞速',
+    }
+    const presetShort = presetLabels[fusionPresetKey] || String(pObj?.name || fusionPresetKey).replace(/^[^\s]+\s*/, '').slice(0, 8)
+    return {
+      ensembleMode,
+      modeIcon: '🔥',
+      modeChip: `🔥Fusion·${presetShort}`,
+      modeFullLabel: `🔥 Devin Fusion · ${presetShort}`,
+      modeColor: '#db2777',
+      modeBg: 'rgba(236, 72, 153, 0.16)',
+      modeBorder: 'rgba(236, 72, 153, 0.48)',
+      presetKey: fusionPresetKey,
+      presetShort,
+      lineupSummary: `${String(candList.length || 3)}路候选 → 挑刺:${criticModel} → ⚖️主裁:${judgeModel}`,
+      provider,
+      model,
+      shortWeapon,
+      reasoningEffort,
+      poolMeta,
+    }
+  }
+
+  return {
+    ensembleMode: 'single' as const,
+    modeIcon: '⚡',
+    modeChip: '⚡单模',
+    modeFullLabel: '⚡ Single 单模直连',
+    modeColor: '#0284c7',
+    modeBg: 'rgba(2, 132, 199, 0.14)',
+    modeBorder: 'rgba(2, 132, 199, 0.4)',
+    presetKey: '',
+    presetShort: '单模直出',
+    lineupSummary: `${poolMeta.badge} · ${shortWeapon} [${reasoningEffort}]`,
+    provider,
+    model,
+    shortWeapon,
+    reasoningEffort,
+    poolMeta,
+  }
+}
+
 /** Decorative glyph for the `sidebar.panellist` row. */
 export function HermesPanelIcon({ size }: PropsRuntime<'sidebar.panellist'>) {
   const px = size ?? 16
@@ -367,12 +561,18 @@ function SidebarAgentRow({
   agent,
   selected,
   existingSession,
+  agentCfg,
+  moaPresets,
+  fusionPresets,
   onSelectAgent,
   onStartAgentSession,
 }: {
   agent: HermesAgentNode
   selected: boolean
   existingSession: SessionSummary | undefined
+  agentCfg?: Record<string, any> | undefined
+  moaPresets?: Record<string, any> | undefined
+  fusionPresets?: Record<string, any> | undefined
   onSelectAgent: (agent: HermesAgentNode) => void
   onStartAgentSession: (agent: HermesAgentNode, forceNew?: boolean) => void
 }) {
@@ -381,6 +581,7 @@ function SidebarAgentRow({
   const callsignText = agent.callsign ?? `${String(agent.seatOrder ?? 1).padStart(2, '0')}号`
   const subCount = agent.subordinateCount ?? agent.subordinateIds?.length ?? 0
   const shortTitle = cleanAgentDisplayTitle(agent, true)
+  const modeInfo = summarizeAgentModelMode(agent, agentCfg, moaPresets, fusionPresets)
 
   return (
     <div
@@ -427,7 +628,7 @@ function SidebarAgentRow({
             overflow: 'hidden',
             textOverflow: 'ellipsis',
           }}
-          title={`【${agent.militaryRank ?? '作战席位'} · ${callsignText}】${agent.title} (${agent.id})\n兵种: ${agent.branchLabel ?? agent.department}\n直属长官: ${agent.supervisor}${agent.reviewer ? ` ｜ 宪兵督察: ${agent.reviewer}` : ''}\n防区目录: ${agent.projectRoot}\n飞书加密频段: --profile ${agent.feishuProfile}${existingSession ? `\n常驻会话: ${existingSession.displayTitle || existingSession.id}` : ''}`}
+          title={`【${agent.militaryRank ?? '作战席位'} · ${callsignText}】${agent.title} (${agent.id})\n模型模式: ${modeInfo.modeFullLabel} (${modeInfo.lineupSummary})\n主模型: ${modeInfo.provider}:${modeInfo.model} [${modeInfo.reasoningEffort}]\n兵种: ${agent.branchLabel ?? agent.department}\n直属长官: ${agent.supervisor}${agent.reviewer ? ` ｜ 宪兵督察: ${agent.reviewer}` : ''}\n防区目录: ${agent.projectRoot}\n飞书加密频段: --profile ${agent.feishuProfile}${existingSession ? `\n常驻会话: ${existingSession.displayTitle || existingSession.id}` : ''}`}
         >
           <span
             style={{
@@ -453,6 +654,22 @@ function SidebarAgentRow({
             </span>
           )}
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{shortTitle}</span>
+          <span
+            title={`当前模型模式: ${modeInfo.modeFullLabel}\n主武器: ${modeInfo.provider}:${modeInfo.model} [${modeInfo.reasoningEffort}]`}
+            style={{
+              fontSize: 8.5,
+              padding: '0 4px',
+              borderRadius: 3,
+              background: modeInfo.ensembleMode === 'single' ? modeInfo.poolMeta.bg : modeInfo.modeBg,
+              color: modeInfo.ensembleMode === 'single' ? modeInfo.poolMeta.color : modeInfo.modeColor,
+              border: `1px solid ${modeInfo.ensembleMode === 'single' ? modeInfo.poolMeta.border : modeInfo.modeBorder}`,
+              fontWeight: 700,
+              flex: 'none',
+              fontFamily: 'monospace',
+            }}
+          >
+            {modeInfo.ensembleMode === 'single' ? `⚡${modeInfo.shortWeapon}` : modeInfo.modeChip}
+          </span>
           {subCount > 0 && (
             <span
               title={`直辖下属 ${String(subCount)} 人`}
@@ -508,6 +725,9 @@ function SidebarBrigadeGroup({
   branchFilter,
   selectedAgentId,
   activeSessionByAgentId,
+  agentConfigsMap,
+  moaPresets,
+  fusionPresets,
   onSelectAgent,
   onStartAgentSession,
 }: {
@@ -516,6 +736,9 @@ function SidebarBrigadeGroup({
   branchFilter: string
   selectedAgentId: string | undefined
   activeSessionByAgentId: ReadonlyMap<string, SessionSummary>
+  agentConfigsMap?: Record<string, any> | undefined
+  moaPresets?: Record<string, any> | undefined
+  fusionPresets?: Record<string, any> | undefined
   onSelectAgent: (agent: HermesAgentNode) => void
   onStartAgentSession: (agent: HermesAgentNode, forceNew?: boolean) => void
 }) {
@@ -599,6 +822,9 @@ function SidebarBrigadeGroup({
               agent={agent}
               selected={selectedAgentId === agent.id}
               existingSession={activeSessionByAgentId.get(agent.id)}
+              agentCfg={agentConfigsMap?.[agent.id]}
+              moaPresets={moaPresets}
+              fusionPresets={fusionPresets}
               onSelectAgent={onSelectAgent}
               onStartAgentSession={onStartAgentSession}
             />
@@ -617,6 +843,9 @@ function SidebarZoneBranch({
   groupByBrigade = true,
   selectedAgentId,
   activeSessionByAgentId,
+  agentConfigsMap,
+  moaPresets,
+  fusionPresets,
   onSelectAgent,
   onStartAgentSession,
 }: {
@@ -627,6 +856,9 @@ function SidebarZoneBranch({
   groupByBrigade?: boolean
   selectedAgentId: string | undefined
   activeSessionByAgentId: ReadonlyMap<string, SessionSummary>
+  agentConfigsMap?: Record<string, any> | undefined
+  moaPresets?: Record<string, any> | undefined
+  fusionPresets?: Record<string, any> | undefined
   onSelectAgent: (agent: HermesAgentNode) => void
   onStartAgentSession: (agent: HermesAgentNode, forceNew?: boolean) => void
 }) {
@@ -722,6 +954,9 @@ function SidebarZoneBranch({
               groupByBrigade={groupByBrigade}
               selectedAgentId={selectedAgentId}
               activeSessionByAgentId={activeSessionByAgentId}
+              agentConfigsMap={agentConfigsMap}
+              moaPresets={moaPresets}
+              fusionPresets={fusionPresets}
               onSelectAgent={onSelectAgent}
               onStartAgentSession={onStartAgentSession}
             />
@@ -735,6 +970,9 @@ function SidebarZoneBranch({
                   branchFilter={branchFilter}
                   selectedAgentId={selectedAgentId}
                   activeSessionByAgentId={activeSessionByAgentId}
+                  agentConfigsMap={agentConfigsMap}
+                  moaPresets={moaPresets}
+                  fusionPresets={fusionPresets}
                   onSelectAgent={onSelectAgent}
                   onStartAgentSession={onStartAgentSession}
                 />
@@ -745,6 +983,9 @@ function SidebarZoneBranch({
                   agent={agent}
                   selected={selectedAgentId === agent.id}
                   existingSession={activeSessionByAgentId.get(agent.id)}
+                  agentCfg={agentConfigsMap?.[agent.id]}
+                  moaPresets={moaPresets}
+                  fusionPresets={fusionPresets}
                   onSelectAgent={onSelectAgent}
                   onStartAgentSession={onStartAgentSession}
                 />
@@ -753,90 +994,6 @@ function SidebarZoneBranch({
       )}
     </div>
   )
-}
-
-const POOL_TIER_META = {
-  S1: {
-    badge: '🚀 S1 AGY订阅',
-    color: '#f59e0b',
-    bg: 'rgba(245,158,11,0.14)',
-    border: 'rgba(245,158,11,0.45)',
-    groupTitle: '🚀 S1 · Google Antigravity Pro 订阅池 ($200/mo · 按Session增量续接)',
-  },
-  S2: {
-    badge: '💎 S2 Codex订阅',
-    color: '#10b981',
-    bg: 'rgba(16,185,129,0.14)',
-    border: 'rgba(16,185,129,0.45)',
-    groupTitle: '💎 S2 · OpenAI Codex Pro 订阅池 ($200/mo + 56,117 Credits 独立池)',
-  },
-  S3: {
-    badge: '🛡️ S3 Devin/SWE-2',
-    color: '#06b6d4',
-    bg: 'rgba(6,182,212,0.14)',
-    border: 'rgba(6,182,212,0.45)',
-    groupTitle: '🛡️ S3 · Cognition Devin Max (SWE-2 0扣费免费工程池 + ACP 持久会话)',
-  },
-  S4: {
-    badge: '⚡ S4 Cursor 1M',
-    color: '#8b5cf6',
-    bg: 'rgba(139,92,246,0.14)',
-    border: 'rgba(139,92,246,0.45)',
-    groupTitle: '⚡ S4 · Cursor Ultra 订阅池 ($400额度 · 内部池 + 1M 百万上下文池)',
-  },
-  A: {
-    badge: '🌐 A池 OpenCode Go',
-    color: '#3b82f6',
-    bg: 'rgba(59,130,246,0.14)',
-    border: 'rgba(59,130,246,0.45)',
-    groupTitle: '🔥 A/B/C/D · 智谱 GLM-5.3 / MiniMax M3.1 满血再生 & OpenCode 0扣费矩阵',
-  },
-  B: {
-    badge: '🇨🇳 B池 智谱MAX',
-    color: '#ec4899',
-    bg: 'rgba(236,72,153,0.14)',
-    border: 'rgba(236,72,153,0.45)',
-    groupTitle: '🔥 A/B/C/D · 智谱 GLM-5.3 / MiniMax M3.1 满血再生 & OpenCode 0扣费矩阵',
-  },
-  C: {
-    badge: '⚡ C池 MiniMax 1M',
-    color: '#14b8a6',
-    bg: 'rgba(20,184,166,0.14)',
-    border: 'rgba(20,184,166,0.45)',
-    groupTitle: '🔥 A/B/C/D · 智谱 GLM-5.3 / MiniMax M3.1 满血再生 & OpenCode 0扣费矩阵',
-  },
-  D: {
-    badge: '🆓 D池 0扣费王牌',
-    color: '#22c55e',
-    bg: 'rgba(34,197,94,0.14)',
-    border: 'rgba(34,197,94,0.45)',
-    groupTitle: '🔥 A/B/C/D · 智谱 GLM-5.3 / MiniMax M3.1 满血再生 & OpenCode 0扣费矩阵',
-  },
-  E: {
-    badge: '🌐 E池 WorkBuddy/Magpie',
-    color: '#0284c7',
-    bg: 'rgba(2,132,199,0.14)',
-    border: 'rgba(2,132,199,0.45)',
-    groupTitle: '🌐 E · WorkBuddy AI Pro (1M免费无限桶 + 异构挑刺池) & Magpie 容灾路由',
-  },
-} as const
-
-type PoolTierKey = keyof typeof POOL_TIER_META
-
-function getPoolTierMeta(tier: string) {
-  return (POOL_TIER_META as Record<string, (typeof POOL_TIER_META)[PoolTierKey]>)[tier] ?? POOL_TIER_META.E
-}
-
-function inferCatalogItemTier(item: { provider: string; model: string; tier?: string }): PoolTierKey {
-  if (item.tier && item.tier in POOL_TIER_META) return item.tier as PoolTierKey
-  if (item.provider === 'agy') return 'S1'
-  if (item.provider === 'openai-codex' || item.provider === 'magpie-responses' || item.model.startsWith('codex/')) return 'S2'
-  if (item.provider === 'devin-acp' || item.model.startsWith('devin/')) return 'S3'
-  if (item.model.startsWith('cursor/')) return 'S4'
-  if (item.model.startsWith('zhipu/')) return 'B'
-  if (item.model.startsWith('minimax/')) return 'C'
-  if (item.model.startsWith('opencode-go/') || item.model.includes(':free') || item.model.endsWith('-free')) return 'D'
-  return 'E'
 }
 
 function formatContextTokensShort(ctx?: number): string {
@@ -1283,7 +1440,7 @@ export function HermesSidebarOrgTree({
     const id = selectedAgent?.id ?? 'default'
     return agentConfigsData?.configs?.[id] ?? {
       agentId: id,
-      provider: 'magpie',
+      provider: 'magpie-responses',
       model: 'group/claude-fable-5-1',
       reasoningEffort: 'high',
       permissionPreset: 'danger-full-access',
@@ -1292,6 +1449,16 @@ export function HermesSidebarOrgTree({
       fusionPreset: 'trinity',
     }
   }, [agentConfigsData, selectedAgent?.id])
+
+  const selectedAgentModeInfo = useMemo(() => {
+    if (!selectedAgent) return undefined
+    return summarizeAgentModelMode(
+      selectedAgent,
+      selectedAgentConfig,
+      agentConfigsData?.moaPresets,
+      agentConfigsData?.fusionPresets,
+    )
+  }, [agentConfigsData?.fusionPresets, agentConfigsData?.moaPresets, selectedAgent, selectedAgentConfig])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -1302,11 +1469,31 @@ export function HermesSidebarOrgTree({
         setShowSessionOptionsInAgentMode(mode === 'sessions')
       }
     }
+    const onCfgUpdated = (e: Event) => {
+      const detail = (e as CustomEvent<{ agentId?: string; config?: Record<string, any>; state?: Record<string, any> }>).detail
+      if (detail?.state && detail.state.configs) {
+        setAgentConfigsData(detail.state)
+        return
+      }
+      if (detail?.agentId && detail.config) {
+        const aid = detail.agentId
+        const cfg = detail.config
+        setAgentConfigsData(prev => ({
+          ...prev,
+          configs: {
+            ...(prev?.configs ?? {}),
+            [aid]: cfg,
+          },
+        }))
+      }
+    }
     window.addEventListener('dsh-hermes-session-bound', onBound)
     window.addEventListener('dsh-hermes-chat-mode', onMode)
+    window.addEventListener('dsh-hermes-config-updated', onCfgUpdated)
     return () => {
       window.removeEventListener('dsh-hermes-session-bound', onBound)
       window.removeEventListener('dsh-hermes-chat-mode', onMode)
+      window.removeEventListener('dsh-hermes-config-updated', onCfgUpdated)
     }
   }, [])
 
@@ -1403,11 +1590,15 @@ export function HermesSidebarOrgTree({
   const handleSaveSidebarAgentConfig = useCallback(async (patch: Record<string, unknown>) => {
     if (!selectedAgent) return
     const activeSess = activeSessionByAgentId.get(selectedAgent.id)
+    const currentMain = sessions?.byId
+      ? Object.values(sessions.byId).find((s): s is SessionSummary => s !== undefined && (s.retainedBy.mainView ?? 0) > 0)
+      : undefined
+    const targetSessionId = activeSess?.id ?? currentMain?.id ?? ''
     const nextCfg = {
       ...selectedAgentConfig,
       ...patch,
       agentId: selectedAgent.id,
-      sessionId: activeSess?.id ?? '',
+      sessionId: targetSessionId,
     }
     setAgentConfigsData(prev => ({
       ...prev,
@@ -1416,16 +1607,22 @@ export function HermesSidebarOrgTree({
         [selectedAgent.id]: nextCfg,
       },
     }))
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('dsh-hermes-config-updated', { detail: { agentId: selectedAgent.id, config: nextCfg } }))
+    }
     const res = await callHermesBridgeApi({
       op: 'updateAgentConfig',
       ...nextCfg,
     })
     if (res?.ok && res.config) {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('dsh-hermes-config-updated', { detail: { agentId: selectedAgent.id, config: res.config } }))
+      }
       setStatusNotice(
-        `✓ 已保存 ${selectedAgent.title} 参数：${String(res.config.model)} [${String(res.config.reasoningEffort)}] · 模式=${String(res.config.ensembleMode).toUpperCase()}`,
+        `✓ 已实时生效 ${selectedAgent.title}：模式=${String(res.config.ensembleMode).toUpperCase()} · 模型=${String(res.config.model)} [${String(res.config.reasoningEffort).toUpperCase()}]`,
       )
     }
-  }, [activeSessionByAgentId, selectedAgent, selectedAgentConfig])
+  }, [activeSessionByAgentId, selectedAgent, selectedAgentConfig, sessions?.byId])
 
   // Auto-restore the last communicated Agent and its previous conversation session on entering DSH
   useEffect(() => {
@@ -1537,12 +1734,35 @@ export function HermesSidebarOrgTree({
     }
   }, [activeSessionByAgentId, allAgents, sessions])
 
+  const handleSelectAgentInSidebar = useCallback((agent: HermesAgentNode) => {
+    setSelectedAgent(agent)
+    activateAgentMinimalChatMode(agent)
+    const existing = activeSessionByAgentId.get(agent.id)
+    const currentMain = sessions?.byId
+      ? Object.values(sessions.byId).find((s): s is SessionSummary => s !== undefined && (s.retainedBy.mainView ?? 0) > 0)
+      : undefined
+    const targetSessionId = existing?.id ?? currentMain?.id ?? ''
+    void callHermesBridgeApi({
+      op: 'applyAgentSessionConfig',
+      agentId: agent.id,
+      sessionId: targetSessionId,
+    })
+  }, [activeSessionByAgentId, sessions?.byId])
+
   const handleStartAgentSession = useCallback(async (agent: HermesAgentNode, forceNew = false) => {
     try {
       activateAgentMinimalChatMode(agent)
+      const existing = !forceNew ? activeSessionByAgentId.get(agent.id) : undefined
+      const currentMain = sessions?.byId
+        ? Object.values(sessions.byId).find((s): s is SessionSummary => s !== undefined && (s.retainedBy.mainView ?? 0) > 0)
+        : undefined
       // Switching to an Agent on purpose is when its configured model applies;
       // writePersistedAgentSession no longer pushes it on every session tick.
-      void callHermesBridgeApi({ op: 'applyAgentSessionConfig', agentId: agent.id })
+      void callHermesBridgeApi({
+        op: 'applyAgentSessionConfig',
+        agentId: agent.id,
+        sessionId: existing?.id ?? currentMain?.id ?? '',
+      })
       if (typeof window !== 'undefined') {
         try {
           window.localStorage.setItem('dsh-hermes-last-agent-id', agent.id)
@@ -1550,7 +1770,6 @@ export function HermesSidebarOrgTree({
           // ignore
         }
       }
-      const existing = !forceNew ? activeSessionByAgentId.get(agent.id) : undefined
       if (existing !== undefined && openSession !== undefined) {
         writePersistedAgentSession(agent.id, existing.id, !existing.blank)
         openSession(existing.id)
@@ -1581,7 +1800,7 @@ export function HermesSidebarOrgTree({
     } catch (err) {
       setStatusNotice(`启动失败: ${err instanceof Error ? err.message : String(err)}`)
     }
-  }, [activeSessionByAgentId, createWorkspace, openSession, startSession, workspaces])
+  }, [activeSessionByAgentId, createWorkspace, openSession, sessions?.byId, startSession, workspaces])
 
   const defaultSteward = useMemo(
     () => primaryAgents.find(a => a.id === 'default') ?? allAgents[0],
@@ -2010,15 +2229,18 @@ export function HermesSidebarOrgTree({
         </div>
       )}
 
-      {/* 当前选中战将 1 行紧凑状态条（完整军籍档案与上下级指挥链由右栏『🎖️ 战将参谋板』联动展示） */}
-      {selectedAgent !== undefined && (
+      {/* 当前选中战将 + 常驻『模型模式 HUD』（无需点开 ⚙️ 即可实时看清 Single/MoA/Fusion 模式、配方阵容与主武器，并支持 1-Click 切换） */}
+      {selectedAgent !== undefined && selectedAgentModeInfo !== undefined && (
         <div
           style={{
-            padding: '4px 7px',
-            borderRadius: 6,
-            border: '1px solid var(--dsw-alias-border-l2, rgba(148,163,184,0.28))',
-            background: 'var(--dsw-alias-bg-layer-2, rgba(15,23,42,0.03))',
+            padding: '5px 7px',
+            borderRadius: 7,
+            border: `1.5px solid ${selectedAgentModeInfo.ensembleMode === 'single' ? 'var(--dsw-alias-border-l2, rgba(148,163,184,0.32))' : selectedAgentModeInfo.modeBorder}`,
+            background: 'var(--dsw-alias-bg-layer-2, rgba(15,23,42,0.04))',
             fontSize: 11,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 5,
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 4 }}>
@@ -2031,7 +2253,7 @@ export function HermesSidebarOrgTree({
                 whiteSpace: 'nowrap',
                 flex: 1,
               }}
-              title={`${selectedAgent.militaryRank ?? ''} · ${selectedAgent.title} (${selectedAgent.id})\n右侧边栏『🎖️ 战将参谋板』已同步展示完整上下级指挥链与参数`}
+              title={`${selectedAgent.militaryRank ?? ''} · ${selectedAgent.title} (${selectedAgent.id})\n当前模型模式: ${selectedAgentModeInfo.modeFullLabel}\n主武器: ${selectedAgentModeInfo.provider}:${selectedAgentModeInfo.model} [${selectedAgentModeInfo.reasoningEffort}]`}
             >
               <span style={{ color: '#d97706', fontFamily: 'monospace', marginRight: 4 }}>
                 {selectedAgent.rankBadge ?? '▲'}{selectedAgent.callsign ?? ''}
@@ -2090,6 +2312,256 @@ export function HermesSidebarOrgTree({
               </button>
             </div>
           </div>
+
+          {/* 🎛️ 常驻模型模式 HUD 条：第 1 行 = 协同模式一键切换 + 配方工作台入口 */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 3,
+              padding: '3px 5px',
+              borderRadius: 5,
+              background: selectedAgentModeInfo.modeBg,
+              border: `1px solid ${selectedAgentModeInfo.modeBorder}`,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+              {([
+                ['single', '⚡单模', '#0284c7'],
+                ['moa', '🐝MoA', '#d97706'],
+                ['fusion', '🔥Fusion', '#db2777'],
+              ] as const).map(([modeKey, label, activeColor]) => {
+                const isAct = selectedAgentModeInfo.ensembleMode === modeKey
+                return (
+                  <button
+                    key={modeKey}
+                    type="button"
+                    onClick={() => { void handleSaveSidebarAgentConfig({ ensembleMode: modeKey }) }}
+                    title={`切换 ${selectedAgent.title} 的模型运行模式为 ${label}`}
+                    style={{
+                      padding: '1.5px 5px',
+                      borderRadius: 4,
+                      border: isAct ? `1px solid ${activeColor}` : '1px solid transparent',
+                      background: isAct ? activeColor : 'transparent',
+                      color: isAct ? '#fff' : 'var(--dsw-alias-label-secondary)',
+                      fontSize: 9.5,
+                      fontWeight: isAct ? 800 : 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {label}
+                  </button>
+                )
+              })}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+              <span
+                style={{
+                  fontSize: 9,
+                  padding: '1px 4px',
+                  borderRadius: 3,
+                  background: 'rgba(139, 92, 246, 0.18)',
+                  color: '#8b5cf6',
+                  fontWeight: 800,
+                  fontFamily: 'monospace',
+                }}
+                title={`当前推理强度: ${selectedAgentModeInfo.reasoningEffort}`}
+              >
+                {selectedAgentModeInfo.reasoningEffort}
+              </span>
+              {onOpenCommandCenter !== undefined && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      window.localStorage.setItem('dsh-hermes-preferred-tab', 'ensemble')
+                      window.dispatchEvent(new CustomEvent('dsh-hermes-open-tab', { detail: { tab: 'ensemble' } }))
+                    }
+                    onOpenCommandCenter()
+                  }}
+                  title="打开 MoA / Devin Fusion 配方工作台"
+                  style={{
+                    padding: '1px 5px',
+                    borderRadius: 3,
+                    border: '1px solid rgba(139, 92, 246, 0.45)',
+                    background: 'rgba(139, 92, 246, 0.14)',
+                    color: '#8b5cf6',
+                    fontSize: 9.5,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  🎛️配方台
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* 🎛️ 常驻模型模式 HUD 条：第 2 行 = 当前主模型 & 算力池 / MoA·Fusion 配方快切与阵容 */}
+          {selectedAgentModeInfo.ensembleMode === 'single' ? (
+            <button
+              type="button"
+              onClick={() => { setShowSidebarParamDrawer(v => !v) }}
+              title={`当前单模直连武器：${selectedAgentModeInfo.provider}:${selectedAgentModeInfo.model}\n点击展开/收起 68 款 2026 模型选择器`}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 4,
+                padding: '3px 6px',
+                borderRadius: 5,
+                border: `1px solid ${selectedAgentModeInfo.poolMeta.border}`,
+                background: selectedAgentModeInfo.poolMeta.bg,
+                color: 'var(--dsw-alias-label-primary)',
+                fontSize: 10,
+                cursor: 'pointer',
+                textAlign: 'left',
+              }}
+            >
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, overflow: 'hidden' }}>
+                <span
+                  style={{
+                    fontSize: 8.5,
+                    padding: '0 4px',
+                    borderRadius: 3,
+                    background: 'rgba(15, 23, 42, 0.15)',
+                    color: selectedAgentModeInfo.poolMeta.color,
+                    fontWeight: 800,
+                    flex: 'none',
+                  }}
+                >
+                  {selectedAgentModeInfo.poolMeta.badge}
+                </span>
+                <strong
+                  style={{
+                    fontFamily: 'monospace',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {selectedAgentModeInfo.model}
+                </strong>
+              </span>
+              <span style={{ fontSize: 9, opacity: 0.78, flex: 'none' }}>换模 ▾</span>
+            </button>
+          ) : selectedAgentModeInfo.ensembleMode === 'moa' ? (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 3,
+                padding: '4px 6px',
+                borderRadius: 5,
+                border: '1px solid rgba(245, 158, 11, 0.4)',
+                background: 'rgba(245, 158, 11, 0.08)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ fontSize: 9.5, fontWeight: 700, color: '#d97706', flex: 'none' }}>🐝配方:</span>
+                <select
+                  value={String(selectedAgentConfig.moaPreset || 'council')}
+                  onChange={(e) => {
+                    void handleSaveSidebarAgentConfig({ moaPreset: e.target.value })
+                  }}
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    padding: '2px 4px',
+                    borderRadius: 4,
+                    border: '1px solid rgba(245, 158, 11, 0.45)',
+                    background: 'var(--dsw-alias-bg-base)',
+                    color: 'var(--dsw-alias-label-primary)',
+                    fontSize: 9.5,
+                    fontWeight: 700,
+                  }}
+                >
+                  {Object.entries(agentConfigsData?.moaPresets ?? {
+                    council: { name: '🏛️ council 全明星内阁' },
+                    codex_elite: { name: '💎 codex_elite Codex订阅内阁' },
+                    agy_acp_hybrid: { name: '🚀 agy_acp_hybrid 三大订阅混编' },
+                    code: { name: '💻 code 代码攻坚团' },
+                    review: { name: '🛡️ review 红队挑刺团' },
+                    cheap: { name: '⚡ cheap 0扣费快参' },
+                  }).map(([k, p]: [string, any]) => (
+                    <option key={k} value={k}>
+                      {String(p?.name || k)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div
+                style={{
+                  fontSize: 9,
+                  fontFamily: 'monospace',
+                  color: 'var(--dsw-alias-label-secondary)',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+                title={selectedAgentModeInfo.lineupSummary}
+              >
+                {selectedAgentModeInfo.lineupSummary}
+              </div>
+            </div>
+          ) : (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 3,
+                padding: '4px 6px',
+                borderRadius: 5,
+                border: '1px solid rgba(236, 72, 153, 0.4)',
+                background: 'rgba(236, 72, 153, 0.08)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ fontSize: 9.5, fontWeight: 700, color: '#db2777', flex: 'none' }}>🔥配方:</span>
+                <select
+                  value={String(selectedAgentConfig.fusionPreset || 'trinity')}
+                  onChange={(e) => {
+                    void handleSaveSidebarAgentConfig({ fusionPreset: e.target.value })
+                  }}
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    padding: '2px 4px',
+                    borderRadius: 4,
+                    border: '1px solid rgba(236, 72, 153, 0.45)',
+                    background: 'var(--dsw-alias-bg-base)',
+                    color: 'var(--dsw-alias-label-primary)',
+                    fontSize: 9.5,
+                    fontWeight: 700,
+                  }}
+                >
+                  {Object.entries(agentConfigsData?.fusionPresets ?? {
+                    trinity: { name: '🔥 trinity 三位一体盲审融合' },
+                    code_fusion: { name: '⚔️ code_fusion 双轨补丁竞速融合' },
+                  }).map(([k, p]: [string, any]) => (
+                    <option key={k} value={k}>
+                      {String(p?.name || k)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div
+                style={{
+                  fontSize: 9,
+                  fontFamily: 'monospace',
+                  color: 'var(--dsw-alias-label-secondary)',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+                title={selectedAgentModeInfo.lineupSummary}
+              >
+                {selectedAgentModeInfo.lineupSummary}
+              </div>
+            </div>
+          )}
 
           {showSidebarParamDrawer && (
             <div
@@ -2267,7 +2739,10 @@ export function HermesSidebarOrgTree({
             groupByBrigade={sidebarGroupByBrigade}
             selectedAgentId={selectedAgent?.id}
             activeSessionByAgentId={activeSessionByAgentId}
-            onSelectAgent={setSelectedAgent}
+            agentConfigsMap={agentConfigsData?.configs}
+            moaPresets={agentConfigsData?.moaPresets}
+            fusionPresets={agentConfigsData?.fusionPresets}
+            onSelectAgent={handleSelectAgentInSidebar}
             onStartAgentSession={(agent, forceNew) => { void handleStartAgentSession(agent, forceNew) }}
           />
         ))}
@@ -2410,18 +2885,38 @@ export function HermesCommandCenterPage({
         if (found) setSelectedAgent(found)
       }
     }
+    const onCfgUpdated = (e: Event) => {
+      const detail = (e as CustomEvent<{ agentId?: string; config?: Record<string, any>; state?: Record<string, any> }>).detail
+      if (detail?.state && detail.state.configs) {
+        setAgentConfigsState(detail.state)
+        return
+      }
+      if (detail?.agentId && detail.config) {
+        const aid = detail.agentId
+        const cfg = detail.config
+        setAgentConfigsState(prev => ({
+          ...prev,
+          configs: {
+            ...(prev?.configs ?? {}),
+            [aid]: cfg,
+          },
+        }))
+      }
+    }
     window.addEventListener('dsh-hermes-open-tab', onOpenTab)
     window.addEventListener('dsh-hermes-select-agent', onSelectAgentEvt)
+    window.addEventListener('dsh-hermes-config-updated', onCfgUpdated)
     return () => {
       window.removeEventListener('dsh-hermes-open-tab', onOpenTab)
       window.removeEventListener('dsh-hermes-select-agent', onSelectAgentEvt)
+      window.removeEventListener('dsh-hermes-config-updated', onCfgUpdated)
     }
   }, [findAgentById])
 
   const currentAgentCfg = useMemo(() => {
     return agentConfigsState?.configs?.[selectedAgent.id] ?? {
       agentId: selectedAgent.id,
-      provider: 'magpie',
+      provider: 'magpie-responses',
       model: 'group/claude-fable-5-1',
       reasoningEffort: 'high',
       permissionPreset: 'danger-full-access',
@@ -2496,6 +2991,9 @@ export function HermesCommandCenterPage({
     })
     if (res?.ok && res.state) {
       setAgentConfigsState(res.state)
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('dsh-hermes-config-updated', { detail: { state: res.state } }))
+      }
       setMoaDirty(false)
       setShowNewMoaInput(false)
       setNewMoaPresetId('')
@@ -2515,6 +3013,9 @@ export function HermesCommandCenterPage({
     })
     if (res?.ok && res.state) {
       setAgentConfigsState(res.state)
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('dsh-hermes-config-updated', { detail: { state: res.state } }))
+      }
       setMoaDirty(false)
       setBanner(`✓ 已将 MoA 配方「${activeMoaPresetId}」恢复为系统默认设置`)
     }
@@ -2528,6 +3029,9 @@ export function HermesCommandCenterPage({
     })
     if (res?.ok && res.state) {
       setAgentConfigsState(res.state)
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('dsh-hermes-config-updated', { detail: { state: res.state } }))
+      }
       setFusionDirty(false)
       setBanner(`✓ 已持久化保存 Devin Fusion 配方「${String(res.preset?.name ?? activeFusionPresetId)}」`)
     } else {
@@ -2542,6 +3046,9 @@ export function HermesCommandCenterPage({
     })
     if (res?.ok && res.state) {
       setAgentConfigsState(res.state)
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('dsh-hermes-config-updated', { detail: { state: res.state } }))
+      }
       setFusionDirty(false)
       setBanner(`✓ 已将 Devin Fusion 配方「${activeFusionPresetId}」恢复为系统默认设置`)
     }
@@ -2563,11 +3070,17 @@ export function HermesCommandCenterPage({
         [selectedAgent.id]: nextCfg,
       },
     }))
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('dsh-hermes-config-updated', { detail: { agentId: selectedAgent.id, config: nextCfg } }))
+    }
     const res = await callHermesBridgeApi({
       op: 'updateAgentConfig',
       ...nextCfg,
     })
     if (res?.ok && res.config) {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('dsh-hermes-config-updated', { detail: { agentId: selectedAgent.id, config: res.config } }))
+      }
       setBanner(
         `✓ 已保存并同步 ${selectedAgent.title} (${selectedAgent.id}) 参数：模型=${String(res.config.provider)}:${String(res.config.model)} · 推理等级=${String(res.config.reasoningEffort).toUpperCase()} · 模式=${String(res.config.ensembleMode).toUpperCase()}`,
       )
