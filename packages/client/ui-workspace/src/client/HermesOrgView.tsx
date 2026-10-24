@@ -23,6 +23,7 @@ import {
   HERMES_INITIAL_WAR_ROOM,
   HERMES_ORG_TREE,
   type HermesAgentNode,
+  type HermesBrigadeNode,
   type HermesOrgTreeData,
   type HermesSessionSummary,
   type HermesZoneNode,
@@ -225,16 +226,64 @@ export function findExistingAgentSession(
   return undefined
 }
 
-function agentMatchesQuery(agent: HermesAgentNode, q: string): boolean {
+function agentMatchesQuery(agent: HermesAgentNode, q: string, branchFilter = 'all'): boolean {
+  if (branchFilter !== 'all') {
+    if (branchFilter === 'staff') {
+      if (agent.branch !== 'intel' && agent.branch !== 'logistics') return false
+    } else if (agent.branch !== branchFilter) {
+      return false
+    }
+  }
   if (!q) return true
-  const haystack = `${agent.id} ${agent.title} ${agent.department} ${agent.sectionPath} ${agent.projectRoot} ${agent.description} ${agent.feishuProfile}`.toLowerCase()
+  const haystack = `${agent.id} ${agent.title} ${agent.callsign ?? ''} ${agent.militaryRank ?? ''} ${agent.branchLabel ?? ''} ${agent.department} ${agent.sectionPath} ${agent.projectRoot} ${agent.description} ${agent.feishuProfile} ${agent.supervisor} ${agent.reviewer ?? ''}`.toLowerCase()
   return haystack.includes(q)
 }
 
-function zoneHasMatch(node: HermesZoneNode, q: string): boolean {
-  if (!q) return true
-  if (node.agents.some(a => agentMatchesQuery(a, q))) return true
-  return node.children.some(child => zoneHasMatch(child, q))
+function zoneHasMatch(node: HermesZoneNode, q: string, branchFilter = 'all'): boolean {
+  if (node.agents.some(a => agentMatchesQuery(a, q, branchFilter))) return true
+  return node.children.some(child => zoneHasMatch(child, q, branchFilter))
+}
+
+function getRankVisualStyle(agent: HermesAgentNode): { bg: string, color: string, border: string, badge: string } {
+  const tier = agent.rankTier ?? (agent.isCompanyHead || agent.id === 'default' ? 1 : 5)
+  if (tier <= 2) {
+    return {
+      bg: 'rgba(245, 158, 11, 0.18)',
+      color: '#d97706',
+      border: 'rgba(245, 158, 11, 0.45)',
+      badge: agent.rankBadge ?? '★★★',
+    }
+  }
+  if (tier === 3) {
+    return {
+      bg: 'rgba(2, 132, 199, 0.16)',
+      color: '#0284c7',
+      border: 'rgba(2, 132, 199, 0.42)',
+      badge: agent.rankBadge ?? '★★',
+    }
+  }
+  if (agent.branch === 'mp') {
+    return {
+      bg: 'rgba(139, 92, 246, 0.16)',
+      color: '#8b5cf6',
+      border: 'rgba(139, 92, 246, 0.4)',
+      badge: '🛡️',
+    }
+  }
+  if (tier === 4) {
+    return {
+      bg: 'rgba(16, 185, 129, 0.15)',
+      color: '#059669',
+      border: 'rgba(16, 185, 129, 0.38)',
+      badge: agent.rankBadge ?? '★',
+    }
+  }
+  return {
+    bg: 'rgba(148, 163, 184, 0.15)',
+    color: 'var(--dsw-alias-label-secondary)',
+    border: 'rgba(148, 163, 184, 0.28)',
+    badge: agent.rankBadge ?? '▲',
+  }
 }
 
 /** Decorative glyph for the `sidebar.panellist` row. */
@@ -251,10 +300,247 @@ export function HermesPanelIcon({ size }: PropsRuntime<'sidebar.panellist'>) {
   )
 }
 
+function SidebarAgentRow({
+  agent,
+  selected,
+  existingSession,
+  onSelectAgent,
+  onStartAgentSession,
+}: {
+  agent: HermesAgentNode
+  selected: boolean
+  existingSession: SessionSummary | undefined
+  onSelectAgent: (agent: HermesAgentNode) => void
+  onStartAgentSession: (agent: HermesAgentNode, forceNew?: boolean) => void
+}) {
+  const isCommander = (agent.rankTier ?? 5) <= 3 || agent.isCompanyHead || agent.id === 'default'
+  const rk = getRankVisualStyle(agent)
+  const callsignText = agent.callsign ?? `${String(agent.seatOrder ?? 1).padStart(2, '0')}号`
+  const subCount = agent.subordinateCount ?? agent.subordinateIds?.length ?? 0
+
+  return (
+    <div
+      onClick={() => { onSelectAgent(agent) }}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 6,
+        padding: '4px 7px',
+        marginTop: 2,
+        borderRadius: 6,
+        cursor: 'pointer',
+        background: selected
+          ? 'var(--dsw-alias-interactive-bg-active, rgba(2,132,199,0.15))'
+          : isCommander
+            ? 'rgba(245, 158, 11, 0.04)'
+            : 'transparent',
+        border: selected
+          ? '1px solid rgba(2,132,199,0.5)'
+          : isCommander
+            ? '1px solid rgba(245, 158, 11, 0.2)'
+            : '1px solid transparent',
+        fontSize: 12,
+      }}
+    >
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            fontWeight: isCommander ? 700 : 500,
+            color: 'var(--dsw-alias-label-primary)',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+          title={`【${agent.militaryRank ?? '作战席位'} · ${callsignText}】${agent.title} (${agent.id})\n兵种: ${agent.branchLabel ?? agent.department}\n直属长官: ${agent.supervisor}${agent.reviewer ? ` ｜ 宪兵督察: ${agent.reviewer}` : ''}\n防区目录: ${agent.projectRoot}\n飞书加密频段: --profile ${agent.feishuProfile}${existingSession ? `\n常驻会话: ${existingSession.displayTitle || existingSession.id}` : ''}`}
+        >
+          <span
+            style={{
+              fontSize: 9.5,
+              padding: '0 4px',
+              borderRadius: 3,
+              background: rk.bg,
+              color: rk.color,
+              border: `1px solid ${rk.border}`,
+              fontWeight: 700,
+              flex: 'none',
+              fontFamily: 'monospace',
+            }}
+          >
+            {rk.badge} {callsignText}
+          </span>
+          {existingSession !== undefined && (
+            <span
+              title="战备在线：已有常驻会话，点击直接续接"
+              style={{ color: '#10b981', fontSize: 9, flex: 'none' }}
+            >
+              ●
+            </span>
+          )}
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{agent.title}</span>
+          {subCount > 0 && (
+            <span
+              title={`直辖下属 ${String(subCount)} 人`}
+              style={{
+                fontSize: 9.5,
+                padding: '0 4px',
+                borderRadius: 999,
+                background: 'rgba(245, 158, 11, 0.16)',
+                color: '#d97706',
+                fontWeight: 700,
+                flex: 'none',
+              }}
+            >
+              统{subCount}
+            </span>
+          )}
+        </div>
+      </div>
+      <button
+        type="button"
+        title={existingSession
+          ? `续接 ${agent.title} 的常驻作战室 (${existingSession.displayTitle || existingSession.id})`
+          : `点将唤醒 ${agent.title} (${agent.id}) 开启专属会话 (${agent.projectRoot})`}
+        onClick={(e) => {
+          e.stopPropagation()
+          onSelectAgent(agent)
+          onStartAgentSession(agent, false)
+        }}
+        style={{
+          flex: 'none',
+          padding: '1px 6px',
+          borderRadius: 4,
+          border: existingSession
+            ? '1px solid rgba(16, 185, 129, 0.45)'
+            : '1px solid var(--dsw-alias-border-l2, rgba(148,163,184,0.35))',
+          background: existingSession ? 'rgba(16, 185, 129, 0.12)' : 'var(--dsw-alias-bg-layer-1, transparent)',
+          color: existingSession ? '#059669' : 'var(--dsw-alias-label-secondary)',
+          fontSize: 10.5,
+          fontWeight: existingSession ? 700 : 600,
+          cursor: 'pointer',
+        }}
+      >
+        {existingSession ? '续接' : '点将'}
+      </button>
+    </div>
+  )
+}
+
+function SidebarBrigadeGroup({
+  brigade,
+  query,
+  branchFilter,
+  selectedAgentId,
+  activeSessionByAgentId,
+  onSelectAgent,
+  onStartAgentSession,
+}: {
+  brigade: HermesBrigadeNode
+  query: string
+  branchFilter: string
+  selectedAgentId: string | undefined
+  activeSessionByAgentId: ReadonlyMap<string, SessionSummary>
+  onSelectAgent: (agent: HermesAgentNode) => void
+  onStartAgentSession: (agent: HermesAgentNode, forceNew?: boolean) => void
+}) {
+  const [open, setOpen] = useState(true)
+  const q = query.trim().toLowerCase()
+  const matched = useMemo(
+    () => brigade.agents.filter(a => agentMatchesQuery(a, q, branchFilter)),
+    [brigade.agents, q, branchFilter],
+  )
+  if (matched.length === 0) return null
+
+  return (
+    <div
+      style={{
+        marginTop: 4,
+        marginBottom: 4,
+        marginLeft: 6,
+        paddingLeft: 6,
+        borderLeft: '1.5px dashed rgba(2, 132, 199, 0.35)',
+      }}
+    >
+      <button
+        type="button"
+        onClick={() => { setOpen(v => !v) }}
+        title={`${brigade.code} · ${brigade.name}\n主官: ${brigade.commanderTitle} (${brigade.commanderId})\n使命: ${brigade.mission}`}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 4,
+          padding: '3px 6px',
+          borderRadius: 5,
+          border: '1px solid rgba(2, 132, 199, 0.22)',
+          background: 'rgba(2, 132, 199, 0.06)',
+          color: 'var(--dsw-alias-label-primary)',
+          fontSize: 11,
+          fontWeight: 700,
+          cursor: 'pointer',
+          textAlign: 'left',
+        }}
+      >
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0 }}>
+          <span style={{ fontSize: 9, opacity: 0.75 }}>{open ? '▾' : '▸'}</span>
+          <span
+            style={{
+              fontSize: 9,
+              padding: '0 4px',
+              borderRadius: 3,
+              background: 'rgba(2, 132, 199, 0.16)',
+              color: '#0284c7',
+              fontFamily: 'monospace',
+              flex: 'none',
+            }}
+          >
+            {brigade.code}
+          </span>
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {brigade.name}
+          </span>
+        </span>
+        <span
+          style={{
+            fontSize: 10,
+            padding: '0 5px',
+            borderRadius: 999,
+            background: 'rgba(2, 132, 199, 0.14)',
+            color: '#0284c7',
+            flex: 'none',
+          }}
+        >
+          {matched.length}人
+        </span>
+      </button>
+      {open && (
+        <div style={{ marginTop: 2 }}>
+          {matched.map(agent => (
+            <SidebarAgentRow
+              key={agent.id}
+              agent={agent}
+              selected={selectedAgentId === agent.id}
+              existingSession={activeSessionByAgentId.get(agent.id)}
+              onSelectAgent={onSelectAgent}
+              onStartAgentSession={onStartAgentSession}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function SidebarZoneBranch({
   node,
   depth,
   query,
+  branchFilter = 'all',
+  groupByBrigade = true,
   selectedAgentId,
   activeSessionByAgentId,
   onSelectAgent,
@@ -263,6 +549,8 @@ function SidebarZoneBranch({
   node: HermesZoneNode
   depth: number
   query: string
+  branchFilter?: string
+  groupByBrigade?: boolean
   selectedAgentId: string | undefined
   activeSessionByAgentId: ReadonlyMap<string, SessionSummary>
   onSelectAgent: (agent: HermesAgentNode) => void
@@ -271,15 +559,17 @@ function SidebarZoneBranch({
   const [expanded, setExpanded] = useState(true)
   const q = query.trim().toLowerCase()
   const matchedAgents = useMemo(
-    () => (q ? node.agents.filter(a => agentMatchesQuery(a, q)) : node.agents),
-    [node.agents, q],
+    () => node.agents.filter(a => agentMatchesQuery(a, q, branchFilter)),
+    [node.agents, q, branchFilter],
   )
-  const visible = matchedAgents.length > 0 || node.children.some(c => zoneHasMatch(c, q))
-  if (q && !visible) return null
+  const visible = matchedAgents.length > 0 || node.children.some(c => zoneHasMatch(c, q, branchFilter))
+  if ((q || branchFilter !== 'all') && !visible) return null
 
   const isOptix = node.feishuProfile === 'company'
   const zoneBadgeBg = isOptix ? 'rgba(234, 88, 12, 0.16)' : 'rgba(16, 185, 129, 0.16)'
   const zoneBadgeColor = isOptix ? '#ea580c' : '#059669'
+  const hasBrigades = groupByBrigade && Array.isArray(node.brigades) && node.brigades.length > 1
+  const theaterCode = node.theaterCode ?? (depth === 0 ? 'THEATER' : 'CORPS')
 
   return (
     <div
@@ -287,7 +577,7 @@ function SidebarZoneBranch({
         marginLeft: depth > 0 ? 10 : 0,
         paddingLeft: depth > 0 ? 7 : 0,
         borderLeft: depth > 0 ? '1.5px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.3))' : 'none',
-        marginBottom: 4,
+        marginBottom: 5,
       }}
     >
       <button
@@ -301,19 +591,34 @@ function SidebarZoneBranch({
           gap: 6,
           padding: '5px 8px',
           borderRadius: 6,
-          border: 'none',
-          background: depth === 0 ? 'var(--dsw-alias-bg-layer-2, rgba(148,163,184,0.1))' : 'transparent',
+          border: depth === 0 ? '1px solid var(--dsw-alias-border-l2, rgba(148,163,184,0.25))' : 'none',
+          background: depth === 0 ? 'var(--dsw-alias-bg-layer-2, rgba(148,163,184,0.1))' : 'rgba(148,163,184,0.05)',
           color: 'var(--dsw-alias-label-primary)',
           fontSize: 12,
-          fontWeight: 600,
+          fontWeight: 700,
           cursor: 'pointer',
           textAlign: 'left',
         }}
       >
         <span style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
           <span style={{ fontSize: 10, opacity: 0.7 }}>{expanded ? '▾' : '▸'}</span>
-          <span>{depth === 0 ? '🗂️' : '📂'}</span>
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{node.name}</span>
+          <span
+            style={{
+              fontSize: 9.5,
+              padding: '0 4px',
+              borderRadius: 3,
+              background: depth === 0 ? 'rgba(245, 158, 11, 0.16)' : 'rgba(2, 132, 199, 0.15)',
+              color: depth === 0 ? '#d97706' : '#0284c7',
+              fontFamily: 'monospace',
+              fontWeight: 700,
+              flex: 'none',
+            }}
+          >
+            {theaterCode}
+          </span>
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {node.militaryTitle ?? node.name}
+          </span>
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 4, flex: 'none' }}>
           <span
@@ -337,7 +642,7 @@ function SidebarZoneBranch({
               color: 'var(--dsw-alias-label-secondary)',
             }}
           >
-            {node.totalCount}
+            {node.totalCount}人
           </span>
         </span>
       </button>
@@ -350,104 +655,37 @@ function SidebarZoneBranch({
               node={child}
               depth={depth + 1}
               query={query}
+              branchFilter={branchFilter}
+              groupByBrigade={groupByBrigade}
               selectedAgentId={selectedAgentId}
               activeSessionByAgentId={activeSessionByAgentId}
               onSelectAgent={onSelectAgent}
               onStartAgentSession={onStartAgentSession}
             />
           ))}
-          {matchedAgents.map((agent) => {
-            const selected = selectedAgentId === agent.id
-            const isHead = agent.isCompanyHead || agent.id === 'default'
-            const existingSession = activeSessionByAgentId.get(agent.id)
-            return (
-              <div
-                key={agent.id}
-                onClick={() => { onSelectAgent(agent) }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 6,
-                  padding: '4px 8px',
-                  marginTop: 1,
-                  borderRadius: 6,
-                  cursor: 'pointer',
-                  background: selected
-                    ? 'var(--dsw-alias-interactive-bg-active, rgba(2,132,199,0.14))'
-                    : 'transparent',
-                  border: selected
-                    ? '1px solid rgba(2,132,199,0.45)'
-                    : '1px solid transparent',
-                  fontSize: 12,
-                }}
-              >
-                <div style={{ minWidth: 0, flex: 1 }}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      fontWeight: isHead ? 700 : 400,
-                      color: 'var(--dsw-alias-label-primary)',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                    title={`${agent.title} (${agent.id})\n工作目录: ${agent.projectRoot}\n飞书通道: --profile ${agent.feishuProfile}${existingSession ? `\n常驻会话: ${existingSession.displayTitle || existingSession.id}` : ''}`}
-                  >
-                    <span
-                      style={{
-                        fontSize: 10,
-                        padding: '0 4px',
-                        borderRadius: 3,
-                        background: isHead ? 'rgba(2,132,199,0.18)' : 'rgba(148,163,184,0.16)',
-                        color: isHead ? '#0284c7' : 'var(--dsw-alias-label-secondary)',
-                        flex: 'none',
-                      }}
-                    >
-                      {String(agent.seatOrder ?? 1).padStart(2, '0')}号
-                    </span>
-                    {existingSession !== undefined && (
-                      <span
-                        title="已有常驻会话，点击直接续接"
-                        style={{ color: '#10b981', fontSize: 9, flex: 'none' }}
-                      >
-                        ●
-                      </span>
-                    )}
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{agent.title}</span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  title={existingSession
-                    ? `续接 ${agent.title} 的常驻会话 (${existingSession.displayTitle || existingSession.id})`
-                    : `与 ${agent.title} (${agent.id}) 开启对话 (${agent.projectRoot})`}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onSelectAgent(agent)
-                    onStartAgentSession(agent, false)
-                  }}
-                  style={{
-                    flex: 'none',
-                    padding: '1px 6px',
-                    borderRadius: 4,
-                    border: existingSession
-                      ? '1px solid rgba(16, 185, 129, 0.45)'
-                      : '1px solid var(--dsw-alias-border-l2, rgba(148,163,184,0.35))',
-                    background: existingSession ? 'rgba(16, 185, 129, 0.12)' : 'var(--dsw-alias-bg-layer-1, transparent)',
-                    color: existingSession ? '#059669' : 'var(--dsw-alias-label-secondary)',
-                    fontSize: 10.5,
-                    fontWeight: existingSession ? 700 : 500,
-                    cursor: 'pointer',
-                  }}
-                >
-                  {existingSession ? '续接' : '对话'}
-                </button>
-              </div>
-            )
-          })}
+          {hasBrigades
+            ? node.brigades!.map(bde => (
+                <SidebarBrigadeGroup
+                  key={bde.id}
+                  brigade={bde}
+                  query={query}
+                  branchFilter={branchFilter}
+                  selectedAgentId={selectedAgentId}
+                  activeSessionByAgentId={activeSessionByAgentId}
+                  onSelectAgent={onSelectAgent}
+                  onStartAgentSession={onStartAgentSession}
+                />
+              ))
+            : matchedAgents.map(agent => (
+                <SidebarAgentRow
+                  key={agent.id}
+                  agent={agent}
+                  selected={selectedAgentId === agent.id}
+                  existingSession={activeSessionByAgentId.get(agent.id)}
+                  onSelectAgent={onSelectAgent}
+                  onStartAgentSession={onStartAgentSession}
+                />
+              ))}
         </div>
       )}
     </div>
@@ -477,6 +715,8 @@ export function HermesSidebarOrgTree({
 }) {
   const [treeData, setTreeData] = useState<HermesOrgTreeData>(HERMES_ORG_TREE)
   const [query, setQuery] = useState('')
+  const [sidebarBranchFilter, setSidebarBranchFilter] = useState<string>('all')
+  const [sidebarGroupByBrigade, setSidebarGroupByBrigade] = useState<boolean>(true)
   const [selectedAgent, setSelectedAgent] = useState<HermesAgentNode | undefined>(() => {
     const flat: HermesAgentNode[] = []
     const walk = (n: HermesZoneNode) => {
@@ -1229,7 +1469,7 @@ export function HermesSidebarOrgTree({
         type="text"
         value={query}
         onChange={(e) => { setQuery(e.target.value) }}
-        placeholder="筛选 83 个智能体 (如: 伴学 / 万界 / Optix)…"
+        placeholder="筛选 83 名战将 (番号 / 军衔 / 伴学 / 万界 / Optix)…"
         style={{
           width: '100%',
           boxSizing: 'border-box',
@@ -1242,6 +1482,58 @@ export function HermesSidebarOrgTree({
           outline: 'none',
         }}
       />
+
+      {/* Military Branch & Brigade Formation Filter Bar */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 3, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+          {([
+            ['all', '🎖️全军'],
+            ['command', '⭐将帅'],
+            ['assault', '⚔️突击'],
+            ['mp', '🛡️督察'],
+            ['staff', '🧭参谋'],
+          ] as const).map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => { setSidebarBranchFilter(key) }}
+              style={{
+                padding: '2px 5px',
+                borderRadius: 4,
+                border: sidebarBranchFilter === key
+                  ? '1px solid #0284c7'
+                  : '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.28))',
+                background: sidebarBranchFilter === key
+                  ? 'rgba(2, 132, 199, 0.16)'
+                  : 'transparent',
+                color: sidebarBranchFilter === key ? '#0284c7' : 'var(--dsw-alias-label-secondary)',
+                fontSize: 10,
+                fontWeight: sidebarBranchFilter === key ? 700 : 500,
+                cursor: 'pointer',
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() => { setSidebarGroupByBrigade(v => !v) }}
+          title="切换『合成旅建制编组』与『平铺席位』模式"
+          style={{
+            padding: '2px 5px',
+            borderRadius: 4,
+            border: '1px solid rgba(245, 158, 11, 0.4)',
+            background: sidebarGroupByBrigade ? 'rgba(245, 158, 11, 0.14)' : 'transparent',
+            color: '#d97706',
+            fontSize: 10,
+            fontWeight: 700,
+            cursor: 'pointer',
+          }}
+        >
+          {sidebarGroupByBrigade ? '🪖合成旅编成' : '📋平铺'}
+        </button>
+      </div>
 
       {statusNotice !== null && (
         <div
@@ -1296,11 +1588,27 @@ export function HermesSidebarOrgTree({
                   : '⚡ 单模'} · {String(selectedAgentConfig.reasoningEffort)}
             </span>
           </div>
+          <div style={{ opacity: 0.85, marginTop: 2, display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center' }}>
+            <span
+              style={{
+                padding: '0 5px',
+                borderRadius: 3,
+                background: 'rgba(245, 158, 11, 0.15)',
+                color: '#d97706',
+                fontWeight: 700,
+                fontSize: 10,
+              }}
+            >
+              {selectedAgent.militaryRank ?? '⚔️ 作战席位'} · {selectedAgent.callsign ?? selectedAgent.id}
+            </span>
+            <span>{selectedAgent.branchLabel ?? selectedAgent.department}</span>
+          </div>
           <div style={{ opacity: 0.78, marginTop: 2 }}>
-            ID: <code>{selectedAgent.id}</code> · 飞书: <code>--profile {selectedAgent.feishuProfile}</code>
+            直属长官: <code>{selectedAgent.supervisor}</code>
+            {selectedAgent.reviewer ? <> · 宪兵督察: <code>{selectedAgent.reviewer}</code></> : null}
           </div>
           <div style={{ opacity: 0.78, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            模型: <code>{String(selectedAgentConfig.model)}</code> (<code>{String(selectedAgentConfig.reasoningEffort)}</code>)
+            武器: <code>{String(selectedAgentConfig.model)}</code> (<code>{String(selectedAgentConfig.reasoningEffort)}</code>) · 频段: <code>{selectedAgent.feishuProfile}</code>
           </div>
           <div
             style={{
@@ -1560,6 +1868,8 @@ export function HermesSidebarOrgTree({
             node={rootNode}
             depth={0}
             query={query}
+            branchFilter={sidebarBranchFilter}
+            groupByBrigade={sidebarGroupByBrigade}
             selectedAgentId={selectedAgent?.id}
             activeSessionByAgentId={activeSessionByAgentId}
             onSelectAgent={setSelectedAgent}
@@ -1608,10 +1918,45 @@ export function HermesCommandCenterPage({
   const [ensembleResult, setEnsembleResult] = useState<Record<string, any> | null>(null)
   const [treeData, setTreeData] = useState<HermesOrgTreeData>(HERMES_ORG_TREE)
   const [query, setQuery] = useState('')
+  const [orgViewMode, setOrgViewMode] = useState<'matrix' | 'tree'>('matrix')
+  const [orgBranchFilter, setOrgBranchFilter] = useState<string>('all')
   const [selectedAgent, setSelectedAgent] = useState<HermesAgentNode>(() => {
     const localRoot = HERMES_ORG_TREE.roots.find(r => r.name === '本机')
     return localRoot?.agents.find(a => a.id === 'default') ?? HERMES_ORG_TREE.roots[0]!.agents[0]!
   })
+
+  const allOrgAgents = useMemo(() => {
+    const out: HermesAgentNode[] = []
+    const walk = (n: HermesZoneNode) => {
+      out.push(...n.agents)
+      for (const c of n.children) walk(c)
+    }
+    for (const r of treeData.roots) walk(r)
+    return out
+  }, [treeData.roots])
+
+  const allOrgSectionsWithBrigades = useMemo(() => {
+    const out: HermesZoneNode[] = []
+    const walk = (n: HermesZoneNode) => {
+      if ((n.brigades && n.brigades.length > 0) || n.agents.length > 0) {
+        out.push(n)
+      }
+      for (const c of n.children) walk(c)
+    }
+    for (const r of treeData.roots) walk(r)
+    return out
+  }, [treeData.roots])
+
+  const orgBranchCounts = useMemo(() => {
+    const counts = { all: allOrgAgents.length, command: 0, assault: 0, mp: 0, staff: 0 }
+    for (const a of allOrgAgents) {
+      if (a.branch === 'command') counts.command++
+      else if (a.branch === 'mp') counts.mp++
+      else if (a.branch === 'intel' || a.branch === 'logistics') counts.staff++
+      else counts.assault++
+    }
+    return counts
+  }, [allOrgAgents])
   const [sessions, setSessions] = useState<HermesSessionSummary[]>(
     () => HERMES_INITIAL_SESSIONS.default ?? [],
   )
@@ -1936,7 +2281,7 @@ export function HermesCommandCenterPage({
             ['warroom', '🎯 作战大屏 (E:/6_learn_space · 11门禁·45课包·9算力池·督办)'],
             ['surgery', '🩺 双进程互为手术台 (主进程 ⇄ :17580 独立热手术伴生进程)'],
             ['ensemble', '🧠 参数 · MoA · Fusion (83岗模型/推理等级 & 多模融合工作台)'],
-            ['org', '🏛️ 三区嵌套组织树 & 83 预设 (Optix / 个人[伴学·万界] / 本机)'],
+            ['org', '🎖️ 全军建制与作战指挥部 (83编制 · 三大战区 · 15合成旅/营)'],
             ['gateway', '📡 飞书双租户常驻事件网关 (company / life)'],
             ['loop6', '♾️ 六步自我强化闭环流水线 (DocxXML + 个人账本)'],
           ] as const).map(([key, label]) => (
@@ -3474,201 +3819,714 @@ export function HermesCommandCenterPage({
         )}
 
         {activeTab === 'org' && (
-          <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr', gap: 18, height: '100%', minHeight: 520 }}>
-            {/* Left column: 3-zone nested tree */}
-            <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column', gap: 10, minHeight: 0, overflow: 'hidden' }}>
-              <div style={{ fontWeight: 700, fontSize: 13.5 }}>
-                🗂️ 三区嵌套组织架构树 ({treeData.totalAgents} 人)
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* 1. Supreme Military Order-of-Battle (OOB) Command Header */}
+            <div
+              style={{
+                ...cardStyle,
+                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.09) 0%, rgba(2, 132, 199, 0.08) 55%, rgba(16, 185, 129, 0.07) 100%)',
+                border: '1px solid rgba(245, 158, 11, 0.35)',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <span
+                      style={{
+                        padding: '2px 8px',
+                        borderRadius: 4,
+                        background: 'rgba(245, 158, 11, 0.22)',
+                        color: '#d97706',
+                        fontSize: 11,
+                        fontWeight: 800,
+                        fontFamily: 'monospace',
+                      }}
+                    >
+                      DEFCON-1 · READY
+                    </span>
+                    <span style={{ fontSize: 16, fontWeight: 800 }}>
+                      🎖️ 全军五级建制与作战序列管理系统 (Military Order of Battle & C2)
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--dsw-alias-label-secondary)', marginTop: 6, lineHeight: 1.55 }}>
+                    <strong>最高统帅部：</strong>最高统帅 <code>胡飞扬 (OWNER)</code> ➔ 五星总参谋长 <code>👑 终极管家 (default · JOC-00)</code> ➔ 统辖 <strong>三大战区 / 两大集团军 / 15 个合成旅与特遣营 / {treeData.totalAgents} 名满编战将</strong>（全员配备直属指挥官 <code>supervisor</code> + 独立宪兵督察官 <code>reviewer</code>）
+                  </div>
+                </div>
+
+                {/* View Mode Switcher */}
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <button
+                    type="button"
+                    onClick={() => { setOrgViewMode('matrix') }}
+                    style={{
+                      padding: '6px 12px',
+                      borderRadius: 7,
+                      border: orgViewMode === 'matrix' ? '1px solid #d97706' : '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.3))',
+                      background: orgViewMode === 'matrix' ? 'rgba(245, 158, 11, 0.18)' : 'transparent',
+                      color: orgViewMode === 'matrix' ? '#d97706' : 'var(--dsw-alias-label-primary)',
+                      fontSize: 12,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    🗺️ 战区合成旅方阵沙盘 (15旅/营)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setOrgViewMode('tree') }}
+                    style={{
+                      padding: '6px 12px',
+                      borderRadius: 7,
+                      border: orgViewMode === 'tree' ? '1px solid #0284c7' : '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.3))',
+                      background: orgViewMode === 'tree' ? 'rgba(2, 132, 199, 0.16)' : 'transparent',
+                      color: orgViewMode === 'tree' ? '#0284c7' : 'var(--dsw-alias-label-primary)',
+                      fontSize: 12,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    🌲 五级建制树视图
+                  </button>
+                </div>
               </div>
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => { setQuery(e.target.value) }}
-                placeholder="搜索岗位 ID / 名称 / 伴学 / 万界 / Optix…"
-                style={{
-                  width: '100%',
-                  boxSizing: 'border-box',
-                  padding: '7px 10px',
-                  borderRadius: 7,
-                  border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.3))',
-                  background: 'transparent',
-                  color: 'var(--dsw-alias-label-primary)',
-                  fontSize: 12.5,
-                }}
-              />
-              <div style={{ flex: 1, overflowY: 'auto', paddingRight: 4 }}>
-                {treeData.roots.map(rootNode => (
-                  <SidebarZoneBranch
-                    key={rootNode.id}
-                    node={rootNode}
-                    depth={0}
-                    query={query}
-                    selectedAgentId={selectedAgent.id}
-                    activeSessionByAgentId={new Map()}
-                    onSelectAgent={setSelectedAgent}
-                    onStartAgentSession={(agent, forceNew) => { startAgentSession(agent, undefined, forceNew) }}
-                  />
-                ))}
+
+              {/* 5-Branch Military Force Breakdown & Filter Bar */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginTop: 12 }}>
+                {([
+                  ['all', '🎖️ 全军满编兵力', `${String(orgBranchCounts.all)} 员战将`, '三大战区 · 15 合成旅/营', '#0284c7'],
+                  ['command', '⭐ 将帅与指挥参谋部', `${String(orgBranchCounts.command)} 名主官`, '总参 / 战区 / 集团军 / 旅营长', '#d97706'],
+                  ['assault', '⚔️ 主力工程与突击兵', `${String(orgBranchCounts.assault)} 名突击手`, '代码 / 美术 / 课程 / 多模态攻坚', '#059669'],
+                  ['mp', '🛡️ 宪兵督察与独立QA', `${String(orgBranchCounts.mp)} 名督察官`, '红队代码审查 / 教学验收 / 盲测', '#8b5cf6'],
+                  ['staff', '🧭 参谋情报与后勤保障', `${String(orgBranchCounts.staff)} 名参谋官`, '架构 / 策划 / 数据 / 法务财务', '#0ea5e9'],
+                ] as const).map(([key, title, stat, sub, accent]) => {
+                  const active = orgBranchFilter === key
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => { setOrgBranchFilter(key) }}
+                      style={{
+                        textAlign: 'left',
+                        padding: '9px 11px',
+                        borderRadius: 8,
+                        border: active ? `1.5px solid ${accent}` : '1px solid var(--dsw-alias-border-l2, rgba(148,163,184,0.24))',
+                        background: active ? `${accent}1f` : 'var(--dsw-alias-bg-layer-1, rgba(255,255,255,0.03))',
+                        color: 'var(--dsw-alias-label-primary)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <div style={{ fontSize: 11, opacity: 0.82, fontWeight: 600 }}>{title}</div>
+                      <div style={{ fontSize: 16, fontWeight: 800, color: accent, marginTop: 2 }}>{stat}</div>
+                      <div style={{ fontSize: 10.5, opacity: 0.72, marginTop: 2 }}>{sub}</div>
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
-            {/* Right column: Selected Agent Workbench */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div style={cardStyle}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-                  <div>
-                    <div style={{ fontSize: 18, fontWeight: 700 }}>
-                      {selectedAgent.title}
-                      <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.75, marginLeft: 8 }}>
-                        ({selectedAgent.id})
-                      </span>
-                    </div>
-                    <div style={{ fontSize: 12.5, color: 'var(--dsw-alias-label-secondary)', marginTop: 4 }}>
-                      所属分区：<strong>{selectedAgent.sectionPath}</strong> · 部门：{selectedAgent.department} · 直属上级：<code>{selectedAgent.supervisor}</code>
-                    </div>
+            {/* 2. Main Split Workspace: Left (OOB Matrix OR 4-Level Tree) + Right (Officer Dossier & C2 Console) */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: orgViewMode === 'matrix' ? '1.35fr 1fr' : '380px 1fr',
+                gap: 18,
+                minHeight: 620,
+                alignItems: 'start',
+              }}
+            >
+              {/* Left Pane: Order-of-Battle Brigade Matrix OR 4-Level Military Tree */}
+              <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column', gap: 12, maxHeight: 820, overflow: 'hidden' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                  <div style={{ fontWeight: 800, fontSize: 14 }}>
+                    {orgViewMode === 'matrix'
+                      ? '🗺️ 三大战区 · 15 合成旅/独立营作战方阵沙盘'
+                      : `🌲 五级军队建制指挥树 (${String(treeData.totalAgents)} 人)`}
                   </div>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <span
-                      style={{
-                        padding: '4px 10px',
-                        borderRadius: 999,
-                        fontSize: 12,
-                        fontWeight: 700,
-                        background: selectedAgent.feishuProfile === 'company' ? 'rgba(234,88,12,0.16)' : 'rgba(16,185,129,0.16)',
-                        color: selectedAgent.feishuProfile === 'company' ? '#ea580c' : '#059669',
-                      }}
-                    >
-                      飞书通道: --profile {selectedAgent.feishuProfile}
-                    </span>
+                  <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => { setQuery(e.target.value) }}
+                    placeholder="搜索番号 (如 BDE-BX-101 / WJ-P01) / 军衔 / 姓名…"
+                    style={{
+                      width: 240,
+                      padding: '5px 10px',
+                      borderRadius: 6,
+                      border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.3))',
+                      background: 'transparent',
+                      color: 'var(--dsw-alias-label-primary)',
+                      fontSize: 12,
+                    }}
+                  />
+                </div>
+
+                <div style={{ flex: 1, overflowY: 'auto', paddingRight: 4, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {orgViewMode === 'tree' ? (
+                    treeData.roots.map(rootNode => (
+                      <SidebarZoneBranch
+                        key={rootNode.id}
+                        node={rootNode}
+                        depth={0}
+                        query={query}
+                        branchFilter={orgBranchFilter}
+                        groupByBrigade
+                        selectedAgentId={selectedAgent.id}
+                        activeSessionByAgentId={new Map()}
+                        onSelectAgent={setSelectedAgent}
+                        onStartAgentSession={(agent, forceNew) => { startAgentSession(agent, undefined, forceNew) }}
+                      />
+                    ))
+                  ) : (
+                    allOrgSectionsWithBrigades.map((sec) => {
+                      const q = query.trim().toLowerCase()
+                      const brigades = (sec.brigades ?? []).map(bde => ({
+                        ...bde,
+                        visibleAgents: bde.agents.filter(a => agentMatchesQuery(a, q, orgBranchFilter)),
+                      })).filter(bde => bde.visibleAgents.length > 0)
+                      if (brigades.length === 0) return null
+
+                      return (
+                        <div
+                          key={sec.id}
+                          style={{
+                            borderRadius: 10,
+                            border: '1px solid var(--dsw-alias-border-l2, rgba(148,163,184,0.28))',
+                            background: 'var(--dsw-alias-bg-layer-2, rgba(15,23,42,0.03))',
+                            padding: 12,
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <span
+                                style={{
+                                  padding: '2px 7px',
+                                  borderRadius: 4,
+                                  background: 'rgba(245, 158, 11, 0.18)',
+                                  color: '#d97706',
+                                  fontFamily: 'monospace',
+                                  fontSize: 11,
+                                  fontWeight: 800,
+                                }}
+                              >
+                                {sec.theaterCode ?? sec.id.toUpperCase()}
+                              </span>
+                              <span style={{ fontWeight: 800, fontSize: 13.5 }}>
+                                {sec.militaryTitle ?? sec.path}
+                              </span>
+                            </div>
+                            <span
+                              style={{
+                                fontSize: 11,
+                                padding: '2px 8px',
+                                borderRadius: 999,
+                                background: sec.feishuProfile === 'company' ? 'rgba(234,88,12,0.16)' : 'rgba(16,185,129,0.16)',
+                                color: sec.feishuProfile === 'company' ? '#ea580c' : '#059669',
+                                fontWeight: 700,
+                              }}
+                            >
+                              频段: --profile {sec.feishuProfile} · 下辖 {brigades.length} 个旅/营
+                            </span>
+                          </div>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: brigades.length > 1 ? 'repeat(2, 1fr)' : '1fr', gap: 10 }}>
+                            {brigades.map((bde) => {
+                              const cmdAgent = findAgentById(bde.commanderId)
+                              const mpAgent = bde.commissarId ? findAgentById(bde.commissarId) : undefined
+                              return (
+                                <div
+                                  key={bde.id}
+                                  style={{
+                                    borderRadius: 8,
+                                    border: '1px solid rgba(2, 132, 199, 0.28)',
+                                    background: 'var(--dsw-alias-bg-layer-1, rgba(255,255,255,0.03))',
+                                    padding: 10,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: 7,
+                                  }}
+                                >
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 6 }}>
+                                    <div>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                                        <span
+                                          style={{
+                                            fontSize: 10,
+                                            padding: '1px 5px',
+                                            borderRadius: 3,
+                                            background: 'rgba(2, 132, 199, 0.18)',
+                                            color: '#0284c7',
+                                            fontFamily: 'monospace',
+                                            fontWeight: 800,
+                                          }}
+                                        >
+                                          {bde.code}
+                                        </span>
+                                        <span style={{ fontWeight: 800, fontSize: 12.5 }}>{bde.name}</span>
+                                      </div>
+                                      <div style={{ fontSize: 11, color: 'var(--dsw-alias-label-secondary)', marginTop: 3, lineHeight: 1.4 }}>
+                                        {bde.mission}
+                                      </div>
+                                    </div>
+                                    <span
+                                      style={{
+                                        fontSize: 10.5,
+                                        padding: '2px 7px',
+                                        borderRadius: 999,
+                                        background: 'rgba(245, 158, 11, 0.16)',
+                                        color: '#d97706',
+                                        fontWeight: 800,
+                                        flex: 'none',
+                                      }}
+                                    >
+                                      {bde.visibleAgents.length}人
+                                    </span>
+                                  </div>
+
+                                  {/* Brigade Commander & MP Commissar bar */}
+                                  <div
+                                    style={{
+                                      display: 'flex',
+                                      flexWrap: 'wrap',
+                                      gap: 6,
+                                      padding: '5px 7px',
+                                      borderRadius: 6,
+                                      background: 'rgba(148, 163, 184, 0.08)',
+                                      fontSize: 11,
+                                    }}
+                                  >
+                                    {cmdAgent && (
+                                      <button
+                                        type="button"
+                                        onClick={() => { setSelectedAgent(cmdAgent) }}
+                                        style={{
+                                          border: 'none',
+                                          background: 'transparent',
+                                          color: '#d97706',
+                                          fontWeight: 700,
+                                          fontSize: 11,
+                                          padding: 0,
+                                          cursor: 'pointer',
+                                        }}
+                                      >
+                                        ⭐⭐ 主官: {cmdAgent.title}
+                                      </button>
+                                    )}
+                                    {mpAgent && (
+                                      <button
+                                        type="button"
+                                        onClick={() => { setSelectedAgent(mpAgent) }}
+                                        style={{
+                                          border: 'none',
+                                          background: 'transparent',
+                                          color: '#8b5cf6',
+                                          fontWeight: 700,
+                                          fontSize: 11,
+                                          padding: 0,
+                                          cursor: 'pointer',
+                                        }}
+                                      >
+                                        ｜ 🛡️ 督察: {mpAgent.title}
+                                      </button>
+                                    )}
+                                  </div>
+
+                                  {/* Brigade Roster Chips */}
+                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                                    {bde.visibleAgents.map((ag) => {
+                                      const isSel = selectedAgent.id === ag.id
+                                      const rk = getRankVisualStyle(ag)
+                                      return (
+                                        <button
+                                          key={ag.id}
+                                          type="button"
+                                          onClick={() => { setSelectedAgent(ag) }}
+                                          title={`【${ag.militaryRank ?? ''} · ${ag.callsign ?? ag.id}】${ag.title}\n点击查看军籍档案，双击直接点将对话`}
+                                          onDoubleClick={() => { startAgentSession(ag) }}
+                                          style={{
+                                            padding: '3px 7px',
+                                            borderRadius: 5,
+                                            border: isSel ? '1.5px solid #0284c7' : `1px solid ${rk.border}`,
+                                            background: isSel ? 'rgba(2, 132, 199, 0.18)' : rk.bg,
+                                            color: isSel ? '#0284c7' : 'var(--dsw-alias-label-primary)',
+                                            fontSize: 11,
+                                            fontWeight: (ag.rankTier ?? 5) <= 3 || isSel ? 700 : 500,
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 4,
+                                          }}
+                                        >
+                                          <span style={{ color: rk.color, fontFamily: 'monospace', fontSize: 10 }}>
+                                            {rk.badge}{ag.callsign ?? ''}
+                                          </span>
+                                          <span>{ag.title}</span>
+                                        </button>
+                                      )
+                                    })}
+                                  </div>
+
+                                  {/* Brigade-level Tactical Order Action */}
+                                  {cmdAgent && (
+                                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2 }}>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedAgent(cmdAgent)
+                                          const rosterNames = bde.visibleAgents.map(a => `${a.title}(${a.id})`).join('、')
+                                          setDispatchPrompt(
+                                            `【作战军令 · ${bde.code} ${bde.name}】请作为本旅主官 (${cmdAgent.title}) 统筹麾下编制（${rosterNames}），针对防区 ${cmdAgent.projectRoot} 执行以下作战任务并由宪兵督察 (${String(bde.commissarId ?? 'QA')}) 验收：`,
+                                          )
+                                        }}
+                                        style={{
+                                          padding: '3px 8px',
+                                          borderRadius: 5,
+                                          border: '1px solid rgba(245, 158, 11, 0.45)',
+                                          background: 'rgba(245, 158, 11, 0.12)',
+                                          color: '#d97706',
+                                          fontSize: 10.5,
+                                          fontWeight: 700,
+                                          cursor: 'pointer',
+                                        }}
+                                      >
+                                        📣 向本旅下达作战军令 (主官领衔)
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )
+                    })
+                  )}
+                </div>
+              </div>
+
+              {/* Right Column: Officer Tactical Dossier & C2 Command Console */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div style={cardStyle}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        <span
+                          style={{
+                            padding: '3px 8px',
+                            borderRadius: 5,
+                            background: 'rgba(245, 158, 11, 0.18)',
+                            color: '#d97706',
+                            fontWeight: 800,
+                            fontSize: 11.5,
+                            fontFamily: 'monospace',
+                          }}
+                        >
+                          {selectedAgent.militaryRank ?? '⚔️ 突击少校'} · 番号 {selectedAgent.callsign ?? selectedAgent.id}
+                        </span>
+                        <span
+                          style={{
+                            padding: '3px 8px',
+                            borderRadius: 5,
+                            background: 'rgba(2, 132, 199, 0.14)',
+                            color: '#0284c7',
+                            fontWeight: 700,
+                            fontSize: 11.5,
+                          }}
+                        >
+                          {selectedAgent.branchLabel ?? selectedAgent.department}
+                        </span>
+                        <span
+                          style={{
+                            padding: '3px 8px',
+                            borderRadius: 999,
+                            fontSize: 11,
+                            fontWeight: 700,
+                            background: selectedAgent.feishuProfile === 'company' ? 'rgba(234,88,12,0.16)' : 'rgba(16,185,129,0.16)',
+                            color: selectedAgent.feishuProfile === 'company' ? '#ea580c' : '#059669',
+                          }}
+                        >
+                          加密频段: --profile {selectedAgent.feishuProfile}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 18, fontWeight: 800, marginTop: 8 }}>
+                        {selectedAgent.title}
+                        <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.75, marginLeft: 8 }}>
+                          ({selectedAgent.id})
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 12, color: 'var(--dsw-alias-label-secondary)', marginTop: 4 }}>
+                        防区建制：<strong>{selectedAgent.sectionPath}</strong> · 编制部门：{selectedAgent.department} · 席位序列：第 {String(selectedAgent.seatOrder ?? 1).padStart(2, '0')} 号
+                      </div>
+                    </div>
                     <button
                       type="button"
                       onClick={() => { startAgentSession(selectedAgent) }}
                       style={{
-                        padding: '6px 14px',
+                        padding: '8px 14px',
                         borderRadius: 8,
                         border: 'none',
                         background: '#0284c7',
                         color: '#fff',
-                        fontWeight: 700,
+                        fontWeight: 800,
                         fontSize: 12.5,
                         cursor: 'pointer',
                       }}
                     >
-                      ✨ 在 DSH 启动该岗位预设会话
+                      ⚡ 升帐点将 (启动 DSH 常驻作战室)
+                    </button>
+                  </div>
+
+                  {/* Interactive Chain of Command & MP Reviewer Card */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(3, 1fr)',
+                      gap: 10,
+                      marginTop: 14,
+                      padding: 12,
+                      borderRadius: 8,
+                      background: 'var(--dsw-alias-bg-layer-2, rgba(148,163,184,0.08))',
+                      border: '1px solid var(--dsw-alias-border-l2, rgba(148,163,184,0.22))',
+                      fontSize: 12,
+                    }}
+                  >
+                    <div>
+                      <div style={{ opacity: 0.72, fontSize: 11 }}>⬆️ 直属上级指挥官 (Supervisor)</div>
+                      {(() => {
+                        const supAgent = findAgentById(selectedAgent.supervisor)
+                        if (supAgent) {
+                          return (
+                            <button
+                              type="button"
+                              onClick={() => { setSelectedAgent(supAgent) }}
+                              style={{
+                                marginTop: 4,
+                                padding: '4px 8px',
+                                borderRadius: 5,
+                                border: '1px solid rgba(245, 158, 11, 0.4)',
+                                background: 'rgba(245, 158, 11, 0.12)',
+                                color: '#d97706',
+                                fontWeight: 700,
+                                fontSize: 11.5,
+                                cursor: 'pointer',
+                                textAlign: 'left',
+                                width: '100%',
+                              }}
+                            >
+                              {supAgent.rankBadge ?? '⭐'} {supAgent.title} ({supAgent.id})
+                            </button>
+                          )
+                        }
+                        return (
+                          <div style={{ fontWeight: 700, marginTop: 4, color: '#d97706' }}>
+                            👑 最高统帅 ({selectedAgent.supervisor})
+                          </div>
+                        )
+                      })()}
+                    </div>
+
+                    <div>
+                      <div style={{ opacity: 0.72, fontSize: 11 }}>🛡️ 独立宪兵督察官 (Reviewer / QA)</div>
+                      {(() => {
+                        const revAgent = selectedAgent.reviewer ? findAgentById(selectedAgent.reviewer) : undefined
+                        if (revAgent) {
+                          return (
+                            <button
+                              type="button"
+                              onClick={() => { setSelectedAgent(revAgent) }}
+                              style={{
+                                marginTop: 4,
+                                padding: '4px 8px',
+                                borderRadius: 5,
+                                border: '1px solid rgba(139, 92, 246, 0.4)',
+                                background: 'rgba(139, 92, 246, 0.12)',
+                                color: '#8b5cf6',
+                                fontWeight: 700,
+                                fontSize: 11.5,
+                                cursor: 'pointer',
+                                textAlign: 'left',
+                                width: '100%',
+                              }}
+                            >
+                              🛡️ {revAgent.title} ({revAgent.id})
+                            </button>
+                          )
+                        }
+                        return (
+                          <div style={{ fontWeight: 600, marginTop: 4, opacity: 0.8 }}>
+                            <code>{selectedAgent.reviewer ?? '总参宪兵直辖'}</code>
+                          </div>
+                        )
+                      })()}
+                    </div>
+
+                    <div>
+                      <div style={{ opacity: 0.72, fontSize: 11 }}>📍 驻防目录 & 预设武器库</div>
+                      <div style={{ fontWeight: 600, marginTop: 4, fontSize: 11.5 }}>
+                        <code>{selectedAgent.projectRoot}</code>
+                      </div>
+                      <div style={{ fontSize: 10.5, opacity: 0.75, marginTop: 2 }}>
+                        武器: <code>{String(currentAgentCfg.model)}</code> ({String(currentAgentCfg.reasoningEffort).toUpperCase()})
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Direct Subordinates Roster (if Commander / Lead) */}
+                  {(selectedAgent.subordinateIds?.length ?? 0) > 0 && (
+                    <div
+                      style={{
+                        marginTop: 12,
+                        padding: '10px 12px',
+                        borderRadius: 8,
+                        border: '1px solid rgba(245, 158, 11, 0.35)',
+                        background: 'rgba(245, 158, 11, 0.06)',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                        <div style={{ fontSize: 12, fontWeight: 800, color: '#d97706' }}>
+                          ⬇️ 麾下直辖作战部队 ({selectedAgent.subordinateIds!.length} 员直属战将)
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const subNames = selectedAgent.subordinateIds!
+                              .map(id => findAgentById(id))
+                              .filter((a): a is HermesAgentNode => a !== undefined)
+                              .map(a => `${a.title}(${a.id})`)
+                              .join('、')
+                            setDispatchPrompt(
+                              `【将军升帐 · 旅营协同军令】请作为 ${selectedAgent.title} (${selectedAgent.id}) 统领直属部下（${subNames}），在防区 ${selectedAgent.projectRoot} 协同推进以下战役目标：`,
+                            )
+                          }}
+                          style={{
+                            padding: '3px 8px',
+                            borderRadius: 5,
+                            border: '1px solid #d97706',
+                            background: 'rgba(245, 158, 11, 0.16)',
+                            color: '#d97706',
+                            fontSize: 11,
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          📣 拟定全队联合作战军令
+                        </button>
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                        {selectedAgent.subordinateIds!.map((subId) => {
+                          const sub = findAgentById(subId)
+                          if (!sub) return null
+                          const rk = getRankVisualStyle(sub)
+                          return (
+                            <button
+                              key={sub.id}
+                              type="button"
+                              onClick={() => { setSelectedAgent(sub) }}
+                              style={{
+                                padding: '3px 8px',
+                                borderRadius: 5,
+                                border: `1px solid ${rk.border}`,
+                                background: rk.bg,
+                                color: 'var(--dsw-alias-label-primary)',
+                                fontSize: 11,
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                              }}
+                            >
+                              <span style={{ color: rk.color, fontFamily: 'monospace', marginRight: 4 }}>
+                                {rk.badge}{sub.callsign ?? ''}
+                              </span>
+                              {sub.title}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  <div style={{ marginTop: 12, fontSize: 12.5, lineHeight: 1.6 }}>
+                    <strong>📜 作战条令与岗位职责 (SOUL 摘要)：</strong> {selectedAgent.description}
+                  </div>
+
+                  {/* Tactical Order Dispatch Box */}
+                  <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+                    <input
+                      type="text"
+                      value={dispatchPrompt}
+                      onChange={(e) => { setDispatchPrompt(e.target.value) }}
+                      placeholder={`向 ${selectedAgent.militaryRank ?? ''} ${selectedAgent.title} (${selectedAgent.callsign ?? selectedAgent.id}) 下达作战军令…`}
+                      style={{
+                        flex: 1,
+                        padding: '8px 12px',
+                        borderRadius: 8,
+                        border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.35))',
+                        background: 'transparent',
+                        color: 'var(--dsw-alias-label-primary)',
+                        fontSize: 12.5,
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => { startAgentSession(selectedAgent, dispatchPrompt.trim() || undefined) }}
+                      style={{
+                        padding: '8px 14px',
+                        borderRadius: 8,
+                        border: '1px solid #0284c7',
+                        background: 'rgba(2,132,199,0.12)',
+                        color: '#0284c7',
+                        fontWeight: 700,
+                        fontSize: 12,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      填入 DSH 作战室
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { void handleDispatchBackground() }}
+                      style={{
+                        padding: '8px 14px',
+                        borderRadius: 8,
+                        border: 'none',
+                        background: '#059669',
+                        color: '#fff',
+                        fontWeight: 700,
+                        fontSize: 12,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      🚀 后台异步传令
                     </button>
                   </div>
                 </div>
 
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: 10,
-                    marginTop: 14,
-                    padding: 12,
-                    borderRadius: 8,
-                    background: 'var(--dsw-alias-bg-layer-2, rgba(148,163,184,0.08))',
-                    fontSize: 12,
-                  }}
-                >
-                  <div>
-                    <div style={{ opacity: 0.7 }}>DSH 预设目录</div>
-                    <div style={{ fontWeight: 600, marginTop: 2 }}><code>~/.dsh/.agent-presets/{selectedAgent.id}/</code></div>
+                {/* Recent Hermes state.db sessions */}
+                <div style={cardStyle}>
+                  <div style={{ fontWeight: 700, fontSize: 13.5, marginBottom: 10 }}>
+                    💬 该战将最近作战记录 (Hermes state.db 已清洗系统提示词噪声)
                   </div>
-                  <div>
-                    <div style={{ opacity: 0.7 }}>绑定工作区 (projectRoot)</div>
-                    <div style={{ fontWeight: 600, marginTop: 2 }}><code>{selectedAgent.projectRoot}</code></div>
-                  </div>
-                  <div>
-                    <div style={{ opacity: 0.7 }}>组织树席位号</div>
-                    <div style={{ fontWeight: 600, marginTop: 2 }}>第 {String(selectedAgent.seatOrder ?? 1).padStart(2, '0')} 号席位 ({selectedAgent.sessionId || `hermes-seat-${selectedAgent.id}`})</div>
-                  </div>
-                </div>
-
-                <div style={{ marginTop: 12, fontSize: 12.5, lineHeight: 1.6 }}>
-                  <strong>岗位职责与 SOUL 摘要：</strong> {selectedAgent.description}
-                </div>
-
-                <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
-                  <input
-                    type="text"
-                    value={dispatchPrompt}
-                    onChange={(e) => { setDispatchPrompt(e.target.value) }}
-                    placeholder={`向 ${selectedAgent.title} (${selectedAgent.id}) 下达任务指令（可直接启动 DSH 预设会话或后台派单）…`}
-                    style={{
-                      flex: 1,
-                      padding: '8px 12px',
-                      borderRadius: 8,
-                      border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.35))',
-                      background: 'transparent',
-                      color: 'var(--dsw-alias-label-primary)',
-                      fontSize: 12.5,
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => { startAgentSession(selectedAgent, dispatchPrompt.trim() || undefined) }}
-                    style={{
-                      padding: '8px 14px',
-                      borderRadius: 8,
-                      border: '1px solid #0284c7',
-                      background: 'rgba(2,132,199,0.12)',
-                      color: '#0284c7',
-                      fontWeight: 700,
-                      fontSize: 12,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    填入 DSH 会话
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { void handleDispatchBackground() }}
-                    style={{
-                      padding: '8px 14px',
-                      borderRadius: 8,
-                      border: 'none',
-                      background: '#059669',
-                      color: '#fff',
-                      fontWeight: 700,
-                      fontSize: 12,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    🚀 后台异步派单
-                  </button>
-                </div>
-              </div>
-
-              {/* Recent Hermes state.db sessions */}
-              <div style={cardStyle}>
-                <div style={{ fontWeight: 700, fontSize: 13.5, marginBottom: 10 }}>
-                  💬 该智能体最近 Hermes 会话记录 (state.db 已清洗系统提示词噪声)
-                </div>
-                {sessions.length === 0 ? (
-                  <div style={{ fontSize: 12.5, color: 'var(--dsw-alias-label-secondary)' }}>
-                    该岗位暂无历史会话，点击上方「✨ 在 DSH 启动该岗位预设会话」即可开启首个原生会话。
-                  </div>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {sessions.map(sess => (
-                      <div
-                        key={sess.id}
-                        style={{
-                          padding: '10px 12px',
-                          borderRadius: 8,
-                          border: '1px solid var(--dsw-alias-border-l2, rgba(148,163,184,0.2))',
-                          background: 'var(--dsw-alias-bg-layer-2, rgba(148,163,184,0.05))',
-                          fontSize: 12,
-                        }}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600 }}>
-                          <span>{sess.cleanTitle || sess.id}</span>
-                          <span style={{ opacity: 0.75 }}>
-                            <code>{sess.id}</code> · {sess.source} · {sess.messageCount} 条消息
-                          </span>
-                        </div>
-                        {sess.lastMessagePreview !== undefined && sess.lastMessagePreview !== '' && (
+                  {sessions.length === 0 ? (
+                    <div style={{ fontSize: 12.5, color: 'var(--dsw-alias-label-secondary)' }}>
+                      该战将暂无历史作战记录，点击上方「⚡ 升帐点将」即可开启首个原生会话。
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {sessions.map(sess => (
+                        <div
+                          key={sess.id}
+                          style={{
+                            padding: '10px 12px',
+                            borderRadius: 8,
+                            border: '1px solid var(--dsw-alias-border-l2, rgba(148,163,184,0.2))',
+                            background: 'var(--dsw-alias-bg-layer-2, rgba(148,163,184,0.05))',
+                            fontSize: 12,
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600 }}>
+                            <span>{sess.cleanTitle || sess.id}</span>
+                            <span style={{ opacity: 0.75 }}>
+                              <code>{sess.id}</code> · {sess.source} · {sess.messageCount} 条消息
+                            </span>
+                          </div>
+                          {sess.lastMessagePreview !== undefined && sess.lastMessagePreview !== '' && (
                           <div style={{ marginTop: 4, opacity: 0.82, fontSize: 11.5 }}>
                             最新消息：{sess.lastMessagePreview}
                           </div>
@@ -3679,6 +4537,7 @@ export function HermesCommandCenterPage({
                 )}
               </div>
             </div>
+          </div>
           </div>
         )}
 
