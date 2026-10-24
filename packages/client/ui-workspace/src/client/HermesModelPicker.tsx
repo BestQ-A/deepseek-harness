@@ -33,6 +33,8 @@ function modelName(item: HermesModelCatalogItem): string {
 
 function channelName(provider: string, t: Props['t']): string {
   if (provider === 'magpie') return t('hermes.model.channel.magpie')
+  if (provider === 'magpie-responses') return t('hermes.model.channel.magpieResponses')
+  if (provider === 'openai-codex') return t('hermes.model.channel.openaiCodex')
   if (provider === 'magpie-workbuddy') return t('hermes.model.channel.workbuddy')
   if (provider === 'agy') return t('hermes.model.channel.agy')
   if (provider === 'devin-acp') return t('hermes.model.channel.devinAcp')

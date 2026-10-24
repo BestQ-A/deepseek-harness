@@ -120,6 +120,16 @@ function readLastCommunicatedAgentId(): string | undefined {
   }
 }
 
+/**
+ * Record which DSH Session an Agent's resident conversation is on.
+ *
+ * Binding only: it must never push the Agent's configured model into the
+ * Session. This runs whenever `sessions` changes — which is after every turn,
+ * since a turn moves `updatedAt` — so applying the model here undid whatever
+ * the user picked in the composer on the very next message. The model reaches
+ * a Session where an Agent is switched to on purpose (applyAgentSessionConfig
+ * from startAgentSession / the config panel), not on a state tick.
+ */
 export function writePersistedAgentSession(agentId: string, sessionId: string, isNonBlank = true): void {
   if (typeof window === 'undefined') return
   try {
@@ -140,12 +150,6 @@ export function writePersistedAgentSession(agentId: string, sessionId: string, i
       agentId,
       dshSessionId: sessionId,
       autoSyncToFeishu: true,
-    })
-    // Also apply this Agent's configured model & reasoningEffort to the DSH Session
-    void callHermesBridgeApi({
-      op: 'applyAgentSessionConfig',
-      agentId,
-      sessionId,
     })
   } catch {
     // ignore storage errors
@@ -751,6 +755,448 @@ function SidebarZoneBranch({
   )
 }
 
+const POOL_TIER_META = {
+  S1: {
+    badge: '🚀 S1 AGY订阅',
+    color: '#f59e0b',
+    bg: 'rgba(245,158,11,0.14)',
+    border: 'rgba(245,158,11,0.45)',
+    groupTitle: '🚀 S1 · Google Antigravity Pro 订阅池 ($200/mo · 按Session增量续接)',
+  },
+  S2: {
+    badge: '💎 S2 Codex订阅',
+    color: '#10b981',
+    bg: 'rgba(16,185,129,0.14)',
+    border: 'rgba(16,185,129,0.45)',
+    groupTitle: '💎 S2 · OpenAI Codex Pro 订阅池 ($200/mo + 56,117 Credits 独立池)',
+  },
+  S3: {
+    badge: '🛡️ S3 Devin/SWE-2',
+    color: '#06b6d4',
+    bg: 'rgba(6,182,212,0.14)',
+    border: 'rgba(6,182,212,0.45)',
+    groupTitle: '🛡️ S3 · Cognition Devin Max (SWE-2 0扣费免费工程池 + ACP 持久会话)',
+  },
+  S4: {
+    badge: '⚡ S4 Cursor 1M',
+    color: '#8b5cf6',
+    bg: 'rgba(139,92,246,0.14)',
+    border: 'rgba(139,92,246,0.45)',
+    groupTitle: '⚡ S4 · Cursor Ultra 订阅池 ($400额度 · 内部池 + 1M 百万上下文池)',
+  },
+  A: {
+    badge: '🌐 A池 OpenCode Go',
+    color: '#3b82f6',
+    bg: 'rgba(59,130,246,0.14)',
+    border: 'rgba(59,130,246,0.45)',
+    groupTitle: '🔥 A/B/C/D · 智谱 GLM-5.3 / MiniMax M3.1 满血再生 & OpenCode 0扣费矩阵',
+  },
+  B: {
+    badge: '🇨🇳 B池 智谱MAX',
+    color: '#ec4899',
+    bg: 'rgba(236,72,153,0.14)',
+    border: 'rgba(236,72,153,0.45)',
+    groupTitle: '🔥 A/B/C/D · 智谱 GLM-5.3 / MiniMax M3.1 满血再生 & OpenCode 0扣费矩阵',
+  },
+  C: {
+    badge: '⚡ C池 MiniMax 1M',
+    color: '#14b8a6',
+    bg: 'rgba(20,184,166,0.14)',
+    border: 'rgba(20,184,166,0.45)',
+    groupTitle: '🔥 A/B/C/D · 智谱 GLM-5.3 / MiniMax M3.1 满血再生 & OpenCode 0扣费矩阵',
+  },
+  D: {
+    badge: '🆓 D池 0扣费王牌',
+    color: '#22c55e',
+    bg: 'rgba(34,197,94,0.14)',
+    border: 'rgba(34,197,94,0.45)',
+    groupTitle: '🔥 A/B/C/D · 智谱 GLM-5.3 / MiniMax M3.1 满血再生 & OpenCode 0扣费矩阵',
+  },
+  E: {
+    badge: '🌐 E池 WorkBuddy/Magpie',
+    color: '#0284c7',
+    bg: 'rgba(2,132,199,0.14)',
+    border: 'rgba(2,132,199,0.45)',
+    groupTitle: '🌐 E · WorkBuddy AI Pro (1M免费无限桶 + 异构挑刺池) & Magpie 容灾路由',
+  },
+} as const
+
+type PoolTierKey = keyof typeof POOL_TIER_META
+
+function getPoolTierMeta(tier: string) {
+  return (POOL_TIER_META as Record<string, (typeof POOL_TIER_META)[PoolTierKey]>)[tier] ?? POOL_TIER_META.E
+}
+
+function inferCatalogItemTier(item: { provider: string; model: string; tier?: string }): PoolTierKey {
+  if (item.tier && item.tier in POOL_TIER_META) return item.tier as PoolTierKey
+  if (item.provider === 'agy') return 'S1'
+  if (item.provider === 'openai-codex' || item.provider === 'magpie-responses' || item.model.startsWith('codex/')) return 'S2'
+  if (item.provider === 'devin-acp' || item.model.startsWith('devin/')) return 'S3'
+  if (item.model.startsWith('cursor/')) return 'S4'
+  if (item.model.startsWith('zhipu/')) return 'B'
+  if (item.model.startsWith('minimax/')) return 'C'
+  if (item.model.startsWith('opencode-go/') || item.model.includes(':free') || item.model.endsWith('-free')) return 'D'
+  return 'E'
+}
+
+function formatContextTokensShort(ctx?: number): string {
+  if (!ctx || ctx <= 0) return ''
+  if (ctx >= 1000000) return `${(ctx / 1000000).toFixed(ctx % 1000000 === 0 ? 0 : 1)}M`
+  return `${Math.round(ctx / 1000)}K`
+}
+
+function extractCleanModelTitle(label: string, fallbackModel: string): string {
+  const idx = label.indexOf('(')
+  const idxZh = label.indexOf('（')
+  const cut = idx >= 0 && idxZh >= 0 ? Math.min(idx, idxZh) : idx >= 0 ? idx : idxZh
+  const base = (cut > 0 ? label.slice(0, cut) : label).trim()
+  return base || fallbackModel
+}
+
+function EnsembleSlotModelSelector({
+  catalog,
+  provider,
+  model,
+  onSelect,
+  accentColor = '#8b5cf6',
+}: {
+  catalog: ReadonlyArray<{
+    provider: string
+    model: string
+    label: string
+    tier?: string
+    poolName?: string
+    quotaHint?: string
+    contextWindow?: number
+  }>
+  provider: string
+  model: string
+  onSelect: (nextProvider: string, nextModel: string) => void
+  accentColor?: string
+}) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const [tierFilter, setTierFilter] = useState<string>('ALL')
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const handleOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleOutside)
+    return () => { document.removeEventListener('mousedown', handleOutside) }
+  }, [open])
+
+  const currentItem = useMemo(() => {
+    return (
+      catalog.find(x => x.provider === provider && x.model === model) ??
+      catalog.find(x => x.model === model) ?? {
+        provider,
+        model,
+        label: model,
+        tier: inferCatalogItemTier({ provider, model }),
+        contextWindow: 256000,
+        quotaHint: '自定义路由模型',
+      }
+    )
+  }, [catalog, provider, model])
+
+  const currentTier = inferCatalogItemTier(currentItem)
+  const tierMeta = getPoolTierMeta(currentTier)
+  const cleanTitle = extractCleanModelTitle(currentItem.label, currentItem.model)
+  const ctxBadge = formatContextTokensShort(currentItem.contextWindow)
+
+  const filteredGroups = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    const bucketOrder = ['S2', 'S1', 'S3', 'S4', 'ABCD', 'E']
+    const buckets = new Map<string, { title: string; color: string; items: typeof catalog[number][] }>()
+    buckets.set('S2', { title: POOL_TIER_META.S2.groupTitle, color: POOL_TIER_META.S2.color, items: [] })
+    buckets.set('S1', { title: POOL_TIER_META.S1.groupTitle, color: POOL_TIER_META.S1.color, items: [] })
+    buckets.set('S3', { title: POOL_TIER_META.S3.groupTitle, color: POOL_TIER_META.S3.color, items: [] })
+    buckets.set('S4', { title: POOL_TIER_META.S4.groupTitle, color: POOL_TIER_META.S4.color, items: [] })
+    buckets.set('ABCD', { title: POOL_TIER_META.B.groupTitle, color: POOL_TIER_META.B.color, items: [] })
+    buckets.set('E', { title: POOL_TIER_META.E.groupTitle, color: POOL_TIER_META.E.color, items: [] })
+
+    for (const item of catalog) {
+      const t = inferCatalogItemTier(item)
+      const bucketKey = ['A', 'B', 'C', 'D'].includes(t) ? 'ABCD' : (buckets.has(t) ? t : 'E')
+      if (tierFilter !== 'ALL' && tierFilter !== bucketKey) continue
+      if (q) {
+        const hay = `${item.label} ${item.provider} ${item.model} ${item.poolName ?? ''} ${item.quotaHint ?? ''} ${t}`.toLowerCase()
+        if (!hay.includes(q)) continue
+      }
+      buckets.get(bucketKey)?.items.push(item)
+    }
+
+    return bucketOrder
+      .map(k => ({ key: k, ...(buckets.get(k)!) }))
+      .filter(g => g.items.length > 0)
+  }, [catalog, search, tierFilter])
+
+  return (
+    <div ref={containerRef} style={{ position: 'relative', minWidth: 260 }}>
+      <button
+        type="button"
+        onClick={() => { setOpen(v => !v) }}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 6,
+          padding: '5px 9px',
+          borderRadius: 7,
+          border: open ? `1.5px solid ${accentColor}` : `1px solid ${tierMeta.border}`,
+          background: 'var(--dsw-alias-bg-base)',
+          color: 'var(--dsw-alias-label-primary)',
+          cursor: 'pointer',
+          textAlign: 'left',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flexWrap: 'wrap' }}>
+          <span
+            style={{
+              padding: '1px 6px',
+              borderRadius: 4,
+              fontSize: 10,
+              fontWeight: 800,
+              background: tierMeta.bg,
+              color: tierMeta.color,
+              border: `1px solid ${tierMeta.border}`,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {tierMeta.badge}
+          </span>
+          <strong style={{ fontSize: 12, fontWeight: 800, whiteSpace: 'nowrap' }}>
+            {cleanTitle}
+          </strong>
+          {ctxBadge && (
+            <span
+              style={{
+                padding: '0 5px',
+                borderRadius: 4,
+                fontSize: 10,
+                fontWeight: 700,
+                background: 'rgba(148,163,184,0.14)',
+                color: 'var(--dsw-alias-label-secondary)',
+              }}
+            >
+              {ctxBadge}
+            </span>
+          )}
+          <code style={{ fontSize: 10.5, color: 'var(--dsw-alias-label-secondary)', opacity: 0.85 }}>
+            {currentItem.model}
+          </code>
+        </div>
+        <span style={{ fontSize: 11, opacity: 0.75, flexShrink: 0 }}>{open ? '▴' : '▾'}</span>
+      </button>
+
+      {open && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 'calc(100% + 5px)',
+            left: 0,
+            zIndex: 120,
+            width: 'min(640px, 88vw)',
+            maxHeight: 440,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+            padding: 10,
+            borderRadius: 10,
+            border: `1.5px solid ${accentColor}`,
+            background: 'var(--dsw-alias-bg-base, #0f172a)',
+            boxShadow: '0 14px 34px rgba(0, 0, 0, 0.32)',
+          }}
+        >
+          {/* Search + Quick Pool Filter Bar */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <input
+                type="search"
+                autoFocus
+                value={search}
+                onChange={(e) => { setSearch(e.target.value) }}
+                placeholder="🔍 搜索本机实机最新模型 (如: gpt-6-astra / codex / swe-2 / opus-5-5 / 1m / 0扣费 / glm-5.3)..."
+                style={{
+                  flex: 1,
+                  padding: '6px 10px',
+                  borderRadius: 7,
+                  border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.38))',
+                  background: 'var(--dsw-alias-bg-layer-1, rgba(15,23,42,0.06))',
+                  color: 'var(--dsw-alias-label-primary)',
+                  fontSize: 12,
+                }}
+              />
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => { setSearch('') }}
+                  style={{
+                    padding: '5px 8px',
+                    borderRadius: 6,
+                    border: '1px solid rgba(148,163,184,0.3)',
+                    background: 'transparent',
+                    color: 'var(--dsw-alias-label-secondary)',
+                    fontSize: 11,
+                    cursor: 'pointer',
+                  }}
+                >
+                  清空
+                </button>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+              {[
+                { key: 'ALL', label: `🌟 全部最新 (${catalog.length})` },
+                { key: 'S2', label: '💎 S2 Codex Pro订阅' },
+                { key: 'S1', label: '🚀 S1 AGY订阅' },
+                { key: 'S3', label: '🛡️ S3 Devin/SWE-2免费池' },
+                { key: 'S4', label: '⚡ S4 Cursor 1M池' },
+                { key: 'ABCD', label: '🔥 B/C/D 满血&0扣费主力' },
+                { key: 'E', label: '🌐 E池 WorkBuddy/Magpie' },
+              ].map((tab) => {
+                const active = tierFilter === tab.key
+                return (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => { setTierFilter(tab.key) }}
+                    style={{
+                      padding: '3px 8px',
+                      borderRadius: 999,
+                      border: active ? `1.5px solid ${accentColor}` : '1px solid rgba(148,163,184,0.28)',
+                      background: active ? 'rgba(139,92,246,0.18)' : 'transparent',
+                      color: active ? accentColor : 'var(--dsw-alias-label-primary)',
+                      fontSize: 10.5,
+                      fontWeight: active ? 800 : 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Model Groups List */}
+          <div style={{ overflowY: 'auto', maxHeight: 330, display: 'flex', flexDirection: 'column', gap: 10, paddingRight: 3 }}>
+            {filteredGroups.length === 0 && (
+              <div style={{ padding: 16, textAlign: 'center', color: 'var(--dsw-alias-label-secondary)', fontSize: 12 }}>
+                没有匹配的模型，请尝试切换上方算力池标签或清空搜索词。
+              </div>
+            )}
+            {filteredGroups.map(grp => (
+              <div key={grp.key} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 800,
+                    color: grp.color,
+                    padding: '3px 6px',
+                    borderRadius: 5,
+                    background: 'rgba(148,163,184,0.08)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <span>{grp.title}</span>
+                  <span>{grp.items.length} 款模型</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  {grp.items.map((item) => {
+                    const isSel = item.provider === provider && item.model === model
+                    const itemTier = inferCatalogItemTier(item)
+                    const mMeta = getPoolTierMeta(itemTier)
+                    const title = extractCleanModelTitle(item.label, item.model)
+                    const cWin = formatContextTokensShort(item.contextWindow)
+                    return (
+                      <button
+                        key={`${item.provider}::${item.model}`}
+                        type="button"
+                        onClick={() => {
+                          onSelect(item.provider, item.model)
+                          setOpen(false)
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: 8,
+                          padding: '6px 9px',
+                          borderRadius: 7,
+                          border: isSel ? `1.5px solid ${mMeta.color}` : '1px solid rgba(148,163,184,0.18)',
+                          background: isSel ? mMeta.bg : 'transparent',
+                          color: 'var(--dsw-alias-label-primary)',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                        }}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                            <span
+                              style={{
+                                padding: '1px 5px',
+                                borderRadius: 4,
+                                fontSize: 9.5,
+                                fontWeight: 800,
+                                background: mMeta.bg,
+                                color: mMeta.color,
+                                border: `1px solid ${mMeta.border}`,
+                              }}
+                            >
+                              {mMeta.badge}
+                            </span>
+                            <strong style={{ fontSize: 12, fontWeight: 800 }}>{title}</strong>
+                            {cWin && (
+                              <span
+                                style={{
+                                  padding: '0 5px',
+                                  borderRadius: 4,
+                                  fontSize: 10,
+                                  fontWeight: 700,
+                                  background: 'rgba(2,132,199,0.12)',
+                                  color: '#0284c7',
+                                }}
+                              >
+                                {cWin} 上下文
+                              </span>
+                            )}
+                            {item.quotaHint && (
+                              <span style={{ fontSize: 10.5, color: item.quotaHint.includes('0扣费') || item.quotaHint.includes('0 Credits') ? '#10b981' : 'var(--dsw-alias-label-secondary)', fontWeight: 600 }}>
+                                {item.quotaHint}
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ fontSize: 10.5, color: 'var(--dsw-alias-label-secondary)', fontFamily: 'monospace' }}>
+                            provider: <strong>{item.provider}</strong> · model: <strong>{item.model}</strong>
+                          </div>
+                        </div>
+                        {isSel && (
+                          <span style={{ fontSize: 11, fontWeight: 800, color: mMeta.color, flexShrink: 0 }}>
+                            ✓ 当前选中
+                          </span>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 /**
  * Embedded 3-zone nested organization tree for the left sidebar (`WorkspaceBrowser`).
  */
@@ -798,6 +1244,28 @@ export function HermesSidebarOrgTree({
     if (typeof document === 'undefined') return false
     return document.documentElement.dataset.dshChatMode === 'sessions'
   })
+  // Whether the composer shows the model picker while in the minimal mode.
+  // Stored apart from the chat mode so each switch means one thing.
+  const [showModelPicker, setShowModelPicker] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true
+    try {
+      return window.localStorage.getItem('dsh-hermes-model-picker') !== 'hidden'
+    } catch {
+      return true
+    }
+  })
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.dataset.dshModelPicker = showModelPicker ? 'shown' : 'hidden'
+    }
+    if (typeof window === 'undefined') return
+    try {
+      window.localStorage.setItem('dsh-hermes-model-picker', showModelPicker ? 'shown' : 'hidden')
+    } catch {
+      // ignore
+    }
+    window.dispatchEvent(new CustomEvent('dsh-hermes-model-picker', { detail: { visible: showModelPicker } }))
+  }, [showModelPicker])
   const [agentConfigsData, setAgentConfigsData] = useState<Record<string, any>>(
     () => (HERMES_INITIAL_AGENT_CONFIGS as Record<string, any>) ?? {},
   )
@@ -1072,6 +1540,9 @@ export function HermesSidebarOrgTree({
   const handleStartAgentSession = useCallback(async (agent: HermesAgentNode, forceNew = false) => {
     try {
       activateAgentMinimalChatMode(agent)
+      // Switching to an Agent on purpose is when its configured model applies;
+      // writePersistedAgentSession no longer pushes it on every session tick.
+      void callHermesBridgeApi({ op: 'applyAgentSessionConfig', agentId: agent.id })
       if (typeof window !== 'undefined') {
         try {
           window.localStorage.setItem('dsh-hermes-last-agent-id', agent.id)
@@ -1347,6 +1818,28 @@ export function HermesSidebarOrgTree({
             }}
           >
             {showSessionOptionsInAgentMode ? '⚙️全项' : '🤖极简'}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => { setShowModelPicker(v => !v) }}
+            title={showModelPicker
+              ? '模型选择器：已显示在输入框右下角。点击隐藏。'
+              : '模型选择器：已隐藏。点击在输入框右下角显示。'}
+            aria-pressed={showModelPicker}
+            style={{
+              padding: '4px 5px',
+              borderRadius: 5,
+              border: '1px solid rgba(139, 92, 246, 0.4)',
+              background: showModelPicker ? 'rgba(139, 92, 246, 0.18)' : 'transparent',
+              color: '#7c3aed',
+              fontSize: 10.5,
+              fontWeight: 600,
+              cursor: 'pointer',
+              flex: 'none',
+            }}
+          >
+            {showModelPicker ? '🎛️模型' : '🎛️模型✕'}
           </button>
         </div>
 
@@ -1698,10 +2191,12 @@ export function HermesSidebarOrgTree({
                       fontSize: 10.5,
                     }}
                   >
-                    <option value="council">🏛️ council (4参谋内阁 → GPT-6.1-Sol)</option>
-                    <option value="code">💻 code (5参谋代码攻坚 → GPT-6.1-Sol)</option>
+                    <option value="council">🏛️ council (Codex GPT-6-Astra 领衔内阁 → GPT-6.1-Sol)</option>
+                    <option value="codex_elite">💎 codex_elite (S2 Codex Pro 订阅领衔内阁)</option>
+                    <option value="agy_acp_hybrid">🚀 agy_acp_hybrid (S1/S2/S3 三大订阅混编内阁)</option>
+                    <option value="code">💻 code (5参谋代码攻坚 → Codex GPT-6.1-Sol)</option>
                     <option value="review">🛡️ review (红队挑刺 → Gemini-4-Argon)</option>
-                    <option value="cheap">⚡ cheap (双模快参 → MiniMax-M3.1)</option>
+                    <option value="cheap">⚡ cheap (0扣费高速快参 → MiniMax-M3.1)</option>
                   </select>
                 </label>
               )}
@@ -1984,29 +2479,6 @@ export function HermesCommandCenterPage({
       setFusionDirty(false)
     }
   }, [activeFusionPresetId, agentConfigsState?.fusionPresets])
-
-  const catalogByChannel = useMemo(() => {
-    const rawCatalog = (agentConfigsState?.catalog ?? []) as Array<{
-      provider: string
-      model: string
-      label: string
-    }>
-    const groups: Array<{ provider: string; title: string; items: Array<{ provider: string; model: string; label: string }> }> = [
-      { provider: 'agy', title: '🚀 AGY · Antigravity 按Session增量续接 (239K)', items: [] },
-      { provider: 'devin-acp', title: '🛡️ Devin ACP · 按Session持久JSON-RPC (200K)', items: [] },
-      { provider: 'magpie', title: '🏢 Magpie 内部旗舰网关', items: [] },
-      { provider: 'magpie-workbuddy', title: '🌐 WorkBuddy AI (国际版) / Magpie', items: [] },
-    ]
-    for (const item of rawCatalog) {
-      let g = groups.find(x => x.provider === item.provider)
-      if (!g) {
-        g = { provider: item.provider, title: item.provider, items: [] }
-        groups.push(g)
-      }
-      g.items.push(item)
-    }
-    return groups.filter(g => g.items.length > 0)
-  }, [agentConfigsState?.catalog])
 
   const handleSaveMoaPresetDraft = async (customNewId?: string) => {
     const targetId = (customNewId ?? String(moaDraft.id || activeMoaPresetId)).trim().replace(/[^a-zA-Z0-9_-]/g, '_')
@@ -3366,15 +3838,18 @@ export function HermesCommandCenterPage({
                         <div style={{ fontSize: 12.5, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 8 }}>
                           <span>🤺 Stage 1 · 并行献策参谋团席位编排 (Reference Advisors)</span>
                           <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--dsw-alias-label-secondary)' }}>
-                            支持为每位参谋独立指定【专精视角】+【渠道/模型 (含 AGY / Devin ACP)】+【推理等级】
+                            支持为每位参谋独立指定【专精视角】+【9大算力池最新模型 (含 S2 Codex订阅 / S1 AGY / S3 Devin SWE-2 / S4 Cursor 1M)】+【推理等级】
                           </span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
                           {[
-                            { label: '+ 🚀 AGY Opus 5.5', provider: 'agy', model: 'claude-opus-5-5', role: '第一性原理与深度架构参谋 (AGY)' },
-                            { label: '+ 🛡️ ACP SWE-1.6', provider: 'devin-acp', model: 'SWE-1.6', role: '补丁实现与回归自检参谋 (Devin ACP)' },
-                            { label: '+ 🌐 Grok 4.7 挑刺', provider: 'magpie-workbuddy', model: 'workbuddy-ai/grok-4.7', role: '边界条件与反方证伪参谋' },
-                            { label: '+ ➕ 自定义参谋', provider: 'magpie-workbuddy', model: 'workbuddy-ai/glm-5.3', role: '专项技术攻坚参谋' },
+                            { label: '+ 💎 S2 Codex GPT-6-Astra', provider: 'openai-codex', model: 'codex/gpt-6-astra', role: 'S2 Codex 跨家族代码独审与架构参谋' },
+                            { label: '+ 💎 S2 Codex GPT-6.1-Sol', provider: 'openai-codex', model: 'codex/gpt-6.1-sol', role: 'S2 Codex 高阶算法与系统推演参谋' },
+                            { label: '+ 🚀 S1 AGY Opus 5.5', provider: 'agy', model: 'claude-opus-5-5', role: 'S1 AGY 第一性原理与深度架构参谋' },
+                            { label: '+ 🛡️ S3 Devin SWE-2-Max (0扣费)', provider: 'devin-acp', model: 'swe-2-max', role: 'S3 Devin SWE-2 Max 0扣费补丁与回归参谋' },
+                            { label: '+ ⚡ S4 Cursor Composer 2.5', provider: 'magpie', model: 'cursor/composer-2.5', role: 'S4 Cursor 多文件重构参谋' },
+                            { label: '+ 🔥 Grok 4.7 挑刺', provider: 'magpie-workbuddy', model: 'workbuddy-ai/grok-4.7', role: '边界条件与反方证伪参谋' },
+                            { label: '+ 🇨🇳 B池 GLM-5.3 满血主力', provider: 'magpie', model: 'zhipu/glm-5.3', role: 'B池 中文工程落地与业务闭环参谋' },
                           ].map((tpl) => (
                             <button
                               key={tpl.label}
@@ -3414,7 +3889,6 @@ export function HermesCommandCenterPage({
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                         {((moaDraft?.referenceModels ?? []) as any[]).map((slot: any, idx: number, arr: any[]) => {
                           const isEnabled = slot.enabled !== false
-                          const compositeVal = `${String(slot.provider || 'magpie-workbuddy')}::${String(slot.model || '')}`
                           return (
                             <div
                               key={`moa-editor-slot-${String(idx)}`}
@@ -3473,11 +3947,12 @@ export function HermesCommandCenterPage({
                                 }}
                               />
 
-                              {/* Col 3: Grouped Provider + Model Selector */}
-                              <select
-                                value={compositeVal}
-                                onChange={(e) => {
-                                  const [nextProv, nextMod] = e.target.value.split('::')
+                              {/* Col 3: Searchable 9-Pool Model Selector Popover */}
+                              <EnsembleSlotModelSelector
+                                catalog={agentConfigsState?.catalog ?? []}
+                                provider={String(slot.provider || 'openai-codex')}
+                                model={String(slot.model || 'codex/gpt-6-astra')}
+                                onSelect={(nextProv, nextMod) => {
                                   setMoaDraft((prev) => {
                                     const nextList = [...(prev.referenceModels ?? [])]
                                     nextList[idx] = { ...nextList[idx], provider: nextProv, model: nextMod }
@@ -3485,26 +3960,8 @@ export function HermesCommandCenterPage({
                                   })
                                   setMoaDirty(true)
                                 }}
-                                style={{
-                                  padding: '5px 8px',
-                                  borderRadius: 6,
-                                  border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.32))',
-                                  background: 'var(--dsw-alias-bg-base)',
-                                  color: 'var(--dsw-alias-label-primary)',
-                                  fontSize: 11.5,
-                                  fontFamily: 'monospace',
-                                }}
-                              >
-                                {catalogByChannel.map(grp => (
-                                  <optgroup key={grp.provider} label={grp.title}>
-                                    {grp.items.map(item => (
-                                      <option key={`${item.provider}::${item.model}`} value={`${item.provider}::${item.model}`}>
-                                        [{item.provider}] {item.label} ({item.model})
-                                      </option>
-                                    ))}
-                                  </optgroup>
-                                ))}
-                              </select>
+                                accentColor="#8b5cf6"
+                              />
 
                               {/* Col 4: Reasoning Effort Selector */}
                               <select
@@ -3640,42 +4097,25 @@ export function HermesCommandCenterPage({
                         </span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', flex: 1, justifyContent: 'flex-end' }}>
-                        <select
-                          value={`${String(moaDraft?.aggregator?.provider || 'magpie-workbuddy')}::${String(moaDraft?.aggregator?.model || 'workbuddy-ai/gpt-6.1-sol')}`}
-                          onChange={(e) => {
-                            const [aggProv, aggMod] = e.target.value.split('::')
-                            setMoaDraft(prev => ({
-                              ...prev,
-                              aggregator: {
-                                ...(prev?.aggregator ?? {}),
-                                provider: aggProv,
-                                model: aggMod,
-                              },
-                            }))
-                            setMoaDirty(true)
-                          }}
-                          style={{
-                            padding: '5px 10px',
-                            borderRadius: 7,
-                            border: '1px solid rgba(2,132,199,0.45)',
-                            background: 'var(--dsw-alias-bg-base)',
-                            color: 'var(--dsw-alias-label-primary)',
-                            fontSize: 12,
-                            fontWeight: 700,
-                            fontFamily: 'monospace',
-                            minWidth: 320,
-                          }}
-                        >
-                          {catalogByChannel.map(grp => (
-                            <optgroup key={grp.provider} label={grp.title}>
-                              {grp.items.map(item => (
-                                <option key={`agg-${item.provider}::${item.model}`} value={`${item.provider}::${item.model}`}>
-                                  [{item.provider}] {item.label} ({item.model})
-                                </option>
-                              ))}
-                            </optgroup>
-                          ))}
-                        </select>
+                        <div style={{ minWidth: 340, flex: '0 1 420px' }}>
+                          <EnsembleSlotModelSelector
+                            catalog={agentConfigsState?.catalog ?? []}
+                            provider={String(moaDraft?.aggregator?.provider || 'openai-codex')}
+                            model={String(moaDraft?.aggregator?.model || 'codex/gpt-6.1-sol')}
+                            onSelect={(aggProv, aggMod) => {
+                              setMoaDraft(prev => ({
+                                ...prev,
+                                aggregator: {
+                                  ...(prev?.aggregator ?? {}),
+                                  provider: aggProv,
+                                  model: aggMod,
+                                },
+                              }))
+                              setMoaDirty(true)
+                            }}
+                            accentColor="#0284c7"
+                          />
+                        </div>
                         <select
                           value={String(moaDraft?.aggregator?.reasoningEffort || 'high')}
                           onChange={(e) => {
@@ -3713,7 +4153,6 @@ export function HermesCommandCenterPage({
                       配置 Stage 1 独立候选主创 (Candidates A/B/C)、Stage 2 交叉盲审挑刺官 (Critic) 与 Stage 3 终审融合主裁 (Judge)：
                     </div>
                     {((fusionDraft?.candidates ?? []) as any[]).map((cand: any, idx: number) => {
-                      const compositeVal = `${String(cand.provider || 'magpie')}::${String(cand.model || '')}`
                       return (
                         <div
                           key={`fusion-cand-${String(idx)}`}
@@ -3750,10 +4189,11 @@ export function HermesCommandCenterPage({
                               fontSize: 11.5,
                             }}
                           />
-                          <select
-                            value={compositeVal}
-                            onChange={(e) => {
-                              const [cProv, cMod] = e.target.value.split('::')
+                          <EnsembleSlotModelSelector
+                            catalog={agentConfigsState?.catalog ?? []}
+                            provider={String(cand.provider || 'openai-codex')}
+                            model={String(cand.model || 'codex/gpt-6-astra')}
+                            onSelect={(cProv, cMod) => {
                               setFusionDraft((prev) => {
                                 const nextCands = [...(prev.candidates ?? [])]
                                 nextCands[idx] = { ...nextCands[idx], provider: cProv, model: cMod }
@@ -3761,26 +4201,8 @@ export function HermesCommandCenterPage({
                               })
                               setFusionDirty(true)
                             }}
-                            style={{
-                              padding: '5px 8px',
-                              borderRadius: 6,
-                              border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.32))',
-                              background: 'var(--dsw-alias-bg-base)',
-                              color: 'var(--dsw-alias-label-primary)',
-                              fontSize: 11.5,
-                              fontFamily: 'monospace',
-                            }}
-                          >
-                            {catalogByChannel.map(grp => (
-                              <optgroup key={grp.provider} label={grp.title}>
-                                {grp.items.map(item => (
-                                  <option key={`fc-${item.provider}::${item.model}`} value={`${item.provider}::${item.model}`}>
-                                    [{item.provider}] {item.label} ({item.model})
-                                  </option>
-                                ))}
-                              </optgroup>
-                            ))}
-                          </select>
+                            accentColor="#ef4444"
+                          />
                           <select
                             value={String(cand.reasoningEffort || 'high')}
                             onChange={(e) => {
@@ -3814,47 +4236,29 @@ export function HermesCommandCenterPage({
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                       <div style={{ padding: '8px 10px', borderRadius: 8, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.35)', display: 'flex', flexDirection: 'column', gap: 5 }}>
                         <strong style={{ fontSize: 12, color: '#d97706' }}>⚔️ Stage 2 · 交叉盲审挑刺官 (Adversarial Critic)</strong>
-                        <select
-                          value={`${String(fusionDraft?.critic?.provider || 'magpie-workbuddy')}::${String(fusionDraft?.critic?.model || 'workbuddy-ai/grok-4.7')}`}
-                          onChange={(e) => {
-                            const [p, m] = e.target.value.split('::')
+                        <EnsembleSlotModelSelector
+                          catalog={agentConfigsState?.catalog ?? []}
+                          provider={String(fusionDraft?.critic?.provider || 'magpie-workbuddy')}
+                          model={String(fusionDraft?.critic?.model || 'workbuddy-ai/grok-4.7')}
+                          onSelect={(p, m) => {
                             setFusionDraft(prev => ({ ...prev, critic: { ...(prev.critic ?? {}), provider: p, model: m } }))
                             setFusionDirty(true)
                           }}
-                          style={{ padding: '5px 8px', borderRadius: 6, fontSize: 11.5, fontFamily: 'monospace', background: 'var(--dsw-alias-bg-base)', color: 'var(--dsw-alias-label-primary)' }}
-                        >
-                          {catalogByChannel.map(grp => (
-                            <optgroup key={grp.provider} label={grp.title}>
-                              {grp.items.map(item => (
-                                <option key={`crit-${item.provider}::${item.model}`} value={`${item.provider}::${item.model}`}>
-                                  [{item.provider}] {item.label} ({item.model})
-                                </option>
-                              ))}
-                            </optgroup>
-                          ))}
-                        </select>
+                          accentColor="#d97706"
+                        />
                       </div>
                       <div style={{ padding: '8px 10px', borderRadius: 8, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.35)', display: 'flex', flexDirection: 'column', gap: 5 }}>
                         <strong style={{ fontSize: 12, color: '#059669' }}>⚖️ Stage 3 · 终审融合主裁 (Synthesizer Judge)</strong>
-                        <select
-                          value={`${String(fusionDraft?.judge?.provider || 'magpie')}::${String(fusionDraft?.judge?.model || 'group/claude-fable-5-1')}`}
-                          onChange={(e) => {
-                            const [p, m] = e.target.value.split('::')
+                        <EnsembleSlotModelSelector
+                          catalog={agentConfigsState?.catalog ?? []}
+                          provider={String(fusionDraft?.judge?.provider || 'openai-codex')}
+                          model={String(fusionDraft?.judge?.model || 'codex/gpt-6.1-sol')}
+                          onSelect={(p, m) => {
                             setFusionDraft(prev => ({ ...prev, judge: { ...(prev.judge ?? {}), provider: p, model: m } }))
                             setFusionDirty(true)
                           }}
-                          style={{ padding: '5px 8px', borderRadius: 6, fontSize: 11.5, fontFamily: 'monospace', background: 'var(--dsw-alias-bg-base)', color: 'var(--dsw-alias-label-primary)' }}
-                        >
-                          {catalogByChannel.map(grp => (
-                            <optgroup key={grp.provider} label={grp.title}>
-                              {grp.items.map(item => (
-                                <option key={`jdg-${item.provider}::${item.model}`} value={`${item.provider}::${item.model}`}>
-                                  [{item.provider}] {item.label} ({item.model})
-                                </option>
-                              ))}
-                            </optgroup>
-                          ))}
-                        </select>
+                          accentColor="#059669"
+                        />
                       </div>
                     </div>
                   </div>

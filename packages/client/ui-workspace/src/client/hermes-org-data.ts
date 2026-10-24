@@ -6227,7 +6227,7 @@ export const HERMES_INITIAL_SESSIONS: Record<string, HermesSessionSummary[]> = {
 
 export const HERMES_INITIAL_GATEWAY = {
   "ok": true,
-  "updatedAt": "2026-10-24T10:03:53.262Z",
+  "updatedAt": "2026-10-24T10:58:07.694Z",
   "stats": {
     "totalReceived": 19,
     "totalDispatched": 3,
@@ -6241,8 +6241,8 @@ export const HERMES_INITIAL_GATEWAY = {
       "profile": "life",
       "agentId": null,
       "eventKey": "im.message.receive_v1",
-      "pid": 63340,
-      "startedAt": "2026-10-24T10:03:53.251Z",
+      "pid": 96952,
+      "startedAt": "2026-10-24T10:58:07.681Z",
       "alive": true
     },
     {
@@ -6250,8 +6250,8 @@ export const HERMES_INITIAL_GATEWAY = {
       "profile": "company",
       "agentId": null,
       "eventKey": "im.message.receive_v1",
-      "pid": 13720,
-      "startedAt": "2026-10-24T10:03:53.262Z",
+      "pid": 85592,
+      "startedAt": "2026-10-24T10:58:07.693Z",
       "alive": true
     }
   ],
@@ -6261,18 +6261,18 @@ export const HERMES_INITIAL_GATEWAY = {
       "profile": "life",
       "agentId": null,
       "eventKey": "im.message.receive_v1",
-      "pid": 63340,
+      "pid": 96952,
       "status": "running",
-      "startedAt": "2026-10-24T10:03:53.251Z"
+      "startedAt": "2026-10-24T10:58:07.681Z"
     },
     "company:im.message.receive_v1": {
       "key": "company:im.message.receive_v1",
       "profile": "company",
       "agentId": null,
       "eventKey": "im.message.receive_v1",
-      "pid": 13720,
+      "pid": 85592,
       "status": "running",
-      "startedAt": "2026-10-24T10:03:53.262Z"
+      "startedAt": "2026-10-24T10:58:07.693Z"
     }
   },
   "recentEvents": [
@@ -6706,7 +6706,7 @@ export const HERMES_INITIAL_GATEWAY = {
         "dshSessionId": "session-aed11ed7-27a8-4b27-af3c-67588efbcfa9",
         "dispatchMode": "dsh_session",
         "autoSyncToFeishu": true,
-        "lastSyncedAt": "2026-10-24T10:07:09.053Z"
+        "lastSyncedAt": "2026-10-24T11:12:05.034Z"
       },
       {
         "agentId": "bl-admin-procurement",
@@ -8715,7 +8715,7 @@ export const HERMES_INITIAL_LOOP6 = [
 
 export const HERMES_INITIAL_WAR_ROOM = {
   "ok": true,
-  "generatedAt": "2026-10-24T10:39:24.332Z",
+  "generatedAt": "2026-10-24T11:17:49.831Z",
   "learnSpaceRoot": "E:/6_learn_space",
   "liveServer": {
     "online": false,
@@ -8724,8 +8724,8 @@ export const HERMES_INITIAL_WAR_ROOM = {
   },
   "summary": {
     "totalAgents": 85,
-    "workingCount": 8,
-    "recentCount": 8,
+    "workingCount": 1,
+    "recentCount": 15,
     "onlineCount": 55,
     "dormantCount": 14,
     "gatesPassCount": 10,
@@ -9319,7 +9319,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
     ]
   },
   "llmPools": {
-    "snapshotUpdatedAt": "10-24 18:37",
+    "snapshotUpdatedAt": "10-24 19:16",
     "totalPools": 9,
     "pools": [
       {
@@ -9332,42 +9332,42 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "color": "#f59e0b",
         "purpose": "S1 导师主池 · 复杂数学/教学独审/多模态架构 (Claude Opus 5.5 + Gemini 4 High)",
         "roleCount": 0,
-        "minRemainingPct": 89.1,
+        "minRemainingPct": 89.6,
         "totalApiCalls": 3553,
         "totalInputTokens": 74594681,
         "totalOutputTokens": 8840138,
         "windows": [
           {
             "label": "Gemini (4-High/3.8) · 7d 周配额",
-            "remainingPct": 89.1,
-            "usedPct": 10.9,
-            "resetStr": "6d11h后 (10-31 05:59)",
-            "detail": "剩余 89.1% (已用 10.9%)",
-            "updatedAt": "18:37:50"
+            "remainingPct": 89.6,
+            "usedPct": 10.4,
+            "resetStr": "6d10h后 (10-31 05:59)",
+            "detail": "剩余 89.6% (已用 10.4%)",
+            "updatedAt": "19:16:25"
           },
           {
             "label": "Gemini (4-High/3.8) · 5h 窗口",
-            "remainingPct": 98.1,
-            "usedPct": 1.9,
-            "resetStr": "4h11m后 (10-24 22:49)",
-            "detail": "剩余 98.1% (已用 1.9%)",
-            "updatedAt": "18:37:50"
+            "remainingPct": 97,
+            "usedPct": 3,
+            "resetStr": "3h33m后 (10-24 22:49)",
+            "detail": "剩余 97.0% (已用 3.0%)",
+            "updatedAt": "19:16:25"
           },
           {
             "label": "Claude (Opus/Sonnet 5.5) · 7d 周配额",
             "remainingPct": 100,
             "usedPct": 0,
-            "resetStr": "6d23h后 (10-31 18:37)",
+            "resetStr": "6d23h后 (10-31 19:16)",
             "detail": "剩余 100.0% (已用 0.0%)",
-            "updatedAt": "18:37:50"
+            "updatedAt": "19:16:25"
           },
           {
             "label": "Claude (Opus/Sonnet 5.5) · 5h 窗口",
             "remainingPct": 100,
             "usedPct": 0,
-            "resetStr": "4h59m后 (10-24 23:37)",
+            "resetStr": "4h59m后 (10-25 00:16)",
             "detail": "剩余 100.0% (已用 0.0%)",
-            "updatedAt": "18:37:50"
+            "updatedAt": "19:16:25"
           }
         ],
         "boundRoles": []
@@ -9382,18 +9382,18 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "color": "#10b981",
         "purpose": "S2 导师主池 · 跨家族独立代码审查与高难调试 (GPT-6 Astra / GPT-5.4)",
         "roleCount": 0,
-        "minRemainingPct": 44,
+        "minRemainingPct": 43,
         "totalApiCalls": 982,
         "totalInputTokens": 16018061,
         "totalOutputTokens": 2423040,
         "windows": [
           {
             "label": "Codex Pro · 7d 周配额窗口",
-            "remainingPct": 44,
-            "usedPct": 56,
-            "resetStr": "6d7h后 (10-31 01:41)",
-            "detail": "已用 56% · 剩余 44% ($200/mo Pro)",
-            "updatedAt": "18:37:25"
+            "remainingPct": 43,
+            "usedPct": 57,
+            "resetStr": "6d6h后 (10-31 01:41)",
+            "detail": "已用 57% · 剩余 43% ($200/mo Pro)",
+            "updatedAt": "19:15:59"
           },
           {
             "label": "Codex Credits 独立账户余额",
@@ -9401,7 +9401,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 0,
             "resetStr": "按需抵扣池",
             "detail": "余额 56,117.10 Credits (约可跑 15,060~78,311 条消息)",
-            "updatedAt": "18:37:25"
+            "updatedAt": "19:15:59"
           }
         ],
         "boundRoles": []
@@ -9433,7 +9433,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "label": "Devin Max (opt组织) · 7d 周配额",
             "remainingPct": 0,
             "usedPct": 100,
-            "resetStr": "21h22m后 (10-25 16:00)",
+            "resetStr": "20h43m后 (10-25 16:00)",
             "detail": "剩余 0% (已用 100% · 采样 10:37)",
             "updatedAt": "18:04:12"
           },
@@ -9449,7 +9449,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "label": "Devin Max (个人默认组织) · 7d 周配额",
             "remainingPct": 0,
             "usedPct": 100,
-            "resetStr": "21h22m后 (10-25 16:00)",
+            "resetStr": "20h43m后 (10-25 16:00)",
             "detail": "周配额剩余 0% · 超额备用金剩 $18446744073708.84 (采样 18:04)",
             "updatedAt": "18:04:12"
           }
@@ -9466,34 +9466,34 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "color": "#3b82f6",
         "purpose": "A 池 · OpenCode Go 订阅池",
         "roleCount": 0,
-        "minRemainingPct": 46,
+        "minRemainingPct": 44,
         "totalApiCalls": 0,
         "totalInputTokens": 0,
         "totalOutputTokens": 0,
         "windows": [
           {
             "label": "5h 滚动窗口",
-            "remainingPct": 59,
-            "usedPct": 41,
-            "resetStr": "3h59m后 (10-24 22:37)",
-            "detail": "剩余 59% · 状态 ok",
-            "updatedAt": "18:37:25"
+            "remainingPct": 52,
+            "usedPct": 48,
+            "resetStr": "3h21m后 (10-24 22:37)",
+            "detail": "剩余 52% · 状态 ok",
+            "updatedAt": "19:15:59"
           },
           {
             "label": "7d 周配额窗口",
-            "remainingPct": 47,
-            "usedPct": 53,
-            "resetStr": "1d13h后 (10-26 08:00)",
-            "detail": "剩余 47% · 状态 ok",
-            "updatedAt": "18:37:25"
+            "remainingPct": 44,
+            "usedPct": 56,
+            "resetStr": "1d12h后 (10-26 08:00)",
+            "detail": "剩余 44% · 状态 ok",
+            "updatedAt": "19:15:59"
           },
           {
             "label": "30d 月度窗口",
-            "remainingPct": 46,
-            "usedPct": 54,
-            "resetStr": "20d22h后 (11-14 17:07)",
-            "detail": "剩余 46% · 状态 ok",
-            "updatedAt": "18:37:25"
+            "remainingPct": 44,
+            "usedPct": 56,
+            "resetStr": "20d21h后 (11-14 17:07)",
+            "detail": "剩余 44% · 状态 ok",
+            "updatedAt": "19:15:59"
           }
         ],
         "boundRoles": []
@@ -9518,16 +9518,16 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "remainingPct": 99,
             "usedPct": 1,
             "resetStr": "23d0h后 (11-16 19:31)",
-            "detail": "剩 3996/4000 次 (已用 4)",
-            "updatedAt": "18:37:25"
+            "detail": "剩 3993/4000 次 (已用 7)",
+            "updatedAt": "19:15:59"
           },
           {
             "label": "GLM-5.3 5h Token 窗口",
             "remainingPct": 99,
             "usedPct": 1,
-            "resetStr": "3h52m后 (10-24 22:30)",
+            "resetStr": "3h14m后 (10-24 22:30)",
             "detail": "已用 1% · 剩余 99%",
-            "updatedAt": "18:37:25"
+            "updatedAt": "19:15:59"
           }
         ],
         "boundRoles": []
@@ -9551,17 +9551,17 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "label": "M3.1 5h 滚动窗口",
             "remainingPct": 99,
             "usedPct": 1,
-            "resetStr": "4h22m后 (10-24 23:00)",
+            "resetStr": "3h44m后 (10-24 23:00)",
             "detail": "剩余 99% (已用 1%)",
-            "updatedAt": "18:37:25"
+            "updatedAt": "19:15:59"
           },
           {
             "label": "M3.1 7d 周配额窗口",
             "remainingPct": 100,
             "usedPct": 0,
-            "resetStr": "1d13h后 (10-26 08:00)",
+            "resetStr": "1d12h后 (10-26 08:00)",
             "detail": "剩余 100% (已用 0%)",
-            "updatedAt": "18:37:25"
+            "updatedAt": "19:15:59"
           }
         ],
         "boundRoles": []
@@ -9576,34 +9576,34 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "color": "#22c55e",
         "purpose": "D 池 · OpenCode Free 0扣费高智商矩阵 (DeepSeek-V4.1-Flash / MiMo / Nemotron)",
         "roleCount": 0,
-        "minRemainingPct": 46,
+        "minRemainingPct": 44,
         "totalApiCalls": 0,
         "totalInputTokens": 0,
         "totalOutputTokens": 0,
         "windows": [
           {
             "label": "5h 滚动窗口",
-            "remainingPct": 59,
-            "usedPct": 41,
-            "resetStr": "3h59m后 (10-24 22:37)",
-            "detail": "剩余 59% · 状态 ok",
-            "updatedAt": "18:37:25"
+            "remainingPct": 52,
+            "usedPct": 48,
+            "resetStr": "3h21m后 (10-24 22:37)",
+            "detail": "剩余 52% · 状态 ok",
+            "updatedAt": "19:15:59"
           },
           {
             "label": "7d 周配额窗口",
-            "remainingPct": 47,
-            "usedPct": 53,
-            "resetStr": "1d13h后 (10-26 08:00)",
-            "detail": "剩余 47% · 状态 ok",
-            "updatedAt": "18:37:25"
+            "remainingPct": 44,
+            "usedPct": 56,
+            "resetStr": "1d12h后 (10-26 08:00)",
+            "detail": "剩余 44% · 状态 ok",
+            "updatedAt": "19:15:59"
           },
           {
             "label": "30d 月度窗口",
-            "remainingPct": 46,
-            "usedPct": 54,
-            "resetStr": "20d22h后 (11-14 17:07)",
-            "detail": "剩余 46% · 状态 ok",
-            "updatedAt": "18:37:25"
+            "remainingPct": 44,
+            "usedPct": 56,
+            "resetStr": "20d21h后 (11-14 17:07)",
+            "detail": "剩余 44% · 状态 ok",
+            "updatedAt": "19:15:59"
           }
         ],
         "boundRoles": []
@@ -9629,7 +9629,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 18,
             "resetStr": "20d7h后 (11-14 02:28)",
             "detail": "剩余 82.0% (实测已用 18.02% · UI显示 1% used · 优先使用不扣第三方池)",
-            "updatedAt": "18:37:25"
+            "updatedAt": "19:15:59"
           },
           {
             "label": "Other Models 第三方池 (Claude / Gemini / GPT)",
@@ -9637,7 +9637,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 100,
             "resetStr": "20d7h后 (11-14 02:28)",
             "detail": "剩余 0.0% (实测已用 100.00% · UI显示 2% used · S1/S2导师满血替补)",
-            "updatedAt": "18:37:25"
+            "updatedAt": "19:15:59"
           },
           {
             "label": "Cursor ULTRA 总包额度 & CLI 凭证 (已备.bak)",
@@ -9645,7 +9645,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 5.3,
             "resetStr": "凭证剩 51d",
             "detail": "剩 $378.95 / $400 (已用 $400.00) · 单次调用约1.4w壳开销，宜整包派大活",
-            "updatedAt": "18:37:25"
+            "updatedAt": "19:15:59"
           }
         ],
         "boundRoles": []
@@ -9671,15 +9671,15 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 0,
             "resetStr": "0 Credits 扣费",
             "detail": "1M 上下文 + Text/Image 多模态 + max 推理 · 完全不扣 Pro Credits",
-            "updatedAt": "18:37:25"
+            "updatedAt": "19:15:59"
           },
           {
             "label": "WorkBuddy Pro Credits 异构池 (GPT-6-Astra / Grok-4.7 / GLM-5.3 / Hy4)",
             "remainingPct": 3.22,
             "usedPct": 96.78,
             "resetStr": "每日签到+50",
-            "detail": "已用 2342.15 / 2420 credits (剩 3.2% · 账号 skylar@moltgit.net)",
-            "updatedAt": "18:37:25"
+            "detail": "已用 2342.16 / 2420 credits (剩 3.2% · 账号 skylar@moltgit.net)",
+            "updatedAt": "19:15:59"
           }
         ],
         "boundRoles": []
@@ -9925,7 +9925,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
     ]
   },
   "feishuTasklist": {
-    "snapshotUpdatedAt": "10-24 18:39",
+    "snapshotUpdatedAt": "10-24 19:17",
     "total": 101,
     "openCount": 35,
     "closedCount": 66,
@@ -10187,21 +10187,21 @@ export const HERMES_INITIAL_WAR_ROOM = {
   },
   "workstations": [
     {
-      "id": "bl-content-engineer",
-      "presetId": "hermes-bl-content-engineer",
-      "title": "伴学 · 内容管线",
+      "id": "bl-release-engineer",
+      "presetId": "hermes-bl-release-engineer",
+      "title": "伴学 · 发布与运维",
       "sectionPath": "个人 / 伴学",
       "department": "伴学教育事业部",
       "projectRoot": "E:/6_learn_space",
       "model": "MiniMax-M3.1-Flash-Preview",
       "status": "WORKING",
-      "sessionCount": 8,
-      "totalMessages": 968,
-      "totalToolCalls": 327,
+      "sessionCount": 4,
+      "totalMessages": 1250,
+      "totalToolCalls": 534,
       "activeLeases": 0,
-      "lastActiveAt": "10-24 18:39",
-      "lastActiveEpoch": 1792838351.2345943,
-      "lastSessionTitle": "修复 brilliant 课程媒体/截图缺口",
+      "lastActiveAt": "10-24 19:16",
+      "lastActiveEpoch": 1792840604.454206,
+      "lastSessionTitle": "确认并恢复小程序云环境配置",
       "lastPreview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
     },
     {
@@ -10212,14 +10212,32 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "department": "伴学教育事业部",
       "projectRoot": "E:/6_learn_space",
       "model": "council",
-      "status": "WORKING",
+      "status": "RECENT",
       "sessionCount": 8,
-      "totalMessages": 974,
+      "totalMessages": 980,
       "totalToolCalls": 540,
       "activeLeases": 0,
-      "lastActiveAt": "10-24 18:39",
-      "lastActiveEpoch": 1792838345.1049569,
+      "lastActiveAt": "10-24 19:09",
+      "lastActiveEpoch": 1792840193.7791202,
       "lastSessionTitle": "定版试用方案与通过标准",
+      "lastPreview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
+    },
+    {
+      "id": "bl-content-engineer",
+      "presetId": "hermes-bl-content-engineer",
+      "title": "伴学 · 内容管线",
+      "sectionPath": "个人 / 伴学",
+      "department": "伴学教育事业部",
+      "projectRoot": "E:/6_learn_space",
+      "model": "MiniMax-M3.1-Flash-Preview",
+      "status": "RECENT",
+      "sessionCount": 8,
+      "totalMessages": 974,
+      "totalToolCalls": 327,
+      "activeLeases": 0,
+      "lastActiveAt": "10-24 19:09",
+      "lastActiveEpoch": 1792840187.150101,
+      "lastSessionTitle": "修复 brilliant 课程媒体/截图缺口",
       "lastPreview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
     },
     {
@@ -10230,33 +10248,15 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "department": "伴学教育事业部",
       "projectRoot": "E:/6_learn_space",
       "model": "MiniMax-M3.1-Flash-Preview",
-      "status": "WORKING",
+      "status": "RECENT",
       "sessionCount": 3,
-      "totalMessages": 656,
+      "totalMessages": 662,
       "totalToolCalls": 226,
       "activeLeases": 0,
-      "lastActiveAt": "10-24 18:38",
-      "lastActiveEpoch": 1792838294.9173205,
+      "lastActiveAt": "10-24 19:09",
+      "lastActiveEpoch": 1792840142.1211963,
       "lastSessionTitle": "语音陪学试用版本反馈复核与遗留问题",
       "lastPreview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
-    },
-    {
-      "id": "wj-hb04-bridge",
-      "presetId": "hermes-wj-hb04-bridge",
-      "title": "万界[HB04] · 多端适配与小游戏SDK工程师",
-      "sectionPath": "个人 / 万界",
-      "department": "程序研发部（工程效能组）",
-      "projectRoot": "F:/0_workspace/6_wechat_game",
-      "model": "MiniMax-M3.1-Flash-Preview",
-      "status": "WORKING",
-      "sessionCount": 1,
-      "totalMessages": 55,
-      "totalToolCalls": 37,
-      "activeLeases": 1,
-      "lastActiveAt": "10-24 18:37",
-      "lastActiveEpoch": 1792838277.8783169,
-      "lastSessionTitle": "【万界Studio部门实质推进｜限10步内完成】你名下在飞书主任务清单…",
-      "lastPreview": "{\"output\": \"=== who imports release-pipeline ===\\nscripts/release-check.mjs:3:// 开关契约集中在 src/release-pipeline.js 的 CLI_FLAG_NAMES：布尔开关吞取值即报错"
     },
     {
       "id": "wj-a01-art-lead",
@@ -10266,15 +10266,15 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "department": "美术与视听部",
       "projectRoot": "F:/0_workspace/6_wechat_game",
       "model": "gemini-4-argon-high",
-      "status": "WORKING",
-      "sessionCount": 3,
-      "totalMessages": 100,
-      "totalToolCalls": 77,
-      "activeLeases": 1,
-      "lastActiveAt": "10-24 18:37",
-      "lastActiveEpoch": 1792838235.3069701,
-      "lastSessionTitle": "推进 PKG-M0-T4 移动端素材生成与验收",
-      "lastPreview": "{\"output\": \"SUMMARY: A01｜PKG-M0-T4 按屏上需求生成移动端素材 〔依赖:PKG-M0-T2〕\\r\\nDESC: 【PKG-M0-T4】按屏上需求生成移动端素材\\r\\n执行：A01（wj-a01-art-lead）统筹；A02 主角、A03 心魔与敌"
+      "status": "RECENT",
+      "sessionCount": 4,
+      "totalMessages": 138,
+      "totalToolCalls": 108,
+      "activeLeases": 0,
+      "lastActiveAt": "10-24 19:08",
+      "lastActiveEpoch": 1792840138.7672822,
+      "lastSessionTitle": "A01 PKG-M0-T4 按屏上需求生成移动端素材",
+      "lastPreview": "{\"output\": \"total 33566261\\ndrwxr-xr-x 1 Administrator 197108 0 Nov 4 2025 $RECYCLE.BIN\\ndrwxr-xr-x 1 Administrator 197108 0 Oct 23 22:51 .\\"
     },
     {
       "id": "wj-p02-canvas",
@@ -10284,33 +10284,15 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "department": "程序研发部",
       "projectRoot": "F:/0_workspace/6_wechat_game",
       "model": "glm-5.3",
-      "status": "WORKING",
-      "sessionCount": 9,
-      "totalMessages": 286,
-      "totalToolCalls": 180,
+      "status": "RECENT",
+      "sessionCount": 10,
+      "totalMessages": 334,
+      "totalToolCalls": 209,
       "activeLeases": 0,
-      "lastActiveAt": "10-24 18:37",
-      "lastActiveEpoch": 1792838234.3522747,
-      "lastSessionTitle": "20261024_183256_581762",
-      "lastPreview": "本轮结论（诚实汇报：尚无源码落盘，未写飞书评论、未关单——因发现关键依赖缺口，不能伪造“已完成”） 一、任务实况（已通过飞书 API 取回 T5 全文） - T5（d2762e5f）要求：src/assets.js 与 src/hub-assets.js 指向 art/m0-mo"
-    },
-    {
-      "id": "bl-super-secretary",
-      "presetId": "hermes-bl-super-secretary",
-      "title": "伴学 · 总裁办执行秘书",
-      "sectionPath": "个人 / 伴学",
-      "department": "个人 · 伴学教育事业部综合办",
-      "projectRoot": "E:/6_learn_space",
-      "model": "swe-2-high",
-      "status": "WORKING",
-      "sessionCount": 5,
-      "totalMessages": 494,
-      "totalToolCalls": 222,
-      "activeLeases": 0,
-      "lastActiveAt": "10-24 18:36",
-      "lastActiveEpoch": 1792838188.0547931,
-      "lastSessionTitle": "竞品复核与AI资源维护",
-      "lastPreview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
+      "lastActiveAt": "10-24 19:08",
+      "lastActiveEpoch": 1792840130.818085,
+      "lastSessionTitle": "20261024_190318_7f38b7",
+      "lastPreview": "{\"output\": \"343: if (!props?.ready() || props.index[kind] === undefined) return false;\\n445: if (!props?.ready() || props.index.chest === un"
     },
     {
       "id": "wj-a05-vfx-ui-art",
@@ -10320,32 +10302,50 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "department": "美术与视听部",
       "projectRoot": "F:/0_workspace/6_wechat_game",
       "model": "glm-5.3",
-      "status": "WORKING",
-      "sessionCount": 1,
-      "totalMessages": 12,
-      "totalToolCalls": 7,
-      "activeLeases": 1,
-      "lastActiveAt": "10-24 18:34",
-      "lastActiveEpoch": 1792838093.016999,
-      "lastSessionTitle": "【万界Studio部门实质推进｜限10步内完成】你名下在飞书主任务清单…",
-      "lastPreview": "{\"output\": \"---jadePanel---\\n---C---\\n21:const C = {\\n22- bg: '#050d18', floor: '#07101e', wall: '#1e4256', grid: '#0d1f30',\\n23- cyan: '#7f"
+      "status": "RECENT",
+      "sessionCount": 2,
+      "totalMessages": 29,
+      "totalToolCalls": 16,
+      "activeLeases": 0,
+      "lastActiveAt": "10-24 19:08",
+      "lastActiveEpoch": 1792840109.060934,
+      "lastSessionTitle": "【万界Studio部门实质推进｜限10步内完成】你名下在飞书主任务清单… #2",
+      "lastPreview": "本轮闭环完成（7 步工具调用，限 10 步内）。 任务 7c1c7e29-10ff-41d2-a782-28c084fc4918 ｜ A05｜UX-M0-HUD HUD 改版方案 —— 已交付并关单 1) 实质交付物（已落盘验证） 文件：F:/0_workspace/6_wech"
     },
     {
-      "id": "bl-release-engineer",
-      "presetId": "hermes-bl-release-engineer",
-      "title": "伴学 · 发布与运维",
-      "sectionPath": "个人 / 伴学",
-      "department": "伴学教育事业部",
-      "projectRoot": "E:/6_learn_space",
+      "id": "wj-hb04-bridge",
+      "presetId": "hermes-wj-hb04-bridge",
+      "title": "万界[HB04] · 多端适配与小游戏SDK工程师",
+      "sectionPath": "个人 / 万界",
+      "department": "程序研发部（工程效能组）",
+      "projectRoot": "F:/0_workspace/6_wechat_game",
       "model": "MiniMax-M3.1-Flash-Preview",
       "status": "RECENT",
-      "sessionCount": 4,
-      "totalMessages": 1242,
-      "totalToolCalls": 534,
+      "sessionCount": 2,
+      "totalMessages": 98,
+      "totalToolCalls": 65,
       "activeLeases": 0,
-      "lastActiveAt": "10-24 18:35",
-      "lastActiveEpoch": 1792838148.8491867,
-      "lastSessionTitle": "确认并恢复小程序云环境配置",
+      "lastActiveAt": "10-24 19:08",
+      "lastActiveEpoch": 1792840105.6792283,
+      "lastSessionTitle": "20261024_190319_aff92f",
+      "lastPreview": "{\"output\": \"=== release-check.mjs ===\\n// 微信发布流水线检查：读取既有构建产物的 .manifest.json，跑 build/包体/upload/审核域名四道自动门禁。\\n// 不构建、不登录、不上传、不编译；输出可粘进飞书/交接群的 "
+    },
+    {
+      "id": "bl-super-secretary",
+      "presetId": "hermes-bl-super-secretary",
+      "title": "伴学 · 总裁办执行秘书",
+      "sectionPath": "个人 / 伴学",
+      "department": "个人 · 伴学教育事业部综合办",
+      "projectRoot": "E:/6_learn_space",
+      "model": "swe-2-high",
+      "status": "RECENT",
+      "sessionCount": 5,
+      "totalMessages": 500,
+      "totalToolCalls": 222,
+      "activeLeases": 0,
+      "lastActiveAt": "10-24 19:08",
+      "lastActiveEpoch": 1792840091.6539266,
+      "lastSessionTitle": "竞品复核与AI资源维护",
       "lastPreview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
     },
     {
@@ -10357,14 +10357,14 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "projectRoot": "C:/Users/Administrator/Documents/1_personal",
       "model": "council",
       "status": "RECENT",
-      "sessionCount": 59,
+      "sessionCount": 60,
       "totalMessages": 3347,
       "totalToolCalls": 2081,
       "activeLeases": 0,
-      "lastActiveAt": "10-24 18:03",
-      "lastActiveEpoch": 1792836230.6288116,
+      "lastActiveAt": "10-24 18:41",
+      "lastActiveEpoch": 1792838463.7606747,
       "lastSessionTitle": "[DSH] 🩺 DSH 独立热手术舱 · 源码热改会话",
-      "lastPreview": "【专用通信校验 VOICE-DSH-20261024-B72E】此新会话仅连接最高终极管家(default)与Codex父语音聊天，不替代已有项目会话。请只回复“ACK VOICE-DSH-20261024-B72E”，并注明你的智能体身份与当前状态。不要调用工具、改文件、派业务"
+      "lastPreview": "你是 DeepSeek Harness (DSH) 仓库的前端实现工程师，任务是改 DSH 自己的代码，让 http://127.0.0.1:17580 这个 Web GUI 里能直接看到\"当前对话实际使用的模型\"，用于业主确认模型符合预期（不是改模型配置）。 工作目录：F:\\3"
     },
     {
       "id": "dsh-harness-engineer",
@@ -10430,7 +10430,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "council",
       "status": "RECENT",
       "sessionCount": 52,
-      "totalMessages": 1857,
+      "totalMessages": 1865,
       "totalToolCalls": 959,
       "activeLeases": 0,
       "lastActiveAt": "10-24 15:28",
@@ -10466,7 +10466,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "code",
       "status": "RECENT",
       "sessionCount": 126,
-      "totalMessages": 4718,
+      "totalMessages": 4724,
       "totalToolCalls": 2667,
       "activeLeases": 0,
       "lastActiveAt": "10-24 15:23",
@@ -10556,7 +10556,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "gemini-4-argon-high",
       "status": "ONLINE",
       "sessionCount": 59,
-      "totalMessages": 2474,
+      "totalMessages": 2482,
       "totalToolCalls": 1419,
       "activeLeases": 0,
       "lastActiveAt": "10-22 18:04",
@@ -10646,7 +10646,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "devin/swe-2",
       "status": "ONLINE",
       "sessionCount": 16,
-      "totalMessages": 811,
+      "totalMessages": 819,
       "totalToolCalls": 407,
       "activeLeases": 0,
       "lastActiveAt": "10-21 17:14",
@@ -10682,7 +10682,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "glm-5.3",
       "status": "ONLINE",
       "sessionCount": 15,
-      "totalMessages": 2085,
+      "totalMessages": 2091,
       "totalToolCalls": 945,
       "activeLeases": 0,
       "lastActiveAt": "10-21 14:44",
@@ -10700,7 +10700,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "MiniMax-M3.1-Flash-Preview",
       "status": "ONLINE",
       "sessionCount": 13,
-      "totalMessages": 2155,
+      "totalMessages": 2163,
       "totalToolCalls": 1003,
       "activeLeases": 0,
       "lastActiveAt": "10-20 12:32",
@@ -10718,7 +10718,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "MiniMax-M3.1-Flash-Preview",
       "status": "ONLINE",
       "sessionCount": 16,
-      "totalMessages": 2497,
+      "totalMessages": 2505,
       "totalToolCalls": 1205,
       "activeLeases": 0,
       "lastActiveAt": "10-20 11:33",
@@ -11719,78 +11719,8 @@ export const HERMES_INITIAL_WAR_ROOM = {
   ],
   "recentStream": [
     {
-      "ts": 1792838351.2345943,
-      "time": "10-24 18:39",
-      "agentId": "bl-content-engineer",
-      "agentTitle": "伴学 · 内容管线",
-      "sectionPath": "个人 / 伴学",
-      "role": "assistant",
-      "toolName": null,
-      "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
-    },
-    {
-      "ts": 1792838345.1049569,
-      "time": "10-24 18:39",
-      "agentId": "bl-product-lead",
-      "agentTitle": "伴学 · 产品负责人",
-      "sectionPath": "个人 / 伴学",
-      "role": "assistant",
-      "toolName": null,
-      "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
-    },
-    {
-      "ts": 1792838294.9173205,
-      "time": "10-24 18:38",
-      "agentId": "bl-ai-tutor-engineer",
-      "agentTitle": "伴学 · AI陪练",
-      "sectionPath": "个人 / 伴学",
-      "role": "assistant",
-      "toolName": null,
-      "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
-    },
-    {
-      "ts": 1792838277.8783169,
-      "time": "10-24 18:37",
-      "agentId": "wj-hb04-bridge",
-      "agentTitle": "万界[HB04] · 多端适配与小游戏SDK工程师",
-      "sectionPath": "个人 / 万界",
-      "role": "tool",
-      "toolName": "terminal",
-      "preview": "{\"output\": \"=== who imports release-pipeline ===\\nscripts/release-check.mjs:3:// 开关契约集中在 src/release-pipeline.js 的 CLI_FLAG_NAMES：布尔开关吞取值即报错"
-    },
-    {
-      "ts": 1792838235.3069701,
-      "time": "10-24 18:37",
-      "agentId": "wj-a01-art-lead",
-      "agentTitle": "万界[A01] · 美术总监 / 主美",
-      "sectionPath": "个人 / 万界",
-      "role": "tool",
-      "toolName": "terminal",
-      "preview": "{\"output\": \"SUMMARY: A01｜PKG-M0-T4 按屏上需求生成移动端素材 〔依赖:PKG-M0-T2〕\\r\\nDESC: 【PKG-M0-T4】按屏上需求生成移动端素材\\r\\n执行：A01（wj-a01-art-lead）统筹；A02 主角、A03 心魔与敌"
-    },
-    {
-      "ts": 1792838234.096791,
-      "time": "10-24 18:37",
-      "agentId": "wj-p02-canvas",
-      "agentTitle": "万界[P02] · 前端引擎与音画交互工程师",
-      "sectionPath": "个人 / 万界",
-      "role": "assistant",
-      "toolName": null,
-      "preview": "本轮结论（诚实汇报：尚无源码落盘，未写飞书评论、未关单——因发现关键依赖缺口，不能伪造“已完成”） 一、任务实况（已通过飞书 API 取回 T5 全文） - T5（d2762e5f）要求：src/assets.js 与 src/hub-assets.js 指向 art/m0-mo"
-    },
-    {
-      "ts": 1792838188.0547931,
-      "time": "10-24 18:36",
-      "agentId": "bl-super-secretary",
-      "agentTitle": "伴学 · 总裁办执行秘书",
-      "sectionPath": "个人 / 伴学",
-      "role": "assistant",
-      "toolName": null,
-      "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
-    },
-    {
-      "ts": 1792838148.8491867,
-      "time": "10-24 18:35",
+      "ts": 1792840604.454206,
+      "time": "10-24 19:16",
       "agentId": "bl-release-engineer",
       "agentTitle": "伴学 · 发布与运维",
       "sectionPath": "个人 / 伴学",
@@ -11799,24 +11729,94 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
     },
     {
-      "ts": 1792838093.016999,
-      "time": "10-24 18:34",
-      "agentId": "wj-a05-vfx-ui-art",
-      "agentTitle": "万界[A05] · UI/UX与战斗特效美术师",
+      "ts": 1792840193.7791202,
+      "time": "10-24 19:09",
+      "agentId": "bl-product-lead",
+      "agentTitle": "伴学 · 产品负责人",
+      "sectionPath": "个人 / 伴学",
+      "role": "assistant",
+      "toolName": null,
+      "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
+    },
+    {
+      "ts": 1792840187.150101,
+      "time": "10-24 19:09",
+      "agentId": "bl-content-engineer",
+      "agentTitle": "伴学 · 内容管线",
+      "sectionPath": "个人 / 伴学",
+      "role": "assistant",
+      "toolName": null,
+      "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
+    },
+    {
+      "ts": 1792840142.1211963,
+      "time": "10-24 19:09",
+      "agentId": "bl-ai-tutor-engineer",
+      "agentTitle": "伴学 · AI陪练",
+      "sectionPath": "个人 / 伴学",
+      "role": "assistant",
+      "toolName": null,
+      "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
+    },
+    {
+      "ts": 1792840138.7672822,
+      "time": "10-24 19:08",
+      "agentId": "wj-a01-art-lead",
+      "agentTitle": "万界[A01] · 美术总监 / 主美",
       "sectionPath": "个人 / 万界",
       "role": "tool",
       "toolName": "terminal",
-      "preview": "{\"output\": \"---jadePanel---\\n---C---\\n21:const C = {\\n22- bg: '#050d18', floor: '#07101e', wall: '#1e4256', grid: '#0d1f30',\\n23- cyan: '#7f"
+      "preview": "{\"output\": \"total 33566261\\ndrwxr-xr-x 1 Administrator 197108 0 Nov 4 2025 $RECYCLE.BIN\\ndrwxr-xr-x 1 Administrator 197108 0 Oct 23 22:51 .\\"
     },
     {
-      "ts": 1792836230.6288116,
-      "time": "10-24 18:03",
+      "ts": 1792840130.818085,
+      "time": "10-24 19:08",
+      "agentId": "wj-p02-canvas",
+      "agentTitle": "万界[P02] · 前端引擎与音画交互工程师",
+      "sectionPath": "个人 / 万界",
+      "role": "tool",
+      "toolName": "terminal",
+      "preview": "{\"output\": \"343: if (!props?.ready() || props.index[kind] === undefined) return false;\\n445: if (!props?.ready() || props.index.chest === un"
+    },
+    {
+      "ts": 1792840108.7970665,
+      "time": "10-24 19:08",
+      "agentId": "wj-a05-vfx-ui-art",
+      "agentTitle": "万界[A05] · UI/UX与战斗特效美术师",
+      "sectionPath": "个人 / 万界",
+      "role": "assistant",
+      "toolName": null,
+      "preview": "本轮闭环完成（7 步工具调用，限 10 步内）。 任务 7c1c7e29-10ff-41d2-a782-28c084fc4918 ｜ A05｜UX-M0-HUD HUD 改版方案 —— 已交付并关单 1) 实质交付物（已落盘验证） 文件：F:/0_workspace/6_wech"
+    },
+    {
+      "ts": 1792840105.6792283,
+      "time": "10-24 19:08",
+      "agentId": "wj-hb04-bridge",
+      "agentTitle": "万界[HB04] · 多端适配与小游戏SDK工程师",
+      "sectionPath": "个人 / 万界",
+      "role": "tool",
+      "toolName": "terminal",
+      "preview": "{\"output\": \"=== release-check.mjs ===\\n// 微信发布流水线检查：读取既有构建产物的 .manifest.json，跑 build/包体/upload/审核域名四道自动门禁。\\n// 不构建、不登录、不上传、不编译；输出可粘进飞书/交接群的 "
+    },
+    {
+      "ts": 1792840091.6539266,
+      "time": "10-24 19:08",
+      "agentId": "bl-super-secretary",
+      "agentTitle": "伴学 · 总裁办执行秘书",
+      "sectionPath": "个人 / 伴学",
+      "role": "assistant",
+      "toolName": null,
+      "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
+    },
+    {
+      "ts": 1792838463.7606747,
+      "time": "10-24 18:41",
       "agentId": "default",
       "agentTitle": "👑 终极管家",
       "sectionPath": "本机",
       "role": "dsh-harness",
       "toolName": "DSH Native",
-      "preview": "【专用通信校验 VOICE-DSH-20261024-B72E】此新会话仅连接最高终极管家(default)与Codex父语音聊天，不替代已有项目会话。请只回复“ACK VOICE-DSH-20261024-B72E”，并注明你的智能体身份与当前状态。不要调用工具、改文件、派业务"
+      "preview": "你是 DeepSeek Harness (DSH) 仓库的前端实现工程师，任务是改 DSH 自己的代码，让 http://127.0.0.1:17580 这个 Web GUI 里能直接看到\"当前对话实际使用的模型\"，用于业主确认模型符合预期（不是改模型配置）。 工作目录：F:\\3"
     },
     {
       "ts": 1792835040.6943388,
@@ -11965,8 +11965,8 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "fullPath": "E:/6_learn_space/docs/teams/hermes-m1-autonomy-20261014/daily-mp-evolution.html",
       "label": "小程序天级进化真机验收台 (HTML)",
       "sizeKb": 31.3,
-      "updatedAt": "10-24 18:32",
-      "mtimeSec": 1792837942.8880131
+      "updatedAt": "10-24 19:02",
+      "mtimeSec": 1792839768.3674
     },
     {
       "relPath": "design-competitor-center/index.html",
@@ -12048,9 +12048,191 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
   "totalAgents": 85,
   "catalog": [
     {
+      "provider": "agy",
+      "model": "claude-opus-5-5",
+      "label": "Claude Opus 5.5 (S1 AGY 订阅 · 239K 按Session增量续接)",
+      "tier": "S1",
+      "poolName": "S1 · Antigravity Pro 订阅池 ($200/mo)",
+      "quotaHint": "7d/5h 独立配额 · --conversation 增量续接",
+      "contextWindow": 239000,
+      "efforts": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "agy",
+      "model": "claude-sonnet-5-5",
+      "label": "Claude Sonnet 5.5 (S1 AGY 订阅 · 239K 按Session增量续接)",
+      "tier": "S1",
+      "poolName": "S1 · Antigravity Pro 订阅池 ($200/mo)",
+      "quotaHint": "7d/5h 独立配额 · --conversation 增量续接",
+      "contextWindow": 239000,
+      "efforts": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "agy",
+      "model": "gemini-4-argon",
+      "label": "Gemini 4 Argon (S1 AGY 订阅 · 239K 全模态与总协调导师)",
+      "tier": "S1",
+      "poolName": "S1 · Antigravity Pro 订阅池 ($200/mo)",
+      "quotaHint": "7d/5h 独立配额 · --conversation 增量续接",
+      "contextWindow": 239000,
+      "efforts": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "agy",
+      "model": "gemini-3.8-flash",
+      "label": "Gemini 3.8 Flash (S1 AGY 订阅 · 239K 极速多模态增量续接)",
+      "tier": "S1",
+      "poolName": "S1 · Antigravity Pro 订阅池 ($200/mo)",
+      "quotaHint": "7d/5h 独立配额 · --conversation 增量续接",
+      "contextWindow": 239000,
+      "efforts": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "openai-codex",
+      "model": "codex/gpt-6-astra",
+      "label": "GPT-6 Astra (S2 Codex Pro 订阅 · 872K 跨家族代码独审总导师)",
+      "tier": "S2",
+      "poolName": "S2 · OpenAI Codex Pro 订阅池 ($200/mo)",
+      "quotaHint": "ChatGPT Pro 7d 窗口 + 56,117 Credits 独立池",
+      "contextWindow": 872000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "openai-codex",
+      "model": "codex/gpt-6.1-sol",
+      "label": "GPT-6.1 Sol (S2 Codex Pro 订阅 · 400K 高阶算法与工程主帅)",
+      "tier": "S2",
+      "poolName": "S2 · OpenAI Codex Pro 订阅池 ($200/mo)",
+      "quotaHint": "ChatGPT Pro 7d 窗口 + 56,117 Credits 独立池",
+      "contextWindow": 400000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "openai-codex",
+      "model": "codex/gpt-6-sol",
+      "label": "GPT-6 Sol (S2 Codex Pro 订阅 · 400K 深度系统推演主力)",
+      "tier": "S2",
+      "poolName": "S2 · OpenAI Codex Pro 订阅池 ($200/mo)",
+      "quotaHint": "ChatGPT Pro 7d 窗口 + 56,117 Credits 独立池",
+      "contextWindow": 400000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "openai-codex",
+      "model": "codex/gpt-6-luna",
+      "label": "GPT-6 Luna (S2 Codex Pro 订阅 · 400K 全能均衡高吞吐导师)",
+      "tier": "S2",
+      "poolName": "S2 · OpenAI Codex Pro 订阅池 ($200/mo)",
+      "quotaHint": "ChatGPT Pro 7d 窗口 + 56,117 Credits 独立池",
+      "contextWindow": 400000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "openai-codex",
+      "model": "codex/gpt-5.6-sol",
+      "label": "GPT-5.6 Sol (S2 Codex Pro 订阅 · 1M 超长上下文稳定工程)",
+      "tier": "S2",
+      "poolName": "S2 · OpenAI Codex Pro 订阅池 ($200/mo)",
+      "quotaHint": "ChatGPT Pro 7d 窗口 + 56,117 Credits 独立池",
+      "contextWindow": 1000000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "openai-codex",
+      "model": "codex/gpt-5.6-terra",
+      "label": "GPT-5.6 Terra (S2 Codex Pro 订阅 · 1M 复杂多文件重构底座)",
+      "tier": "S2",
+      "poolName": "S2 · OpenAI Codex Pro 订阅池 ($200/mo)",
+      "quotaHint": "ChatGPT Pro 7d 窗口 + 56,117 Credits 独立池",
+      "contextWindow": 1000000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "openai-codex",
+      "model": "codex/gpt-5.6-luna",
+      "label": "GPT-5.6 Luna (S2 Codex Pro 订阅 · 1M 高速交互与验证底座)",
+      "tier": "S2",
+      "poolName": "S2 · OpenAI Codex Pro 订阅池 ($200/mo)",
+      "quotaHint": "ChatGPT Pro 7d 窗口 + 56,117 Credits 独立池",
+      "contextWindow": 1000000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
       "provider": "magpie-responses",
       "model": "group/claude-fable-5-1",
-      "label": "Codex GPT-6-Astra · Fable 5.1 槽 (Responses)",
+      "label": "Codex Fable 5.1 路由组 (S2 Codex Responses 槽 · 272K)",
+      "tier": "S2",
+      "poolName": "S2 · OpenAI Codex Responses 路由组",
+      "quotaHint": "Responses 协议多节点自动负载均衡",
       "contextWindow": 272000,
       "efforts": [
         "low",
@@ -12064,7 +12246,10 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
     {
       "provider": "magpie-responses",
       "model": "group/claude-fable-astra",
-      "label": "Codex GPT-6-Astra · Astra 槽 (Responses)",
+      "label": "Codex GPT-6 Astra 路由组 (S2 Codex Responses 槽 · 272K)",
+      "tier": "S2",
+      "poolName": "S2 · OpenAI Codex Responses 路由组",
+      "quotaHint": "Responses 协议多节点自动负载均衡",
       "contextWindow": 272000,
       "efforts": [
         "low",
@@ -12076,9 +12261,837 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
       "defaultEffort": "high"
     },
     {
+      "provider": "magpie-responses",
+      "model": "group/claude-sonnet-sol",
+      "label": "Codex GPT-6 Sol 路由组 (S2 Codex Responses 槽 · 272K)",
+      "tier": "S2",
+      "poolName": "S2 · OpenAI Codex Responses 路由组",
+      "quotaHint": "Responses 协议多节点自动负载均衡",
+      "contextWindow": 272000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie-responses",
+      "model": "group/claude-sonnet-5-5",
+      "label": "Codex Sonnet 5.5 路由组 (S2 Codex Responses 槽 · 272K)",
+      "tier": "S2",
+      "poolName": "S2 · OpenAI Codex Responses 路由组",
+      "quotaHint": "Responses 协议多节点自动负载均衡",
+      "contextWindow": 272000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "swe-2-max",
+      "label": "Devin SWE-2 Max (S3 免费工程池 · ★0扣费不占周配额 · 256K 极限主力)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Max 免费工程池 ($200/mo)",
+      "quotaHint": "★0扣费·不占7d周配额·仅限并发",
+      "contextWindow": 256000,
+      "efforts": [
+        "medium",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "max"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "swe-2-high",
+      "label": "Devin SWE-2 High (S3 免费工程池 · ★0扣费不占周配额 · 256K 高速苦力)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Max 免费工程池 ($200/mo)",
+      "quotaHint": "★0扣费·不占7d周配额·仅限并发",
+      "contextWindow": 256000,
+      "efforts": [
+        "medium",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "swe-2-max-lightning",
+      "label": "Devin SWE-2 Max Lightning (S3 免费工程池 · ★0扣费极速闪电版 · 256K)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Max 免费工程池 ($200/mo)",
+      "quotaHint": "★0扣费·不占7d周配额·极速闪电通道",
+      "contextWindow": 256000,
+      "efforts": [
+        "medium",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "max"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "claude-fable-5-1",
+      "label": "Claude Fable 5.1 (S3 Devin ACP 持久会话 · 顶级推理与架构导师)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Windsurf ACP 持久会话池",
+      "quotaHint": "JSON-RPC 常驻会话 · 200K 上下文",
+      "contextWindow": 200000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "claude-opus-5-5",
+      "label": "Claude Opus 5.5 (S3 Devin ACP 持久会话 · 深度代码与安全审计)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Windsurf ACP 持久会话池",
+      "quotaHint": "JSON-RPC 常驻会话 · 200K 上下文",
+      "contextWindow": 200000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "claude-opus-5-5-fast",
+      "label": "Claude Opus 5.5 Fast (S3 Devin ACP 持久会话 · 高速 Opus 5.5 通道)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Windsurf ACP 持久会话池",
+      "quotaHint": "JSON-RPC 常驻会话 · Fast 极速输出",
+      "contextWindow": 200000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "claude-sonnet-5-5",
+      "label": "Claude Sonnet 5.5 (S3 Devin ACP 持久会话 · 全栈工程主力)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Windsurf ACP 持久会话池",
+      "quotaHint": "JSON-RPC 常驻会话 · 200K 上下文",
+      "contextWindow": 200000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "claude-haiku-5-5",
+      "label": "Claude Haiku 5.5 (S3 Devin ACP 持久会话 · 高速轻量参谋)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Windsurf ACP 持久会话池",
+      "quotaHint": "JSON-RPC 常驻会话 · 低延迟快参",
+      "contextWindow": 200000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "medium"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "gpt-6-astra",
+      "label": "GPT-6 Astra (S3 Devin ACP 持久会话 · 跨家族独审与复杂调试)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Windsurf ACP 持久会话池",
+      "quotaHint": "JSON-RPC 常驻会话 · 272K 上下文",
+      "contextWindow": 272000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "gpt-6-1-sol",
+      "label": "GPT-6.1 Sol (S3 Devin ACP 持久会话 · 高阶算法与架构合成)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Windsurf ACP 持久会话池",
+      "quotaHint": "JSON-RPC 常驻会话 · 272K 上下文",
+      "contextWindow": 272000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "gpt-6-sol",
+      "label": "GPT-6 Sol (S3 Devin ACP 持久会话 · 深度代码合成)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Windsurf ACP 持久会话池",
+      "quotaHint": "JSON-RPC 常驻会话 · 272K 上下文",
+      "contextWindow": 272000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "gpt-6-luna",
+      "label": "GPT-6 Luna (S3 Devin ACP 持久会话 · 均衡工程参谋)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Windsurf ACP 持久会话池",
+      "quotaHint": "JSON-RPC 常驻会话 · 272K 上下文",
+      "contextWindow": 272000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "gemini-4-argon",
+      "label": "Gemini 4 Argon (S3 Devin ACP 持久会话 · 1M 全栈与多模态导师)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Windsurf ACP 持久会话池",
+      "quotaHint": "JSON-RPC 常驻会话 · 1M 上下文",
+      "contextWindow": 1000000,
+      "efforts": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "gemini-3-8-flash",
+      "label": "Gemini 3.8 Flash (S3 Devin ACP 持久会话 · 高速多模态参谋)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Windsurf ACP 持久会话池",
+      "quotaHint": "JSON-RPC 常驻会话 · 1M 上下文",
+      "contextWindow": 1000000,
+      "efforts": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "kimi-k3",
+      "label": "Kimi K3 (S3 Devin ACP 持久会话 · 超长链中文推理)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Windsurf ACP 持久会话池",
+      "quotaHint": "JSON-RPC 常驻会话 · 256K 上下文",
+      "contextWindow": 256000,
+      "efforts": [
+        "low",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "glm-5-3",
+      "label": "GLM-5.3 (S3 Devin ACP 持久会话 · 智谱最新旗舰工程底座)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Windsurf ACP 持久会话池",
+      "quotaHint": "JSON-RPC 常驻会话 · 204K 上下文",
+      "contextWindow": 204800,
+      "efforts": [
+        "low",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "grok-4-7",
+      "label": "Grok 4.7 (S3 Devin ACP 持久会话 · 第一性原理与红队挑刺)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Windsurf ACP 持久会话池",
+      "quotaHint": "JSON-RPC 常驻会话 · 256K 上下文",
+      "contextWindow": 256000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "muse-wonder-1-0",
+      "label": "Muse Wonder 1.0 (S3 Devin ACP 持久会话 · 创意与前端交互美学)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Windsurf ACP 持久会话池",
+      "quotaHint": "JSON-RPC 常驻会话 · 300K 上下文",
+      "contextWindow": 300000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "deepseek-v4-1-flash-1017",
+      "label": "DeepSeek V4.1 Flash 1017 (S3 Devin ACP 持久会话 · 高速思考链)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Windsurf ACP 持久会话池",
+      "quotaHint": "JSON-RPC 常驻会话 · 256K 上下文",
+      "contextWindow": 256000,
+      "efforts": [
+        "low",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "fusion-claude-opus-5-5-high-sidekick-swe-2-medium",
+      "label": "Devin Native Fusion: Opus 5.5 High × SWE-2 (S3 双模原生协同)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Native Fusion 双模池",
+      "quotaHint": "Opus 5.5 主帅 + SWE-2 免费副驾",
+      "contextWindow": 256000,
+      "efforts": [
+        "high"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "fusion-claude-fable-5-1-high-sidekick-swe-2-medium",
+      "label": "Devin Native Fusion: Fable 5.1 High × SWE-2 (S3 双模原生协同)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Native Fusion 双模池",
+      "quotaHint": "Fable 5.1 主帅 + SWE-2 免费副驾",
+      "contextWindow": 256000,
+      "efforts": [
+        "high"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "fusion-gpt-6-astra-high-sidekick-swe-2-medium",
+      "label": "Devin Native Fusion: GPT-6 Astra High × SWE-2 (S3 双模原生协同)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Native Fusion 双模池",
+      "quotaHint": "GPT-6 Astra 主帅 + SWE-2 免费副驾",
+      "contextWindow": 256000,
+      "efforts": [
+        "high"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "devin-acp",
+      "model": "fusion-gpt-6-1-sol-high-sidekick-swe-2-medium",
+      "label": "Devin Native Fusion: GPT-6.1 Sol High × SWE-2 (S3 双模原生协同)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Native Fusion 双模池",
+      "quotaHint": "GPT-6.1 Sol 主帅 + SWE-2 免费副驾",
+      "contextWindow": 256000,
+      "efforts": [
+        "high"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "devin/swe-2",
+      "label": "Devin SWE-2 (S3 Magpie 网关直连 · ★0扣费不占周配额 · 256K)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Max 免费工程池 (Magpie 网关)",
+      "quotaHint": "★0扣费·不占7d周配额·HTTP直连高速通道",
+      "contextWindow": 256000,
+      "efforts": [
+        "medium",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "devin/swe-2-max-lightning",
+      "label": "Devin SWE-2 Max Lightning (S3 Magpie 网关直连 · ★0扣费闪电版)",
+      "tier": "S3",
+      "poolName": "S3 · Devin Max 免费工程池 (Magpie 网关)",
+      "quotaHint": "★0扣费·不占7d周配额·极速闪电通道",
+      "contextWindow": 256000,
+      "efforts": [
+        "medium",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "max"
+    },
+    {
+      "provider": "magpie",
+      "model": "cursor/composer-2.5",
+      "label": "Cursor Composer 2.5 (S4 Cursor 内部池 · ★不扣第三方池 · 多文件重构王牌)",
+      "tier": "S4",
+      "poolName": "S4 · Cursor Ultra 订阅池 ($200/mo)",
+      "quotaHint": "★Cursor内部池(剩82%)·不扣第三方额度",
+      "contextWindow": 256000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "cursor/grok-4.7@500k",
+      "label": "Cursor Grok 4.7 500K (S4 Cursor 内部池 · ★不扣第三方池 · 500K 上下文)",
+      "tier": "S4",
+      "poolName": "S4 · Cursor Ultra 订阅池 ($200/mo)",
+      "quotaHint": "★Cursor内部池(剩82%)·500K大上下文",
+      "contextWindow": 500000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "cursor/claude-opus-5-5@1m",
+      "label": "Claude Opus 5.5 1M (S4 Cursor 百万上下文池 · 1M 架构终审)",
+      "tier": "S4",
+      "poolName": "S4 · Cursor Ultra 订阅池 ($200/mo)",
+      "quotaHint": "1M 百万上下文 · S1 导师满血替补",
+      "contextWindow": 1000000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "cursor/claude-fable-5-1@1m",
+      "label": "Claude Fable 5.1 1M (S4 Cursor 百万上下文池 · 1M 顶级推理)",
+      "tier": "S4",
+      "poolName": "S4 · Cursor Ultra 订阅池 ($200/mo)",
+      "quotaHint": "1M 百万上下文 · 深度架构推演",
+      "contextWindow": 1000000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "cursor/muse-wonder-1.0@1m",
+      "label": "Muse Wonder 1.0 1M (S4 Cursor 百万上下文池 · 1M 创意与前端)",
+      "tier": "S4",
+      "poolName": "S4 · Cursor Ultra 订阅池 ($200/mo)",
+      "quotaHint": "1M 百万上下文 · 视觉与前端美学",
+      "contextWindow": 1000000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "cursor/gpt-5.6-sol@1m",
+      "label": "GPT-5.6 Sol 1M (S4 Cursor 百万上下文池 · 1M 深度推导)",
+      "tier": "S4",
+      "poolName": "S4 · Cursor Ultra 订阅池 ($200/mo)",
+      "quotaHint": "1M 百万上下文 · 跨仓库全量分析",
+      "contextWindow": 1000000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "zhipu/glm-5.3",
+      "label": "GLM-5.3 (B池 智谱 CodingPlan MAX · ★每5h满血再生·无周上限主力)",
+      "tier": "B",
+      "poolName": "B · 智谱 CodingPlan MAX (无周上限)",
+      "quotaHint": "★第一顺位主力苦力 · 5h窗口剩99% · 无周限",
+      "contextWindow": 204800,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "zhipu/glm-5.3-flash",
+      "label": "GLM-5.3 Flash (B池 智谱 CodingPlan MAX · ★每5h满血再生·高速工具链)",
+      "tier": "B",
+      "poolName": "B · 智谱 CodingPlan MAX (无周上限)",
+      "quotaHint": "★无周上限 · 高并发极速工具调用",
+      "contextWindow": 204800,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "minimax/MiniMax-M3.1-Flash",
+      "label": "MiniMax M3.1 Flash (C池 MiniMax CodingPlan · ★1M上下文·每5h满血再生)",
+      "tier": "C",
+      "poolName": "C · MiniMax CodingPlan (1M · 无周上限)",
+      "quotaHint": "★第一顺位高速苦力 · 1M上下文 · 5h窗口剩99%",
+      "contextWindow": 1000000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "minimax/MiniMax-M3",
+      "label": "MiniMax M3 (C池 MiniMax CodingPlan · 1M 深度长文与复杂指令)",
+      "tier": "C",
+      "poolName": "C · MiniMax CodingPlan (1M · 无周上限)",
+      "quotaHint": "1M 超长上下文 · 复杂业务规划",
+      "contextWindow": 1000000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "opencode-go/deepseek-v4.1-flash",
+      "label": "DeepSeek V4.1 Flash (D池 OpenCode Free · ★0扣费无限用 · AIME 86.7%)",
+      "tier": "D",
+      "poolName": "D · OpenCode Free 0扣费高智商矩阵",
+      "quotaHint": "★0扣费无限用 · 原生思考链推理王牌",
+      "contextWindow": 1000000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "opencode-go/gemini-4-argon-contributor",
+      "label": "Gemini 4 Argon Contributor (A池 OpenCode Go · 异构多模态桥接)",
+      "tier": "A",
+      "poolName": "A · OpenCode Go 订阅池",
+      "quotaHint": "1M 上下文 · 异构多模态审查",
+      "contextWindow": 1000000,
+      "efforts": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "aihubmix/mimo-v2.6-pro",
+      "label": "Xiaomi MiMo V2.6 Pro (D池 数学与理科推导专精 · AIME 84.0%)",
+      "tier": "D",
+      "poolName": "D · OpenCode / AIHubMix 理科推导池",
+      "quotaHint": "数学/物理/算法形式化验证专精",
+      "contextWindow": 256000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "openrouter/nvidia/nemotron-3.5-super-vl:free",
+      "label": "Nemotron 3.5 Super VL Free (D池 ★0扣费原生多模态视觉审查)",
+      "tier": "D",
+      "poolName": "D · OpenCode Free 0扣费高智商矩阵",
+      "quotaHint": "★0扣费 · Vision+Text 看截图/配图专精",
+      "contextWindow": 256000,
+      "efforts": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "aihubmix/qwen3.8-max-free",
+      "label": "Qwen 3.8 Max Free (D池 ★0扣费通义最新旗舰 · 中文全能推理)",
+      "tier": "D",
+      "poolName": "D · OpenCode Free 0扣费高智商矩阵",
+      "quotaHint": "★0扣费 · 中文长链分析与工具调用",
+      "contextWindow": 256000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie-workbuddy",
+      "model": "workbuddy-ai/deepseek-v4.1-flash",
+      "label": "DeepSeek V4.1 Flash (E池 WorkBuddy 免费无限桶 · ★0 Credits · 1M图文)",
+      "tier": "E",
+      "poolName": "E · WorkBuddy AI Pro & Magpie 路由池",
+      "quotaHint": "★0 Credits 免费无限桶 · 1M上下文 · Text+Image",
+      "contextWindow": 1000000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie-workbuddy",
+      "model": "workbuddy-ai/deepseek-v4.1-flash-sg",
+      "label": "DeepSeek V4.1 Flash SG (E池 WorkBuddy 免费无限桶 · ★0 Credits 新加坡低延迟)",
+      "tier": "E",
+      "poolName": "E · WorkBuddy AI Pro & Magpie 路由池",
+      "quotaHint": "★0 Credits 免费无限桶 · 新加坡高速节点",
+      "contextWindow": 1000000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie-workbuddy",
+      "model": "workbuddy-ai/gpt-6.1-sol",
+      "label": "GPT-6.1 Sol (E池 WorkBuddy Pro · 400K 极强代码/聚合主帅)",
+      "tier": "E",
+      "poolName": "E · WorkBuddy AI Pro & Magpie 路由池",
+      "quotaHint": "WorkBuddy Pro 异构池 · 400K 上下文",
+      "contextWindow": 400000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie-workbuddy",
+      "model": "workbuddy-ai/gpt-6-astra",
+      "label": "GPT-6 Astra (E池 WorkBuddy Pro · 400K 架构设计与独审)",
+      "tier": "E",
+      "poolName": "E · WorkBuddy AI Pro & Magpie 路由池",
+      "quotaHint": "WorkBuddy Pro 异构池 · 400K 上下文",
+      "contextWindow": 400000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie-workbuddy",
+      "model": "workbuddy-ai/grok-4.7",
+      "label": "Grok 4.7 (E池 WorkBuddy Pro · 256K 第一性原理挑刺/极速推理)",
+      "tier": "E",
+      "poolName": "E · WorkBuddy AI Pro & Magpie 路由池",
+      "quotaHint": "WorkBuddy Pro 异构池 · 红队挑刺王牌",
+      "contextWindow": 256000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie-workbuddy",
+      "model": "workbuddy-ai/glm-5.3",
+      "label": "GLM-5.3 (E池 WorkBuddy Pro · 204K 中文工程主力)",
+      "tier": "E",
+      "poolName": "E · WorkBuddy AI Pro & Magpie 路由池",
+      "quotaHint": "WorkBuddy Pro 异构池 · 204K 上下文",
+      "contextWindow": 204800,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie-workbuddy",
+      "model": "workbuddy-ai/hy4-preview",
+      "label": "Tencent Hunyuan 4 Preview (E池 WorkBuddy Pro · 腾讯混元 Hy4 异构参谋)",
+      "tier": "E",
+      "poolName": "E · WorkBuddy AI Pro & Magpie 路由池",
+      "quotaHint": "WorkBuddy Pro 异构池 · 腾讯混元最新旗舰",
+      "contextWindow": 256000,
+      "efforts": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "defaultEffort": "high"
+    },
+    {
       "provider": "magpie",
       "model": "auto/claude-opus-5-5",
-      "label": "Claude Opus 5.5 (Magpie · 1M 架构/审查)",
+      "label": "Claude Opus 5.5 (E池 Magpie Auto · 1M 跨源自动容灾路由)",
+      "tier": "E",
+      "poolName": "E · WorkBuddy AI Pro & Magpie 路由池",
+      "quotaHint": "Magpie 跨池自动故障转移 · 1M 上下文",
+      "contextWindow": 1000000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "auto/claude-sonnet-5-5",
+      "label": "Claude Sonnet 5.5 (E池 Magpie Auto · 1M 跨源自动容灾路由)",
+      "tier": "E",
+      "poolName": "E · WorkBuddy AI Pro & Magpie 路由池",
+      "quotaHint": "Magpie 跨池自动故障转移 · 1M 上下文",
+      "contextWindow": 1000000,
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "auto/gemini-4-argon",
+      "label": "Gemini 4 Argon (E池 Magpie Auto · 1M 全栈/视觉容灾路由)",
+      "tier": "E",
+      "poolName": "E · WorkBuddy AI Pro & Magpie 路由池",
+      "quotaHint": "Magpie 跨池自动故障转移 · 1M 上下文",
+      "contextWindow": 1048576,
+      "efforts": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "defaultEffort": "high"
+    },
+    {
+      "provider": "magpie",
+      "model": "auto/MiniMax-M3.1-Flash",
+      "label": "MiniMax M3.1 Flash (E池 Magpie Auto · 1M 高吞吐容灾路由)",
+      "tier": "E",
+      "poolName": "E · WorkBuddy AI Pro & Magpie 路由池",
+      "quotaHint": "Magpie 跨池自动故障转移 · 1M 上下文",
       "contextWindow": 1000000,
       "efforts": [
         "low",
@@ -12092,102 +13105,14 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
     {
       "provider": "magpie",
       "model": "group/claude-sonnet-flash",
-      "label": "DeepSeek V4.1 Flash · Sonnet Flash 槽 (Completions)",
+      "label": "Sonnet-Flash 高速路由组 (E池 Magpie Completions 槽 · 1M)",
+      "tier": "E",
+      "poolName": "E · WorkBuddy AI Pro & Magpie 路由池",
+      "quotaHint": "Completions 协议多源高速池",
       "contextWindow": 1000000,
       "efforts": [
         "low",
         "high",
-        "max"
-      ],
-      "defaultEffort": "high"
-    },
-    {
-      "provider": "magpie-workbuddy",
-      "model": "workbuddy-ai/gpt-6.1-sol",
-      "label": "GPT-6.1 Sol (WorkBuddy · 400K 极强代码/聚合)",
-      "contextWindow": 400000,
-      "efforts": [
-        "low",
-        "medium",
-        "high",
-        "max"
-      ],
-      "defaultEffort": "high"
-    },
-    {
-      "provider": "magpie-workbuddy",
-      "model": "workbuddy-ai/gpt-6-astra",
-      "label": "GPT-6 Astra (WorkBuddy · 400K 架构设计)",
-      "contextWindow": 400000,
-      "efforts": [
-        "low",
-        "medium",
-        "high",
-        "max"
-      ],
-      "defaultEffort": "high"
-    },
-    {
-      "provider": "magpie-workbuddy",
-      "model": "workbuddy-ai/grok-4.7",
-      "label": "Grok 4.7 (WorkBuddy · 256K 挑刺/极速推理)",
-      "contextWindow": 256000,
-      "efforts": [
-        "low",
-        "medium",
-        "high",
-        "max"
-      ],
-      "defaultEffort": "high"
-    },
-    {
-      "provider": "magpie-workbuddy",
-      "model": "workbuddy-ai/glm-5.3",
-      "label": "GLM-5.3 (WorkBuddy · 204K 中文工程主力)",
-      "contextWindow": 204800,
-      "efforts": [
-        "low",
-        "medium",
-        "high",
-        "max"
-      ],
-      "defaultEffort": "high"
-    },
-    {
-      "provider": "magpie-workbuddy",
-      "model": "workbuddy-ai/deepseek-v4.1-flash",
-      "label": "DeepSeek V4.1 Flash (WorkBuddy · 1M 免费图文)",
-      "contextWindow": 1000000,
-      "efforts": [
-        "low",
-        "medium",
-        "high",
-        "max"
-      ],
-      "defaultEffort": "high"
-    },
-    {
-      "provider": "magpie",
-      "model": "auto/gemini-4-argon",
-      "label": "Gemini 4 Argon (Magpie · 1M 全栈/视觉)",
-      "contextWindow": 1048576,
-      "efforts": [
-        "low",
-        "medium",
-        "high"
-      ],
-      "defaultEffort": "high"
-    },
-    {
-      "provider": "magpie",
-      "model": "auto/MiniMax-M3.1-Flash",
-      "label": "MiniMax M3.1 Flash (Magpie · 1M 高吞吐)",
-      "contextWindow": 1000000,
-      "efforts": [
-        "low",
-        "medium",
-        "high",
-        "xhigh",
         "max"
       ],
       "defaultEffort": "high"
@@ -12195,142 +13120,15 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
     {
       "provider": "magpie",
       "model": "group/claude-haiku-5-5",
-      "label": "DeepSeek V4.1 Flash · Haiku 5.5 槽 (Completions)",
+      "label": "Haiku 5.5 轻量路由组 (E池 Magpie Completions 槽 · 1M)",
+      "tier": "E",
+      "poolName": "E · WorkBuddy AI Pro & Magpie 路由池",
+      "quotaHint": "Completions 协议极速轻量池",
       "contextWindow": 1000000,
       "efforts": [
         "low",
         "high",
         "max"
-      ],
-      "defaultEffort": "medium"
-    },
-    {
-      "provider": "agy",
-      "model": "claude-opus-5-5",
-      "label": "Claude Opus 5.5 (AGY · 239K 按Session增量续接)",
-      "contextWindow": 239000,
-      "efforts": [
-        "low",
-        "medium",
-        "high"
-      ],
-      "defaultEffort": "high"
-    },
-    {
-      "provider": "agy",
-      "model": "claude-sonnet-5-5",
-      "label": "Claude Sonnet 5.5 (AGY · 239K 按Session增量续接)",
-      "contextWindow": 239000,
-      "efforts": [
-        "low",
-        "medium",
-        "high"
-      ],
-      "defaultEffort": "high"
-    },
-    {
-      "provider": "agy",
-      "model": "gemini-4-argon",
-      "label": "Gemini 4 Argon (AGY · 239K 按Session增量续接)",
-      "contextWindow": 239000,
-      "efforts": [
-        "low",
-        "medium",
-        "high"
-      ],
-      "defaultEffort": "high"
-    },
-    {
-      "provider": "agy",
-      "model": "gemini-3.8-flash",
-      "label": "Gemini 3.8 Flash (AGY · 239K 极速增量续接)",
-      "contextWindow": 239000,
-      "efforts": [
-        "low",
-        "medium",
-        "high"
-      ],
-      "defaultEffort": "medium"
-    },
-    {
-      "provider": "agy",
-      "model": "gpt-oss-120b",
-      "label": "GPT-OSS 120B (AGY · 239K 按Session增量续接)",
-      "contextWindow": 239000,
-      "efforts": [
-        "medium"
-      ],
-      "defaultEffort": "medium"
-    },
-    {
-      "provider": "devin-acp",
-      "model": "claude-opus-4-6",
-      "label": "Claude Opus 4.6 (Devin ACP · 按Session持久JSON-RPC)",
-      "contextWindow": 200000,
-      "efforts": [
-        "low",
-        "medium",
-        "high"
-      ],
-      "defaultEffort": "high"
-    },
-    {
-      "provider": "devin-acp",
-      "model": "claude-sonnet-4-6",
-      "label": "Claude Sonnet 4.6 (Devin ACP · 按Session持久JSON-RPC)",
-      "contextWindow": 200000,
-      "efforts": [
-        "low",
-        "medium",
-        "high"
-      ],
-      "defaultEffort": "high"
-    },
-    {
-      "provider": "devin-acp",
-      "model": "gpt-5.4",
-      "label": "GPT-5.4 (Devin ACP · 按Session持久JSON-RPC)",
-      "contextWindow": 200000,
-      "efforts": [
-        "low",
-        "medium",
-        "high"
-      ],
-      "defaultEffort": "high"
-    },
-    {
-      "provider": "devin-acp",
-      "model": "SWE-1.6",
-      "label": "Cognition SWE-1.6 (Devin ACP · 代码专精持久会话)",
-      "contextWindow": 200000,
-      "efforts": [
-        "low",
-        "medium",
-        "high"
-      ],
-      "defaultEffort": "high"
-    },
-    {
-      "provider": "devin-acp",
-      "model": "gemini-3.1-pro",
-      "label": "Gemini 3.1 Pro (Devin ACP · 按Session持久JSON-RPC)",
-      "contextWindow": 200000,
-      "efforts": [
-        "low",
-        "medium",
-        "high"
-      ],
-      "defaultEffort": "high"
-    },
-    {
-      "provider": "devin-acp",
-      "model": "claude-haiku-4-5",
-      "label": "Claude Haiku 4.5 (Devin ACP · 高速轻量持久会话)",
-      "contextWindow": 200000,
-      "efforts": [
-        "low",
-        "medium",
-        "high"
       ],
       "defaultEffort": "medium"
     }
@@ -12345,38 +13143,78 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
   "moaPresets": {
     "council": {
       "id": "council",
-      "name": "🏛️ Council 战略内阁 (Hermes 默认 MoA)",
-      "description": "4 路异构参谋并行献策 (Grok-4.7[xhigh] + GLM-5.3 + Sonnet-5.5 + DeepSeek-V4.1)，由 GPT-6.1-Sol 汇总成高密度行动指南",
+      "name": "🏛️ Council 战略内阁 (Codex GPT-6-Astra + Grok-4.7 + GLM-5.3 + DeepSeek-V4.1)",
+      "description": "4 路最新旗舰参谋并行献策 (S2 Codex GPT-6-Astra + Grok-4.7 + B池 GLM-5.3 + D池 DeepSeek-V4.1)，由 S2 Codex GPT-6.1-Sol 汇总成高密度行动指南",
       "fanout": "user_turn",
       "referenceModels": [
+        {
+          "provider": "openai-codex",
+          "model": "codex/gpt-6-astra",
+          "reasoningEffort": "high",
+          "role": "S2 Codex 跨家族架构与第一性原理参谋"
+        },
         {
           "provider": "magpie-workbuddy",
           "model": "workbuddy-ai/grok-4.7",
           "reasoningEffort": "high",
-          "role": "第一性原理与边界挑刺参谋"
-        },
-        {
-          "provider": "magpie-workbuddy",
-          "model": "workbuddy-ai/glm-5.3",
-          "reasoningEffort": "high",
-          "role": "中文工程落地与业务闭环参谋"
+          "role": "边界挑刺与反方证伪参谋"
         },
         {
           "provider": "magpie",
-          "model": "group/claude-sonnet-flash",
+          "model": "zhipu/glm-5.3",
           "reasoningEffort": "high",
-          "role": "代码结构与工具调用策略参谋"
+          "role": "B池 中文工程落地与业务闭环参谋"
         },
         {
           "provider": "magpie-workbuddy",
           "model": "workbuddy-ai/deepseek-v4.1-flash",
           "reasoningEffort": "high",
-          "role": "算法复杂度与高性价比路径参谋"
+          "role": "E池 0扣费算法复杂度与高性价比参谋"
         }
       ],
       "aggregator": {
-        "provider": "magpie-workbuddy",
-        "model": "workbuddy-ai/gpt-6.1-sol",
+        "provider": "openai-codex",
+        "model": "codex/gpt-6.1-sol",
+        "reasoningEffort": "high"
+      },
+      "builtin": true,
+      "customized": false
+    },
+    "codex_elite": {
+      "id": "codex_elite",
+      "name": "💎 Codex Pro 订阅领衔内阁 (GPT-6-Astra + GPT-6.1-Sol + Opus-5.5 + SWE-2-Max)",
+      "description": "以 S2 OpenAI Codex Pro ($200/mo) 订阅池为核心，联合 S1 AGY Claude Opus 5.5 与 S3 Devin SWE-2 Max 免费工程池，专为高难架构与核心代码设计",
+      "fanout": "user_turn",
+      "timeoutMs": 90000,
+      "referenceModels": [
+        {
+          "provider": "openai-codex",
+          "model": "codex/gpt-6-astra",
+          "reasoningEffort": "high",
+          "role": "S2 Codex GPT-6 Astra 架构与代码独审主参谋"
+        },
+        {
+          "provider": "openai-codex",
+          "model": "codex/gpt-6-sol",
+          "reasoningEffort": "high",
+          "role": "S2 Codex GPT-6 Sol 深度系统推演参谋"
+        },
+        {
+          "provider": "agy",
+          "model": "claude-opus-5-5",
+          "reasoningEffort": "high",
+          "role": "S1 AGY Claude Opus 5.5 契约与安全参谋"
+        },
+        {
+          "provider": "devin-acp",
+          "model": "swe-2-max",
+          "reasoningEffort": "high",
+          "role": "S3 Devin SWE-2 Max 0扣费工程实现参谋"
+        }
+      ],
+      "aggregator": {
+        "provider": "openai-codex",
+        "model": "codex/gpt-6.1-sol",
         "reasoningEffort": "high"
       },
       "builtin": true,
@@ -12384,44 +13222,44 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
     },
     "code": {
       "id": "code",
-      "name": "💻 Code 极限攻坚 (5 路代码参谋 + GPT-6.1-Sol 聚合)",
-      "description": "针对复杂重构、跨包魔改与底层 Bug 定位，聚合 Grok-4.7、Gemini-4-Argon、Opus-5.5、GPT-6-Astra、GLM-5.3 五路代码视角",
+      "name": "💻 Code 极限攻坚 (5 路最新代码参谋 + Codex GPT-6.1-Sol 聚合)",
+      "description": "针对复杂重构、跨包魔改与底层 Bug 定位，聚合 Codex GPT-6-Astra、Devin SWE-2-Max、Opus-5.5、Gemini-4-Argon、GLM-5.3 五路最新代码视角",
       "fanout": "user_turn",
       "referenceModels": [
         {
-          "provider": "magpie-workbuddy",
-          "model": "workbuddy-ai/grok-4.7",
+          "provider": "openai-codex",
+          "model": "codex/gpt-6-astra",
           "reasoningEffort": "high",
-          "role": "边界条件与并发竞态猎手"
+          "role": "S2 Codex 最小侵入式补丁与根因定位参谋"
         },
         {
-          "provider": "magpie",
-          "model": "auto/gemini-4-argon",
+          "provider": "devin-acp",
+          "model": "swe-2-max",
           "reasoningEffort": "high",
-          "role": "跨文件全量上下文架构参谋"
+          "role": "S3 Devin SWE-2 Max 0扣费多文件工程参谋"
         },
         {
           "provider": "magpie",
           "model": "auto/claude-opus-5-5",
           "reasoningEffort": "high",
-          "role": "类型安全与契约不变量守护参谋"
+          "role": "Claude Opus 5.5 类型安全与不变量守护参谋"
         },
         {
-          "provider": "magpie-workbuddy",
-          "model": "workbuddy-ai/gpt-6-astra",
+          "provider": "magpie",
+          "model": "auto/gemini-4-argon",
           "reasoningEffort": "high",
-          "role": "最小侵入式补丁设计参谋"
+          "role": "Gemini 4 Argon 百万上下文全局依赖参谋"
         },
         {
-          "provider": "magpie-workbuddy",
-          "model": "workbuddy-ai/glm-5.3",
+          "provider": "magpie",
+          "model": "zhipu/glm-5.3",
           "reasoningEffort": "high",
-          "role": "回归测试与实机验证设计参谋"
+          "role": "B池 GLM-5.3 回归测试与实机验证设计参谋"
         }
       ],
       "aggregator": {
-        "provider": "magpie-workbuddy",
-        "model": "workbuddy-ai/gpt-6.1-sol",
+        "provider": "openai-codex",
+        "model": "codex/gpt-6.1-sol",
         "reasoningEffort": "high"
       },
       "builtin": true,
@@ -12429,33 +13267,33 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
     },
     "review": {
       "id": "review",
-      "name": "🛡️ Review 独立红队审查 (5 路挑刺 + Gemini-4-Argon 终审)",
+      "name": "🛡️ Review 独立红队审查 (Codex GPT-6-Astra + Grok-4.7 + Opus-5.5 → Gemini-4 终审)",
       "description": "对方案、PR 补丁或交付物进行多视角红蓝对抗挑刺，由 Gemini-4-Argon 汇总缺陷等级与阻断项",
       "fanout": "user_turn",
       "referenceModels": [
         {
+          "provider": "openai-codex",
+          "model": "codex/gpt-6-astra",
+          "reasoningEffort": "high",
+          "role": "S2 Codex 跨家族逻辑正确性与并发死锁审计"
+        },
+        {
           "provider": "magpie-workbuddy",
           "model": "workbuddy-ai/grok-4.7",
           "reasoningEffort": "high",
-          "role": "反方证伪与极端输入破坏测试"
+          "role": "Grok 4.7 反方证伪与极端输入破坏测试"
         },
         {
           "provider": "magpie",
           "model": "auto/claude-opus-5-5",
           "reasoningEffort": "high",
-          "role": "安全边界、越权与凭据泄漏审计"
+          "role": "Opus 5.5 安全边界、越权与凭据泄漏审计"
         },
         {
-          "provider": "magpie-workbuddy",
-          "model": "workbuddy-ai/gpt-6.1-sol",
+          "provider": "magpie",
+          "model": "zhipu/glm-5.3",
           "reasoningEffort": "high",
-          "role": "逻辑正确性与状态机死锁审计"
-        },
-        {
-          "provider": "magpie-workbuddy",
-          "model": "workbuddy-ai/glm-5.3",
-          "reasoningEffort": "high",
-          "role": "所有者规则与六步闭环合规审计"
+          "role": "GLM-5.3 所有者规则与六步闭环合规审计"
         }
       ],
       "aggregator": {
@@ -12468,35 +13306,41 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
     },
     "cheap": {
       "id": "cheap",
-      "name": "⚡ Cheap 轻量双模快参 (GPT-6.1-Sol + GLM-5.3 → MiniMax 聚合)",
-      "description": "低延迟、低 Token 消耗的双参谋快速校验模式，适合日常高频巡检与快速问答",
+      "name": "⚡ Cheap 0扣费高速快参 (Devin SWE-2 + DeepSeek-V4.1 + GLM-5.3 → MiniMax-M3.1)",
+      "description": "全 0 扣费 / 每 5h 满血再生高速池组合，零周配额损耗完成日常高频巡检与快速会诊",
       "fanout": "user_turn",
       "referenceModels": [
         {
-          "provider": "magpie-workbuddy",
-          "model": "workbuddy-ai/gpt-6.1-sol",
-          "reasoningEffort": "medium",
-          "role": "核心执行路径参谋"
+          "provider": "magpie",
+          "model": "devin/swe-2",
+          "reasoningEffort": "high",
+          "role": "S3 Devin SWE-2 0扣费核心执行路径参谋"
         },
         {
           "provider": "magpie-workbuddy",
-          "model": "workbuddy-ai/glm-5.3",
+          "model": "workbuddy-ai/deepseek-v4.1-flash",
+          "reasoningEffort": "high",
+          "role": "E池 0扣费推理与边界快检参谋"
+        },
+        {
+          "provider": "magpie",
+          "model": "zhipu/glm-5.3",
           "reasoningEffort": "medium",
-          "role": "风险与遗漏点快检参谋"
+          "role": "B池 满血再生中文工程快检参谋"
         }
       ],
       "aggregator": {
         "provider": "magpie",
-        "model": "auto/MiniMax-M3.1-Flash",
-        "reasoningEffort": "medium"
+        "model": "minimax/MiniMax-M3.1-Flash",
+        "reasoningEffort": "high"
       },
       "builtin": true,
       "customized": false
     },
     "agy_acp_hybrid": {
       "id": "agy_acp_hybrid",
-      "name": "🚀 AGY × ACP 跨订阅混编内阁 (Opus-5.5 + Gemini-4 + GPT-5.4 + SWE-1.6)",
-      "description": "聚合 Antigravity 239K 增量续接与 Devin Windsurf ACP 持久会话双算力池，零 HTTP Key 消耗完成异构多参谋会诊",
+      "name": "🚀 S1/S2/S3 三大订阅混编内阁 (AGY Opus-5.5 + Codex GPT-6-Astra + AGY Gemini-4 + Devin SWE-2-Max)",
+      "description": "聚合 S1 Antigravity 239K 增量续接、S2 OpenAI Codex Pro 订阅与 S3 Devin ACP 持久会话三大顶级订阅池，全 2026 最新旗舰底座",
       "fanout": "user_turn",
       "timeoutMs": 90000,
       "referenceModels": [
@@ -12504,25 +13348,25 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
           "provider": "agy",
           "model": "claude-opus-5-5",
           "reasoningEffort": "high",
-          "role": "第一性原理与深度架构参谋 (AGY)"
+          "role": "S1 AGY Opus 5.5 第一性原理与深度架构参谋"
+        },
+        {
+          "provider": "openai-codex",
+          "model": "codex/gpt-6-astra",
+          "reasoningEffort": "high",
+          "role": "S2 Codex GPT-6 Astra 跨家族代码独审参谋"
         },
         {
           "provider": "agy",
           "model": "gemini-4-argon",
           "reasoningEffort": "high",
-          "role": "全栈上下文与多模态边界参谋 (AGY)"
+          "role": "S1 AGY Gemini 4 全栈上下文与多模态参谋"
         },
         {
           "provider": "devin-acp",
-          "model": "gpt-5.4",
+          "model": "swe-2-max",
           "reasoningEffort": "high",
-          "role": "工程执行与方案拆解参谋 (Devin ACP)"
-        },
-        {
-          "provider": "devin-acp",
-          "model": "SWE-1.6",
-          "reasoningEffort": "high",
-          "role": "补丁落盘与回归自检参谋 (Devin ACP)"
+          "role": "S3 Devin SWE-2 Max 0扣费补丁落盘与自检参谋"
         }
       ],
       "aggregator": {
@@ -14060,4 +14904,4 @@ export const HERMES_INITIAL_AGENT_CONFIGS = {
       "updatedAt": null
     }
   }
-}
+} as const

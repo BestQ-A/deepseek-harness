@@ -128,9 +128,22 @@ describe('Hermes model picker', () => {
   })
 
   it('uses the English dictionary without inferring a route for a model without a prefix', () => {
-    render(<HermesModelPicker catalog={[]} provider="other" model="plain:model" onSelect={vi.fn()} t={makeTranslate(en)} />)
+    const fullChannels: readonly HermesModelCatalogItem[] = [
+      { provider: 'openai-codex', model: 'codex/gpt-6-astra', label: 'GPT-6 Astra' },
+      { provider: 'magpie-responses', model: 'group/claude-fable-5-1', label: 'Codex Fable 5.1' },
+      { provider: 'agy', model: 'claude-opus-5-5', label: 'Claude Opus 5.5' },
+      { provider: 'devin-acp', model: 'swe-2-max', label: 'Devin SWE-2 Max' },
+    ]
+    const view = render(<HermesModelPicker catalog={fullChannels} provider="other" model="plain:model" onSelect={vi.fn()} t={makeTranslate(en)} />)
     expect(screen.getByText('Not in the current catalog')).toBeTruthy()
     expect(screen.getByText('No prefix')).toBeTruthy()
     expect(screen.getByRole('button', { name: /Main model/ }).textContent).toContain('plain:model')
+    fireEvent.click(screen.getByRole('button', { name: /Main model/ }))
+    expect(screen.getAllByText('S2 · OpenAI Codex Pro Subscription ($200/mo)').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('S2 · Codex Responses routing group').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Antigravity Subscription (AGY · session-bound delta)').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Devin Windsurf ACP (session-bound JSON-RPC)').length).toBeGreaterThan(0)
+    view.rerender(<HermesModelPicker catalog={[]} provider="" model="" onSelect={vi.fn()} t={makeTranslate(en)} />)
+    expect(screen.getAllByText('Not set').length).toBeGreaterThan(0)
   })
 })
