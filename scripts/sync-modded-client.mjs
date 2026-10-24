@@ -55,6 +55,9 @@ if (fs.existsSync(PLUGIN_SRC)) {
         if (fs.existsSync(path.join(PLUGIN_SRC, 'cordis.patch.yml'))) {
           fs.copyFileSync(path.join(PLUGIN_SRC, 'cordis.patch.yml'), path.join(dest, 'cordis.patch.yml'))
         }
+        if (fs.existsSync(path.join(PLUGIN_SRC, 'client.js'))) {
+          fs.copyFileSync(path.join(PLUGIN_SRC, 'client.js'), path.join(dest, 'client.js'))
+        }
         for (const f of fs.readdirSync(path.join(PLUGIN_SRC, 'lib'))) {
           fs.copyFileSync(path.join(PLUGIN_SRC, 'lib', f), path.join(dest, 'lib', f))
         }
@@ -70,7 +73,12 @@ if (fs.existsSync(GENERATOR_SCRIPT)) {
   execFileSync(process.execPath, [GENERATOR_SCRIPT], { stdio: 'inherit' })
 }
 
-const pnpmEntry = process.env.npm_execpath || 'C:/Users/Administrator/AppData/Local/Programs/DeepSeek Harness/resources/runtime/primary-runtime/dependencies/pnpm/bin/pnpm.cjs'
+const pnpmCandidates = [
+  process.env.npm_execpath,
+  'C:/Users/Administrator/AppData/Roaming/npm/node_modules/pnpm/bin/pnpm.cjs',
+  'C:/Users/Administrator/AppData/Local/Programs/DeepSeek Harness/resources/runtime/primary-runtime/dependencies/pnpm/bin/pnpm.cjs',
+].filter(Boolean)
+const pnpmEntry = pnpmCandidates.find(p => fs.existsSync(p)) || pnpmCandidates[0]
 
 console.log('[2/4] Building @deepseek-ai/dsh-agent-preset-registry...')
 execFileSync(process.execPath, [pnpmEntry, 'exec', 'tsc', '-b', 'packages/preset/agent-preset-registry/tsconfig.json'], {

@@ -286,6 +286,65 @@ function getRankVisualStyle(agent: HermesAgentNode): { bg: string, color: string
   }
 }
 
+function cleanAgentDisplayTitle(agent: HermesAgentNode, compact = true): string {
+  const raw = String(agent.title || '')
+  if (!compact) return raw
+  return raw
+    .replace(/^🏛️\s*Optix\(在职公司\)\s*·\s*/i, '')
+    .replace(/^(?:🛡️|🛠️)?\s*Optix\s*·\s*/i, '')
+    .replace(/^伴学\s*·\s*/i, '')
+    .replace(/^万界\[[A-Z0-9]+\]\s*·\s*/i, '')
+    .replace(/^(?:🎮\s*)?万界事业部\s*·\s*/i, '')
+    .replace(/^本机\s*·\s*/i, '')
+    .replace(/^🧭\s*个人\(伴学&万界\)\s*/i, '个人总司令 · ')
+    .trim()
+}
+
+function cleanBrigadeDisplay(brigade: HermesBrigadeNode): { shortCode: string, shortName: string } {
+  const numMatch = brigade.code.match(/(\d{3})$/)
+  const isBattalion = brigade.code.startsWith('BN-') || brigade.name.endsWith('营')
+  const shortCode = numMatch
+    ? `${numMatch[1]}${isBattalion ? '营' : '旅'}`
+    : brigade.code === 'JOC-HQ-00'
+      ? '总参部'
+      : brigade.code === 'BDE-HARNESS-01'
+        ? '近卫1旅'
+        : brigade.code === 'CORPS-WJ-HQ'
+          ? '前指营'
+          : brigade.code === 'TF-OPTIX-01'
+            ? '特战支队'
+            : brigade.code === 'TC-PERS-HQ'
+              ? '战区联指'
+              : brigade.code
+  const shortName = brigade.name
+    .replace(/^第\s*\d+\s*/, '')
+    .replace(/^近卫第\s*\d+\s*/, '')
+    .replace(/\s*\([^)]*\)$/, '')
+    .trim()
+  return { shortCode, shortName }
+}
+
+function cleanZoneDisplay(node: HermesZoneNode): { badge: string, title: string } {
+  if (node.id === 'sec-optix') return { badge: '第一战区', title: '🛡️ Optix 在职特战群' }
+  if (node.id === 'sec-family') return { badge: '第二战区', title: '⚔️ 个人产业大兵团' }
+  if (node.id === 'sec-personal-banxue') return { badge: '第1集团军', title: '🚩 伴学教育兵团' }
+  if (node.id === 'sec-personal-wanjie') return { badge: '第2集团军', title: '🚩 万界游戏兵团' }
+  if (node.id === 'sec-local') return { badge: '近卫总参', title: '🎖️ 本机统帅与基建' }
+  return { badge: node.theaterCode ?? '战区', title: node.militaryTitle ?? node.name }
+}
+
+function broadcastSelectedAgentToRightPanel(agent: HermesAgentNode): void {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem('dsh-hermes-last-agent-id', agent.id)
+    window.dispatchEvent(new CustomEvent('dsh-hermes-select-agent', {
+      detail: { agentId: agent.id, agent },
+    }))
+  } catch {
+    /* ignore */
+  }
+}
+
 /** Decorative glyph for the `sidebar.panellist` row. */
 export function HermesPanelIcon({ size }: PropsRuntime<'sidebar.panellist'>) {
   const px = size ?? 16
@@ -317,18 +376,27 @@ function SidebarAgentRow({
   const rk = getRankVisualStyle(agent)
   const callsignText = agent.callsign ?? `${String(agent.seatOrder ?? 1).padStart(2, '0')}号`
   const subCount = agent.subordinateCount ?? agent.subordinateIds?.length ?? 0
+  const shortTitle = cleanAgentDisplayTitle(agent, true)
 
   return (
     <div
-      onClick={() => { onSelectAgent(agent) }}
+      onClick={() => {
+        broadcastSelectedAgentToRightPanel(agent)
+        onSelectAgent(agent)
+      }}
+      onDoubleClick={() => {
+        broadcastSelectedAgentToRightPanel(agent)
+        onSelectAgent(agent)
+        onStartAgentSession(agent, false)
+      }}
       style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: 6,
-        padding: '4px 7px',
-        marginTop: 2,
-        borderRadius: 6,
+        gap: 5,
+        padding: '3px 6px',
+        marginTop: 1.5,
+        borderRadius: 5,
         cursor: 'pointer',
         background: selected
           ? 'var(--dsw-alias-interactive-bg-active, rgba(2,132,199,0.15))'
@@ -338,9 +406,9 @@ function SidebarAgentRow({
         border: selected
           ? '1px solid rgba(2,132,199,0.5)'
           : isCommander
-            ? '1px solid rgba(245, 158, 11, 0.2)'
+            ? '1px solid rgba(245, 158, 11, 0.18)'
             : '1px solid transparent',
-        fontSize: 12,
+        fontSize: 11.5,
       }}
     >
       <div style={{ minWidth: 0, flex: 1 }}>
@@ -359,7 +427,7 @@ function SidebarAgentRow({
         >
           <span
             style={{
-              fontSize: 9.5,
+              fontSize: 9,
               padding: '0 4px',
               borderRadius: 3,
               background: rk.bg,
@@ -370,7 +438,7 @@ function SidebarAgentRow({
               fontFamily: 'monospace',
             }}
           >
-            {rk.badge} {callsignText}
+            {rk.badge}{callsignText}
           </span>
           {existingSession !== undefined && (
             <span
@@ -380,12 +448,12 @@ function SidebarAgentRow({
               ●
             </span>
           )}
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{agent.title}</span>
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{shortTitle}</span>
           {subCount > 0 && (
             <span
               title={`直辖下属 ${String(subCount)} 人`}
               style={{
-                fontSize: 9.5,
+                fontSize: 9,
                 padding: '0 4px',
                 borderRadius: 999,
                 background: 'rgba(245, 158, 11, 0.16)',
@@ -406,19 +474,20 @@ function SidebarAgentRow({
           : `点将唤醒 ${agent.title} (${agent.id}) 开启专属会话 (${agent.projectRoot})`}
         onClick={(e) => {
           e.stopPropagation()
+          broadcastSelectedAgentToRightPanel(agent)
           onSelectAgent(agent)
           onStartAgentSession(agent, false)
         }}
         style={{
           flex: 'none',
-          padding: '1px 6px',
+          padding: '1px 5px',
           borderRadius: 4,
           border: existingSession
             ? '1px solid rgba(16, 185, 129, 0.45)'
-            : '1px solid var(--dsw-alias-border-l2, rgba(148,163,184,0.35))',
+            : '1px solid var(--dsw-alias-border-l2, rgba(148,163,184,0.32))',
           background: existingSession ? 'rgba(16, 185, 129, 0.12)' : 'var(--dsw-alias-bg-layer-1, transparent)',
           color: existingSession ? '#059669' : 'var(--dsw-alias-label-secondary)',
-          fontSize: 10.5,
+          fontSize: 10,
           fontWeight: existingSession ? 700 : 600,
           cursor: 'pointer',
         }}
@@ -453,14 +522,15 @@ function SidebarBrigadeGroup({
     [brigade.agents, q, branchFilter],
   )
   if (matched.length === 0) return null
+  const { shortCode, shortName } = cleanBrigadeDisplay(brigade)
 
   return (
     <div
       style={{
-        marginTop: 4,
-        marginBottom: 4,
-        marginLeft: 6,
-        paddingLeft: 6,
+        marginTop: 3,
+        marginBottom: 3,
+        marginLeft: 4,
+        paddingLeft: 5,
         borderLeft: '1.5px dashed rgba(2, 132, 199, 0.35)',
       }}
     >
@@ -474,7 +544,7 @@ function SidebarBrigadeGroup({
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: 4,
-          padding: '3px 6px',
+          padding: '2.5px 5px',
           borderRadius: 5,
           border: '1px solid rgba(2, 132, 199, 0.22)',
           background: 'rgba(2, 132, 199, 0.06)',
@@ -498,15 +568,15 @@ function SidebarBrigadeGroup({
               flex: 'none',
             }}
           >
-            {brigade.code}
+            {shortCode}
           </span>
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {brigade.name}
+            {shortName}
           </span>
         </span>
         <span
           style={{
-            fontSize: 10,
+            fontSize: 9.5,
             padding: '0 5px',
             borderRadius: 999,
             background: 'rgba(2, 132, 199, 0.14)',
@@ -514,7 +584,7 @@ function SidebarBrigadeGroup({
             flex: 'none',
           }}
         >
-          {matched.length}人
+          {matched.length}
         </span>
       </button>
       {open && (
@@ -566,84 +636,73 @@ function SidebarZoneBranch({
   if ((q || branchFilter !== 'all') && !visible) return null
 
   const isOptix = node.feishuProfile === 'company'
-  const zoneBadgeBg = isOptix ? 'rgba(234, 88, 12, 0.16)' : 'rgba(16, 185, 129, 0.16)'
-  const zoneBadgeColor = isOptix ? '#ea580c' : '#059669'
   const hasBrigades = groupByBrigade && Array.isArray(node.brigades) && node.brigades.length > 1
-  const theaterCode = node.theaterCode ?? (depth === 0 ? 'THEATER' : 'CORPS')
+  const zDisp = cleanZoneDisplay(node)
 
   return (
     <div
       style={{
-        marginLeft: depth > 0 ? 10 : 0,
-        paddingLeft: depth > 0 ? 7 : 0,
+        marginLeft: depth > 0 ? 8 : 0,
+        paddingLeft: depth > 0 ? 6 : 0,
         borderLeft: depth > 0 ? '1.5px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.3))' : 'none',
-        marginBottom: 5,
+        marginBottom: 4,
       }}
     >
       <button
         type="button"
         onClick={() => { setExpanded(v => !v) }}
+        title={`${node.theaterCode ?? ''} · ${node.militaryTitle ?? node.name} (飞书频段: --profile ${node.feishuProfile})`}
         style={{
           width: '100%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: 6,
-          padding: '5px 8px',
+          gap: 5,
+          padding: '4px 7px',
           borderRadius: 6,
           border: depth === 0 ? '1px solid var(--dsw-alias-border-l2, rgba(148,163,184,0.25))' : 'none',
           background: depth === 0 ? 'var(--dsw-alias-bg-layer-2, rgba(148,163,184,0.1))' : 'rgba(148,163,184,0.05)',
           color: 'var(--dsw-alias-label-primary)',
-          fontSize: 12,
+          fontSize: 11.5,
           fontWeight: 700,
           cursor: 'pointer',
           textAlign: 'left',
         }}
       >
-        <span style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0 }}>
           <span style={{ fontSize: 10, opacity: 0.7 }}>{expanded ? '▾' : '▸'}</span>
           <span
             style={{
-              fontSize: 9.5,
+              fontSize: 9,
               padding: '0 4px',
               borderRadius: 3,
-              background: depth === 0 ? 'rgba(245, 158, 11, 0.16)' : 'rgba(2, 132, 199, 0.15)',
-              color: depth === 0 ? '#d97706' : '#0284c7',
-              fontFamily: 'monospace',
+              background: isOptix
+                ? 'rgba(234, 88, 12, 0.16)'
+                : depth === 0
+                  ? 'rgba(245, 158, 11, 0.16)'
+                  : 'rgba(2, 132, 199, 0.15)',
+              color: isOptix ? '#ea580c' : depth === 0 ? '#d97706' : '#0284c7',
               fontWeight: 700,
               flex: 'none',
             }}
           >
-            {theaterCode}
+            {zDisp.badge}
           </span>
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {node.militaryTitle ?? node.name}
+            {zDisp.title}
           </span>
         </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 4, flex: 'none' }}>
-          <span
-            style={{
-              fontSize: 10,
-              padding: '0 5px',
-              borderRadius: 4,
-              background: zoneBadgeBg,
-              color: zoneBadgeColor,
-              fontWeight: 600,
-            }}
-          >
-            {node.feishuProfile}
-          </span>
-          <span
-            style={{
-              fontSize: 11,
-              padding: '0 6px',
-              borderRadius: 999,
-              background: 'var(--dsw-alias-bg-layer-3, rgba(148,163,184,0.2))',
-              color: 'var(--dsw-alias-label-secondary)',
-            }}
-          >
-            {node.totalCount}人
-          </span>
+        <span
+          style={{
+            fontSize: 10.5,
+            padding: '0 6px',
+            borderRadius: 999,
+            background: 'var(--dsw-alias-bg-layer-3, rgba(148,163,184,0.2))',
+            color: 'var(--dsw-alias-label-secondary)',
+            flex: 'none',
+          }}
+        >
+          {node.totalCount}
         </span>
       </button>
 
@@ -1023,6 +1082,25 @@ export function HermesSidebarOrgTree({
     [allAgents, primaryAgents],
   )
 
+  // Listen for agent selection / session launch requests from the Right Sidebar Officer Dossier (`dsh-hermes-bridge/client.js`)
+  useEffect(() => {
+    const onSelectEvent = (e: Event) => {
+      const detail = (e as CustomEvent<{ agentId?: string, startSession?: boolean, forceNew?: boolean }>).detail
+      if (!detail?.agentId) return
+      const found = allAgents.find(a => a.id === detail.agentId)
+      if (found) {
+        setSelectedAgent(found)
+        if (detail.startSession) {
+          void handleStartAgentSession(found, Boolean(detail.forceNew))
+        }
+      }
+    }
+    window.addEventListener('dsh-hermes-select-agent', onSelectEvent)
+    return () => {
+      window.removeEventListener('dsh-hermes-select-agent', onSelectEvent)
+    }
+  }, [allAgents, handleStartAgentSession])
+
   const handlePopSurgeryPod = useCallback(async (handoffCurrent = false) => {
     if (surgeryBusy) return
     setSurgeryBusy(true)
@@ -1107,361 +1185,216 @@ export function HermesSidebarOrgTree({
         gap: 6,
       }}
     >
-      {/* 👑 置顶：主智能体对话舱 (核心日常入口) */}
+      {/* 🎖️ 极简统帅指挥条 (1行高频动作 + 1行手术舱热指令) */}
       <div
         style={{
-          padding: '7px 8px',
-          borderRadius: 8,
-          background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.14), rgba(16, 185, 129, 0.10))',
-          border: '1px solid rgba(2, 132, 199, 0.32)',
+          padding: '5px 6px',
+          borderRadius: 7,
+          background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.12), rgba(16, 185, 129, 0.08))',
+          border: '1px solid rgba(2, 132, 199, 0.28)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 5,
+          gap: 4,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
-          <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--dsw-alias-label-primary)' }}>
-            👑 主智能体常驻对话舱
-          </span>
-          <div style={{ display: 'flex', gap: 4 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          {defaultSteward !== undefined && (
             <button
               type="button"
               onClick={() => {
-                const nextMode = showSessionOptionsInAgentMode ? 'hermes' : 'sessions'
-                setShowSessionOptionsInAgentMode(!showSessionOptionsInAgentMode)
-                if (typeof document !== 'undefined') {
-                  document.documentElement.dataset.dshChatMode = nextMode
-                }
-                if (typeof window !== 'undefined') {
-                  window.dispatchEvent(new CustomEvent('dsh-hermes-chat-mode', { detail: { mode: nextMode } }))
-                }
-              }}
-              title="切换对话框显示模式：极简三按钮 (Agent自动运行) vs 展开完整 Session 选项 (工作区/预设/权限/模型)"
-              style={{
-                padding: '2px 6px',
-                borderRadius: 4,
-                border: '1px solid rgba(16, 185, 129, 0.45)',
-                background: showSessionOptionsInAgentMode ? 'rgba(16, 185, 129, 0.18)' : 'transparent',
-                color: '#059669',
-                fontSize: 10,
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              {showSessionOptionsInAgentMode ? '⚙️ 已展开选项' : '🤖 极简对话框'}
-            </button>
-            {onOpenCommandCenter !== undefined && (
-              <button
-                type="button"
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    window.localStorage.setItem('dsh-hermes-preferred-tab', 'warroom')
-                    window.dispatchEvent(new CustomEvent('dsh-hermes-open-tab', { detail: { tab: 'warroom' } }))
-                  }
-                  onOpenCommandCenter()
-                }}
-                title="打开 E:/6_learn_space 作战大屏插件视图（伴学45课包·11项门禁·9大算力池·飞书督办·83岗实时工位）"
-                style={{
-                  padding: '2px 7px',
-                  borderRadius: 4,
-                  border: '1px solid rgba(245, 158, 11, 0.55)',
-                  background: 'rgba(245, 158, 11, 0.16)',
-                  color: '#d97706',
-                  fontSize: 10,
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                }}
-              >
-                🎯 作战大屏
-              </button>
-            )}
-            {onOpenCommandCenter !== undefined && (
-              <button
-                type="button"
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    window.localStorage.setItem('dsh-hermes-preferred-tab', 'org')
-                    window.dispatchEvent(new CustomEvent('dsh-hermes-open-tab', { detail: { tab: 'org' } }))
-                  }
-                  onOpenCommandCenter()
-                }}
-                style={{
-                  padding: '2px 6px',
-                  borderRadius: 4,
-                  border: '1px solid rgba(2, 132, 199, 0.4)',
-                  background: 'rgba(2, 132, 199, 0.15)',
-                  color: '#0284c7',
-                  fontSize: 10,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                }}
-              >
-                总控台
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* 🎯 E:/6_learn_space 作战大屏迷你实时态势条 */}
-        {onOpenCommandCenter !== undefined && (
-          <button
-            type="button"
-            onClick={() => {
-              if (typeof window !== 'undefined') {
-                window.localStorage.setItem('dsh-hermes-preferred-tab', 'warroom')
-                window.dispatchEvent(new CustomEvent('dsh-hermes-open-tab', { detail: { tab: 'warroom' } }))
-              }
-              onOpenCommandCenter()
-            }}
-            title="点击查看 E:/6_learn_space 作战大屏完整态势：11项门禁、初一数学45节课包矩阵、S1~S4/A~E 9大算力池配额、飞书督办与83岗实时工位流"
-            style={{
-              width: '100%',
-              padding: '4px 7px',
-              borderRadius: 5,
-              border: '1px solid rgba(245, 158, 11, 0.35)',
-              background: 'rgba(245, 158, 11, 0.09)',
-              color: 'var(--dsw-alias-label-primary)',
-              fontSize: 10.5,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              cursor: 'pointer',
-              textAlign: 'left',
-            }}
-          >
-            <span>
-              🎯 <strong>作战大屏</strong> (E:/6_learn_space)
-            </span>
-            <span style={{ opacity: 0.88, fontSize: 10 }}>
-              门禁 {String((HERMES_INITIAL_WAR_ROOM as any)?.summary?.gatesPassCount ?? 10)}/{String((HERMES_INITIAL_WAR_ROOM as any)?.summary?.gatesTotalCount ?? 11)} · 45课包 · 9算力池 ▸
-            </span>
-          </button>
-        )}
-
-        {/* 🩺 双进程互为手术台 (Main Desktop ⇄ :17580 Detached Surgery Pod) */}
-        <div
-          style={{
-            padding: '5px 7px',
-            borderRadius: 6,
-            border: isSurgeryPodWindow
-              ? '1px solid rgba(16, 185, 129, 0.55)'
-              : '1px solid rgba(14, 165, 233, 0.35)',
-            background: isSurgeryPodWindow
-              ? 'rgba(16, 185, 129, 0.14)'
-              : 'rgba(14, 165, 233, 0.08)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 4,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 10.5 }}>
-            <span style={{ fontWeight: 700, color: isSurgeryPodWindow ? '#059669' : '#0284c7' }}>
-              {isSurgeryPodWindow ? '🩺 当前处于：独立热手术进程 (:17580)' : '🩺 独立热手术伴生进程 (:17580)'}
-            </span>
-            <span style={{ fontSize: 9.5, opacity: 0.86 }}>
-              {isSurgeryPodWindow
-                ? `主端 ${surgeryStatus?.mainDesktop?.running ? '🟢运行中' : '⚪已停'}`
-                : surgeryStatus?.surgeryPod?.healthy
-                  ? `🟢在线 PID:${String(surgeryStatus.surgeryPod.pid ?? '')}`
-                  : '⚪按需拉起'}
-            </span>
-          </div>
-          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-            {isSurgeryPodWindow ? (
-              <>
-                <button
-                  type="button"
-                  disabled={surgeryBusy}
-                  onClick={() => { void handleRestartMainDesktopFromSidebar() }}
-                  title="在独立热手术进程中编译同步 DSH 源码并热重启主桌面客户端 (DeepSeek Harness.exe)，当前独立进程不断连"
-                  style={{
-                    flex: 1,
-                    padding: '3px 6px',
-                    borderRadius: 4,
-                    border: 'none',
-                    background: '#059669',
-                    color: '#fff',
-                    fontSize: 10,
-                    fontWeight: 700,
-                    cursor: surgeryBusy ? 'wait' : 'pointer',
-                  }}
-                >
-                  {surgeryBusy ? '⏳ 编译重启主端中…' : '⚡ 编译同步并热重启主 DSH'}
-                </button>
-                {onOpenCommandCenter !== undefined && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (typeof window !== 'undefined') {
-                        window.localStorage.setItem('dsh-hermes-preferred-tab', 'surgery')
-                        window.dispatchEvent(new CustomEvent('dsh-hermes-open-tab', { detail: { tab: 'surgery' } }))
-                      }
-                      onOpenCommandCenter()
-                    }}
-                    style={{
-                      padding: '3px 6px',
-                      borderRadius: 4,
-                      border: '1px solid rgba(16, 185, 129, 0.45)',
-                      background: 'transparent',
-                      color: 'var(--dsw-alias-label-primary)',
-                      fontSize: 10,
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    手术台
-                  </button>
-                )}
-              </>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  disabled={surgeryBusy}
-                  onClick={() => { void handlePopSurgeryPod(false) }}
-                  title="启动并弹出一个完全脱离主进程的独立编程 Agent 窗口 (:17580)，用于修改并热重启 DSH 主进程而不断连"
-                  style={{
-                    flex: 1,
-                    padding: '3px 6px',
-                    borderRadius: 4,
-                    border: 'none',
-                    background: '#0284c7',
-                    color: '#fff',
-                    fontSize: 10,
-                    fontWeight: 700,
-                    cursor: surgeryBusy ? 'wait' : 'pointer',
-                  }}
-                >
-                  {surgeryBusy ? '⏳ 正在拉起…' : '🩺 弹出独立进程'}
-                </button>
-                <button
-                  type="button"
-                  disabled={surgeryBusy}
-                  onClick={() => { void handlePopSurgeryPod(true) }}
-                  title="将当前智能体会话无缝 Fork 接力到独立热手术进程 (:17580) 继续执行"
-                  style={{
-                    padding: '3px 6px',
-                    borderRadius: 4,
-                    border: '1px solid rgba(2, 132, 199, 0.4)',
-                    background: 'transparent',
-                    color: 'var(--dsw-alias-label-primary)',
-                    fontSize: 10,
-                    fontWeight: 600,
-                    cursor: surgeryBusy ? 'wait' : 'pointer',
-                  }}
-                >
-                  📤 接力会话
-                </button>
-                <button
-                  type="button"
-                  disabled={surgeryBusy}
-                  onClick={() => { void handleRestartSurgeryPodFromSidebar() }}
-                  title="当在主进程修改了独立进程代码后，一键编译同步并重启 :17580 独立热手术进程"
-                  style={{
-                    padding: '3px 6px',
-                    borderRadius: 4,
-                    border: '1px solid rgba(139, 92, 246, 0.4)',
-                    background: 'transparent',
-                    color: '#8b5cf6',
-                    fontSize: 10,
-                    fontWeight: 600,
-                    cursor: surgeryBusy ? 'wait' : 'pointer',
-                  }}
-                >
-                  🔄 重启独立舱
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-
-        {defaultSteward !== undefined && (
-          <div style={{ display: 'flex', gap: 4 }}>
-            <button
-              type="button"
-              onClick={() => {
+                broadcastSelectedAgentToRightPanel(defaultSteward)
                 setSelectedAgent(defaultSteward)
                 void handleStartAgentSession(defaultSteward, false)
               }}
               style={{
                 flex: 1,
-                padding: '5px 8px',
-                borderRadius: 6,
+                padding: '4px 7px',
+                borderRadius: 5,
                 border: 'none',
                 background: '#0284c7',
                 color: '#fff',
-                fontSize: 11.5,
+                fontSize: 11,
                 fontWeight: 700,
                 cursor: 'pointer',
-                textAlign: 'left',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                minWidth: 0,
               }}
-              title="优先续接 👑 终极管家 (default) 的常驻主会话，保持全局上下文连续"
+              title="续接或启动 👑 终极管家 (default · JOC-00) 常驻主会话"
             >
-              <span>👑 与主智能体对话 (终极管家)</span>
-              <span style={{ fontSize: 10, opacity: 0.92 }}>
-                {activeSessionByAgentId.has('default') ? '● 续接' : '▶ 启动'}
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                👑 终极管家
+              </span>
+              <span style={{ fontSize: 9.5, opacity: 0.92, flex: 'none', marginLeft: 4 }}>
+                {activeSessionByAgentId.has('default') ? '●续接' : '▶启动'}
               </span>
             </button>
+          )}
+
+          {onOpenCommandCenter !== undefined && (
             <button
               type="button"
               onClick={() => {
-                setSelectedAgent(defaultSteward)
-                void handleStartAgentSession(defaultSteward, true)
+                if (typeof window !== 'undefined') {
+                  window.localStorage.setItem('dsh-hermes-preferred-tab', 'org')
+                  window.dispatchEvent(new CustomEvent('dsh-hermes-open-tab', { detail: { tab: 'org' } }))
+                }
+                onOpenCommandCenter()
               }}
-              title="强制新建一个 👑 终极管家 (default) 会话"
+              title="打开全屏『🎖️ 全军建制与作战指挥部』(15 合成旅沙盘 · 作战大屏 · MoA 融合)"
               style={{
-                padding: '5px 7px',
-                borderRadius: 6,
-                border: '1px solid rgba(2, 132, 199, 0.4)',
-                background: 'var(--dsw-alias-bg-layer-1, transparent)',
-                color: 'var(--dsw-alias-label-primary)',
+                padding: '4px 6px',
+                borderRadius: 5,
+                border: '1px solid rgba(245, 158, 11, 0.5)',
+                background: 'rgba(245, 158, 11, 0.15)',
+                color: '#d97706',
                 fontSize: 10.5,
+                fontWeight: 700,
                 cursor: 'pointer',
+                flex: 'none',
               }}
             >
-              ➕新开
+              🎖️沙盘
             </button>
-          </div>
-        )}
+          )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
-          {primaryAgents.filter(a => a.id !== 'default').map((head) => {
-            const hasActive = activeSessionByAgentId.has(head.id)
-            const shortLabel = head.id === 'fit-lead-1013'
-              ? '🏛️ Optix主帅'
-              : head.id === 'bl-company-coordinator'
-                ? '🧭 个人总协调'
-                : '🎮 万界制作人'
-            return (
+          {onOpenCommandCenter !== undefined && (
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.localStorage.setItem('dsh-hermes-preferred-tab', 'warroom')
+                  window.dispatchEvent(new CustomEvent('dsh-hermes-open-tab', { detail: { tab: 'warroom' } }))
+                }
+                onOpenCommandCenter()
+              }}
+              title={`打开 E:/6_learn_space 作战大屏 (门禁 ${String((HERMES_INITIAL_WAR_ROOM as any)?.summary?.gatesPassCount ?? 10)}/${String((HERMES_INITIAL_WAR_ROOM as any)?.summary?.gatesTotalCount ?? 11)})`}
+              style={{
+                padding: '4px 6px',
+                borderRadius: 5,
+                border: '1px solid rgba(2, 132, 199, 0.35)',
+                background: 'rgba(2, 132, 199, 0.12)',
+                color: '#0284c7',
+                fontSize: 10.5,
+                fontWeight: 600,
+                cursor: 'pointer',
+                flex: 'none',
+              }}
+            >
+              🎯大屏
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={() => {
+              const nextMode = showSessionOptionsInAgentMode ? 'hermes' : 'sessions'
+              setShowSessionOptionsInAgentMode(!showSessionOptionsInAgentMode)
+              if (typeof document !== 'undefined') {
+                document.documentElement.dataset.dshChatMode = nextMode
+              }
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('dsh-hermes-chat-mode', { detail: { mode: nextMode } }))
+              }
+            }}
+            title="切换对话框显示模式：🤖 极简三按钮 vs ⚙️ 展开完整 Session 调试选项"
+            style={{
+              padding: '4px 5px',
+              borderRadius: 5,
+              border: '1px solid rgba(16, 185, 129, 0.4)',
+              background: showSessionOptionsInAgentMode ? 'rgba(16, 185, 129, 0.18)' : 'transparent',
+              color: '#059669',
+              fontSize: 10.5,
+              fontWeight: 600,
+              cursor: 'pointer',
+              flex: 'none',
+            }}
+          >
+            {showSessionOptionsInAgentMode ? '⚙️全项' : '🤖极简'}
+          </button>
+        </div>
+
+        {/* 🩺 紧凑型双进程互为手术舱条 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          {isSurgeryPodWindow ? (
+            <button
+              type="button"
+              disabled={surgeryBusy}
+              onClick={() => { void handleRestartMainDesktopFromSidebar() }}
+              title="当前处于 :17580 独立手术舱 · 点击编译同步并热重启主桌面端 DeepSeek Harness.exe"
+              style={{
+                flex: 1,
+                padding: '2.5px 6px',
+                borderRadius: 4,
+                border: '1px solid rgba(16, 185, 129, 0.5)',
+                background: 'rgba(16, 185, 129, 0.16)',
+                color: '#059669',
+                fontSize: 10,
+                fontWeight: 700,
+                cursor: surgeryBusy ? 'wait' : 'pointer',
+              }}
+            >
+              {surgeryBusy ? '⏳ 编译重启主端中…' : '🩺 手术舱在线 · ⚡编译并热重启主DSH'}
+            </button>
+          ) : (
+            <>
               <button
-                key={head.id}
                 type="button"
-                onClick={() => {
-                  setSelectedAgent(head)
-                  void handleStartAgentSession(head, false)
-                }}
-                title={`${head.title} (${head.id})\n点击直接${hasActive ? '续接常驻会话' : '开启专属对话'}`}
+                disabled={surgeryBusy}
+                onClick={() => { void handlePopSurgeryPod(false) }}
+                title={`弹出 :17580 独立热手术进程窗口 (${surgeryStatus?.surgeryPod?.healthy ? `在线 PID:${String(surgeryStatus.surgeryPod.pid ?? '')}` : '按需启动'})`}
                 style={{
-                  padding: '3px 4px',
-                  borderRadius: 5,
-                  border: '1px solid var(--dsw-alias-border-l2, rgba(148,163,184,0.32))',
-                  background: 'var(--dsw-alias-bg-layer-1, rgba(255,255,255,0.04))',
+                  flex: 1,
+                  padding: '2.5px 6px',
+                  borderRadius: 4,
+                  border: '1px solid rgba(2, 132, 199, 0.35)',
+                  background: 'rgba(2, 132, 199, 0.08)',
                   color: 'var(--dsw-alias-label-primary)',
-                  fontSize: 10.5,
+                  fontSize: 10,
                   fontWeight: 600,
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
+                  cursor: surgeryBusy ? 'wait' : 'pointer',
+                  textAlign: 'left',
                 }}
               >
-                {hasActive ? '● ' : ''}{shortLabel}
+                {surgeryBusy ? '⏳ 拉起中…' : `🩺 独立手术舱 (${surgeryStatus?.surgeryPod?.healthy ? '🟢在线' : '弹出'})`}
               </button>
-            )
-          })}
+              <button
+                type="button"
+                disabled={surgeryBusy}
+                onClick={() => { void handlePopSurgeryPod(true) }}
+                title="将当前智能体会话无缝 Fork 接力到 :17580 独立手术舱继续执行"
+                style={{
+                  padding: '2.5px 5px',
+                  borderRadius: 4,
+                  border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.3))',
+                  background: 'transparent',
+                  color: 'var(--dsw-alias-label-secondary)',
+                  fontSize: 10,
+                  cursor: surgeryBusy ? 'wait' : 'pointer',
+                }}
+              >
+                📤接力
+              </button>
+              <button
+                type="button"
+                disabled={surgeryBusy}
+                onClick={() => { void handleRestartSurgeryPodFromSidebar() }}
+                title="编译同步并热重启 :17580 独立手术舱进程"
+                style={{
+                  padding: '2.5px 5px',
+                  borderRadius: 4,
+                  border: '1px solid rgba(139, 92, 246, 0.35)',
+                  background: 'transparent',
+                  color: '#8b5cf6',
+                  fontSize: 10,
+                  cursor: surgeryBusy ? 'wait' : 'pointer',
+                }}
+              >
+                🔄热更
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -1549,153 +1482,85 @@ export function HermesSidebarOrgTree({
         </div>
       )}
 
+      {/* 当前选中战将 1 行紧凑状态条（完整军籍档案与上下级指挥链由右栏『🎖️ 战将参谋板』联动展示） */}
       {selectedAgent !== undefined && (
         <div
           style={{
-            padding: '6px 8px',
-            borderRadius: 7,
+            padding: '4px 7px',
+            borderRadius: 6,
             border: '1px solid var(--dsw-alias-border-l2, rgba(148,163,184,0.28))',
             background: 'var(--dsw-alias-bg-layer-2, rgba(15,23,42,0.03))',
             fontSize: 11,
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 4 }}>
-            <div style={{ fontWeight: 700, color: 'var(--dsw-alias-label-primary)' }}>
-              {selectedAgent.title}
-            </div>
-            <span
+            <div
               style={{
-                padding: '1px 6px',
-                borderRadius: 4,
-                fontSize: 9.5,
                 fontWeight: 700,
-                background: selectedAgentConfig.ensembleMode === 'fusion'
-                  ? 'rgba(239, 68, 68, 0.16)'
-                  : selectedAgentConfig.ensembleMode === 'moa'
-                    ? 'rgba(139, 92, 246, 0.18)'
-                    : 'rgba(2, 132, 199, 0.14)',
-                color: selectedAgentConfig.ensembleMode === 'fusion'
-                  ? '#ef4444'
-                  : selectedAgentConfig.ensembleMode === 'moa'
-                    ? '#8b5cf6'
-                    : '#0284c7',
-              }}
-            >
-              {selectedAgentConfig.ensembleMode === 'fusion'
-                ? `🔥 Fusion:${String(selectedAgentConfig.fusionPreset)}`
-                : selectedAgentConfig.ensembleMode === 'moa'
-                  ? `🐝 MoA:${String(selectedAgentConfig.moaPreset)}`
-                  : '⚡ 单模'} · {String(selectedAgentConfig.reasoningEffort)}
-            </span>
-          </div>
-          <div style={{ opacity: 0.85, marginTop: 2, display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center' }}>
-            <span
-              style={{
-                padding: '0 5px',
-                borderRadius: 3,
-                background: 'rgba(245, 158, 11, 0.15)',
-                color: '#d97706',
-                fontWeight: 700,
-                fontSize: 10,
-              }}
-            >
-              {selectedAgent.militaryRank ?? '⚔️ 作战席位'} · {selectedAgent.callsign ?? selectedAgent.id}
-            </span>
-            <span>{selectedAgent.branchLabel ?? selectedAgent.department}</span>
-          </div>
-          <div style={{ opacity: 0.78, marginTop: 2 }}>
-            直属长官: <code>{selectedAgent.supervisor}</code>
-            {selectedAgent.reviewer ? <> · 宪兵督察: <code>{selectedAgent.reviewer}</code></> : null}
-          </div>
-          <div style={{ opacity: 0.78, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            武器: <code>{String(selectedAgentConfig.model)}</code> (<code>{String(selectedAgentConfig.reasoningEffort)}</code>) · 频段: <code>{selectedAgent.feishuProfile}</code>
-          </div>
-          <div
-            style={{
-              opacity: 0.72,
-              marginTop: 2,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-            title={selectedAgent.projectRoot}
-          >
-            目录: {selectedAgent.projectRoot}
-          </div>
-          <div style={{ display: 'flex', gap: 4, marginTop: 5 }}>
-            <button
-              type="button"
-              onClick={() => { void handleStartAgentSession(selectedAgent, false) }}
-              style={{
-                flex: 1,
-                padding: '3px 6px',
-                borderRadius: 4,
-                border: 'none',
-                background: '#0284c7',
-                color: '#fff',
-                fontSize: 11,
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              {activeSessionByAgentId.has(selectedAgent.id) ? '💬 续接常驻对话' : '✨ 与该 Agent 对话'}
-            </button>
-            <button
-              type="button"
-              onClick={() => { void handleStartAgentSession(selectedAgent, true) }}
-              title="强制新建该岗位的空白对话"
-              style={{
-                padding: '3px 6px',
-                borderRadius: 4,
-                border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.35))',
-                background: 'transparent',
                 color: 'var(--dsw-alias-label-primary)',
-                fontSize: 10.5,
-                cursor: 'pointer',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                flex: 1,
               }}
+              title={`${selectedAgent.militaryRank ?? ''} · ${selectedAgent.title} (${selectedAgent.id})\n右侧边栏『🎖️ 战将参谋板』已同步展示完整上下级指挥链与参数`}
             >
-              ➕ 新开
-            </button>
-            <button
-              type="button"
-              onClick={() => { setShowSidebarParamDrawer(v => !v) }}
-              title="设置该智能体的专属模型、推理等级 (low~max)、Hermes MoA 或 Devin Fusion 模式"
-              style={{
-                padding: '3px 6px',
-                borderRadius: 4,
-                border: '1px solid rgba(139, 92, 246, 0.45)',
-                background: showSidebarParamDrawer ? 'rgba(139, 92, 246, 0.18)' : 'transparent',
-                color: '#8b5cf6',
-                fontSize: 10.5,
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              ⚙️ 参数
-            </button>
-            {onOpenCommandCenter !== undefined && (
+              <span style={{ color: '#d97706', fontFamily: 'monospace', marginRight: 4 }}>
+                {selectedAgent.rankBadge ?? '▲'}{selectedAgent.callsign ?? ''}
+              </span>
+              {cleanAgentDisplayTitle(selectedAgent, true)}
+            </div>
+            <div style={{ display: 'flex', gap: 3, flex: 'none' }}>
               <button
                 type="button"
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    window.localStorage.setItem('dsh-hermes-preferred-tab', 'ensemble')
-                    window.dispatchEvent(new CustomEvent('dsh-hermes-open-tab', { detail: { tab: 'ensemble' } }))
-                  }
-                  onOpenCommandCenter()
-                }}
+                onClick={() => { void handleStartAgentSession(selectedAgent, false) }}
                 style={{
-                  padding: '3px 6px',
+                  padding: '2px 6px',
+                  borderRadius: 4,
+                  border: 'none',
+                  background: '#0284c7',
+                  color: '#fff',
+                  fontSize: 10,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                {activeSessionByAgentId.has(selectedAgent.id) ? '💬续接' : '⚡点将'}
+              </button>
+              <button
+                type="button"
+                onClick={() => { void handleStartAgentSession(selectedAgent, true) }}
+                title="强制新建该战将的空白对话"
+                style={{
+                  padding: '2px 5px',
                   borderRadius: 4,
                   border: '1px solid var(--dsw-alias-border-l3, rgba(148,163,184,0.35))',
                   background: 'transparent',
                   color: 'var(--dsw-alias-label-primary)',
-                  fontSize: 10.5,
+                  fontSize: 10,
                   cursor: 'pointer',
                 }}
               >
-                总控
+                ➕
               </button>
-            )}
+              <button
+                type="button"
+                onClick={() => { setShowSidebarParamDrawer(v => !v) }}
+                title="展开/收起模型与推理等级快速设置（也可在右侧『🎖️ 战将参谋板』查看）"
+                style={{
+                  padding: '2px 5px',
+                  borderRadius: 4,
+                  border: '1px solid rgba(139, 92, 246, 0.45)',
+                  background: showSidebarParamDrawer ? 'rgba(139, 92, 246, 0.18)' : 'transparent',
+                  color: '#8b5cf6',
+                  fontSize: 10,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                ⚙️
+              </button>
+            </div>
           </div>
 
           {showSidebarParamDrawer && (

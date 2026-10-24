@@ -6095,7 +6095,7 @@ export const HERMES_INITIAL_SESSIONS: Record<string, HermesSessionSummary[]> = {
 
 export const HERMES_INITIAL_GATEWAY = {
   "ok": true,
-  "updatedAt": "2026-10-24T06:51:13.291Z",
+  "updatedAt": "2026-10-24T08:22:51.030Z",
   "stats": {
     "totalReceived": 19,
     "totalDispatched": 3,
@@ -6103,44 +6103,25 @@ export const HERMES_INITIAL_GATEWAY = {
     "totalDuplicate": 4,
     "totalBlockedCrossTenant": 0
   },
-  "liveConsumers": [
-    {
-      "key": "life:im.message.receive_v1",
-      "profile": "life",
-      "agentId": null,
-      "eventKey": "im.message.receive_v1",
-      "pid": 92076,
-      "startedAt": "2026-10-24T06:51:13.257Z",
-      "alive": true
-    },
-    {
-      "key": "company:im.message.receive_v1",
-      "profile": "company",
-      "agentId": null,
-      "eventKey": "im.message.receive_v1",
-      "pid": 96696,
-      "startedAt": "2026-10-24T06:51:13.287Z",
-      "alive": true
-    }
-  ],
+  "liveConsumers": [],
   "persistedConsumers": {
     "life:im.message.receive_v1": {
       "key": "life:im.message.receive_v1",
       "profile": "life",
       "agentId": null,
       "eventKey": "im.message.receive_v1",
-      "pid": 92076,
+      "pid": 91464,
       "status": "running",
-      "startedAt": "2026-10-24T06:51:13.257Z"
+      "startedAt": "2026-10-24T08:22:51.020Z"
     },
     "company:im.message.receive_v1": {
       "key": "company:im.message.receive_v1",
       "profile": "company",
       "agentId": null,
       "eventKey": "im.message.receive_v1",
-      "pid": 96696,
+      "pid": 81388,
       "status": "running",
-      "startedAt": "2026-10-24T06:51:13.287Z"
+      "startedAt": "2026-10-24T08:22:51.029Z"
     }
   },
   "recentEvents": [
@@ -6571,10 +6552,10 @@ export const HERMES_INITIAL_GATEWAY = {
         "hasLarkRoleScript": false,
         "larkRoleScript": null,
         "defaultChatId": null,
-        "dshSessionId": "session-aed11ed7-27a8-4b27-af3c-67588efbcfa9",
+        "dshSessionId": "session-abf7550c-e330-4642-8048-14975b027933",
         "dispatchMode": "dsh_session",
         "autoSyncToFeishu": true,
-        "lastSyncedAt": "2026-10-24T06:56:07.229Z"
+        "lastSyncedAt": "2026-10-24T08:27:42.141Z"
       },
       {
         "agentId": "bl-admin-procurement",
@@ -8490,7 +8471,7 @@ export const HERMES_INITIAL_LOOP6 = [
 
 export const HERMES_INITIAL_WAR_ROOM = {
   "ok": true,
-  "generatedAt": "2026-10-24T07:00:07.731Z",
+  "generatedAt": "2026-10-24T08:27:42.434Z",
   "learnSpaceRoot": "E:/6_learn_space",
   "liveServer": {
     "online": false,
@@ -8499,9 +8480,9 @@ export const HERMES_INITIAL_WAR_ROOM = {
   },
   "summary": {
     "totalAgents": 83,
-    "workingCount": 6,
-    "recentCount": 3,
-    "onlineCount": 59,
+    "workingCount": 3,
+    "recentCount": 7,
+    "onlineCount": 58,
     "dormantCount": 15,
     "gatesPassCount": 10,
     "gatesTotalCount": 11,
@@ -9094,7 +9075,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
     ]
   },
   "llmPools": {
-    "snapshotUpdatedAt": "10-24 14:59",
+    "snapshotUpdatedAt": "10-24 16:25",
     "totalPools": 9,
     "pools": [
       {
@@ -9108,41 +9089,41 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "purpose": "S1 导师主池 · 复杂数学/教学独审/多模态架构 (Claude Opus 5.5 + Gemini 4 High)",
         "roleCount": 0,
         "minRemainingPct": 90.3,
-        "totalApiCalls": 3530,
-        "totalInputTokens": 73821090,
-        "totalOutputTokens": 8822850,
+        "totalApiCalls": 3553,
+        "totalInputTokens": 74594681,
+        "totalOutputTokens": 8840138,
         "windows": [
           {
             "label": "Gemini (4-High/3.8) · 7d 周配额",
             "remainingPct": 90.3,
             "usedPct": 9.7,
-            "resetStr": "6d15h后 (10-31 05:59)",
+            "resetStr": "6d13h后 (10-31 05:59)",
             "detail": "剩余 90.3% (已用 9.7%)",
-            "updatedAt": "14:59:11"
+            "updatedAt": "16:24:52"
           },
           {
             "label": "Gemini (4-High/3.8) · 5h 窗口",
             "remainingPct": 100,
             "usedPct": 0,
-            "resetStr": "4h59m后 (10-24 19:59)",
+            "resetStr": "4h59m后 (10-24 21:24)",
             "detail": "剩余 100.0% (已用 0.0%)",
-            "updatedAt": "14:59:11"
+            "updatedAt": "16:24:52"
           },
           {
             "label": "Claude (Opus/Sonnet 5.5) · 7d 周配额",
             "remainingPct": 100,
             "usedPct": 0,
-            "resetStr": "6d23h后 (10-31 14:59)",
+            "resetStr": "6d23h后 (10-31 16:24)",
             "detail": "剩余 100.0% (已用 0.0%)",
-            "updatedAt": "14:59:11"
+            "updatedAt": "16:24:52"
           },
           {
             "label": "Claude (Opus/Sonnet 5.5) · 5h 窗口",
             "remainingPct": 100,
             "usedPct": 0,
-            "resetStr": "4h59m后 (10-24 19:59)",
+            "resetStr": "4h59m后 (10-24 21:24)",
             "detail": "剩余 100.0% (已用 0.0%)",
-            "updatedAt": "14:59:11"
+            "updatedAt": "16:24:52"
           }
         ],
         "boundRoles": []
@@ -9157,18 +9138,18 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "color": "#10b981",
         "purpose": "S2 导师主池 · 跨家族独立代码审查与高难调试 (GPT-6 Astra / GPT-5.4)",
         "roleCount": 0,
-        "minRemainingPct": 77,
+        "minRemainingPct": 52,
         "totalApiCalls": 982,
         "totalInputTokens": 16018061,
         "totalOutputTokens": 2423040,
         "windows": [
           {
             "label": "Codex Pro · 7d 周配额窗口",
-            "remainingPct": 77,
-            "usedPct": 23,
-            "resetStr": "6d10h后 (10-31 01:41)",
-            "detail": "已用 23% · 剩余 77% ($200/mo Pro)",
-            "updatedAt": "14:58:44"
+            "remainingPct": 52,
+            "usedPct": 48,
+            "resetStr": "6d9h后 (10-31 01:41)",
+            "detail": "已用 48% · 剩余 52% ($200/mo Pro)",
+            "updatedAt": "16:24:48"
           },
           {
             "label": "Codex Credits 独立账户余额",
@@ -9176,7 +9157,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 0,
             "resetStr": "按需抵扣池",
             "detail": "余额 56,117.10 Credits (约可跑 15,060~78,311 条消息)",
-            "updatedAt": "14:58:44"
+            "updatedAt": "16:24:48"
           }
         ],
         "boundRoles": []
@@ -9192,9 +9173,9 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "purpose": "S3 工程双桶池 · SWE-2 免费无限并发苦力 + 7d 周配额导师池",
         "roleCount": 0,
         "minRemainingPct": 0,
-        "totalApiCalls": 8405,
-        "totalInputTokens": 184128918,
-        "totalOutputTokens": 14740938,
+        "totalApiCalls": 8476,
+        "totalInputTokens": 200281657,
+        "totalOutputTokens": 14808503,
         "windows": [
           {
             "label": "Devin SWE-2 专属工程池 (swe-2-max / swe-2-high)",
@@ -9202,15 +9183,15 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 0,
             "resetStr": "0扣费·仅限并发",
             "detail": "Protobuf 实测无 Token 计费块 · 完全免费不扣 7d 周配额 · 256K 上下文工程苦力",
-            "updatedAt": "14:52:23"
+            "updatedAt": "15:25:35"
           },
           {
             "label": "Devin Max (opt组织) · 7d 周配额",
             "remainingPct": 0,
             "usedPct": 100,
-            "resetStr": "1d1h后 (10-25 16:00)",
+            "resetStr": "23h35m后 (10-25 16:00)",
             "detail": "剩余 0% (已用 100% · 采样 10:37)",
-            "updatedAt": "14:52:23"
+            "updatedAt": "15:25:35"
           },
           {
             "label": "Devin Max (opt组织) · 24h 日配额",
@@ -9218,15 +9199,15 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 0,
             "resetStr": "即将重置 (10-23 16:00)",
             "detail": "日配额剩余 100% (主力绑定组织)",
-            "updatedAt": "14:52:23"
+            "updatedAt": "15:25:35"
           },
           {
             "label": "Devin Max (个人默认组织) · 7d 周配额",
             "remainingPct": 0,
             "usedPct": 100,
-            "resetStr": "1d1h后 (10-25 16:00)",
-            "detail": "周配额剩余 0% · 超额备用金剩 $18446744073708.84 (采样 14:52)",
-            "updatedAt": "14:52:23"
+            "resetStr": "23h35m后 (10-25 16:00)",
+            "detail": "周配额剩余 0% · 超额备用金剩 $18446744073708.84 (采样 15:25)",
+            "updatedAt": "15:25:35"
           }
         ],
         "boundRoles": []
@@ -9241,34 +9222,34 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "color": "#3b82f6",
         "purpose": "A 池 · OpenCode Go 订阅池",
         "roleCount": 0,
-        "minRemainingPct": 57,
+        "minRemainingPct": 50,
         "totalApiCalls": 0,
         "totalInputTokens": 0,
         "totalOutputTokens": 0,
         "windows": [
           {
             "label": "5h 滚动窗口",
-            "remainingPct": 57,
-            "usedPct": 43,
-            "resetStr": "2h38m后 (10-24 17:37)",
-            "detail": "剩余 57% · 状态 ok",
-            "updatedAt": "14:58:44"
+            "remainingPct": 50,
+            "usedPct": 50,
+            "resetStr": "1h12m后 (10-24 17:37)",
+            "detail": "剩余 50% · 状态 ok",
+            "updatedAt": "16:24:48"
           },
           {
             "label": "7d 周配额窗口",
-            "remainingPct": 81,
-            "usedPct": 19,
-            "resetStr": "1d17h后 (10-26 08:00)",
-            "detail": "剩余 81% · 状态 ok",
-            "updatedAt": "14:58:44"
+            "remainingPct": 78,
+            "usedPct": 22,
+            "resetStr": "1d15h后 (10-26 08:00)",
+            "detail": "剩余 78% · 状态 ok",
+            "updatedAt": "16:24:48"
           },
           {
             "label": "30d 月度窗口",
-            "remainingPct": 63,
-            "usedPct": 37,
-            "resetStr": "21d2h后 (11-14 17:07)",
-            "detail": "剩余 63% · 状态 ok",
-            "updatedAt": "14:58:44"
+            "remainingPct": 61,
+            "usedPct": 39,
+            "resetStr": "21d0h后 (11-14 17:07)",
+            "detail": "剩余 61% · 状态 ok",
+            "updatedAt": "16:24:48"
           }
         ],
         "boundRoles": []
@@ -9283,26 +9264,26 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "color": "#ec4899",
         "purpose": "B 池 · 智谱 CodingPlan MAX (GLM-5.3 · 每5h满血再生·无周上限主力苦力)",
         "roleCount": 0,
-        "minRemainingPct": 91,
-        "totalApiCalls": 20918,
-        "totalInputTokens": 528742473,
-        "totalOutputTokens": 21951792,
+        "minRemainingPct": 88,
+        "totalApiCalls": 21384,
+        "totalInputTokens": 605064962,
+        "totalOutputTokens": 22535798,
         "windows": [
           {
             "label": "MCP 搜索/阅读月度配额",
             "remainingPct": 99,
             "usedPct": 1,
-            "resetStr": "23d4h后 (11-16 19:31)",
-            "detail": "剩 3997/4000 次 (已用 3)",
-            "updatedAt": "14:58:44"
+            "resetStr": "23d3h后 (11-16 19:31)",
+            "detail": "剩 3996/4000 次 (已用 4)",
+            "updatedAt": "16:24:48"
           },
           {
             "label": "GLM-5.3 5h Token 窗口",
-            "remainingPct": 91,
-            "usedPct": 9,
-            "resetStr": "2h18m后 (10-24 17:16)",
-            "detail": "已用 9% · 剩余 91%",
-            "updatedAt": "14:58:44"
+            "remainingPct": 88,
+            "usedPct": 12,
+            "resetStr": "52m后重置 (10-24 17:16)",
+            "detail": "已用 12% · 剩余 88%",
+            "updatedAt": "16:24:48"
           }
         ],
         "boundRoles": []
@@ -9317,26 +9298,26 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "color": "#14b8a6",
         "purpose": "C 池 · MiniMax CodingPlan (M3.1 1M上下文 · 每5h满血再生·模拟器QA主力)",
         "roleCount": 0,
-        "minRemainingPct": 73,
-        "totalApiCalls": 8370,
-        "totalInputTokens": 45188899,
-        "totalOutputTokens": 6007527,
+        "minRemainingPct": 61,
+        "totalApiCalls": 8422,
+        "totalInputTokens": 45287947,
+        "totalOutputTokens": 6071009,
         "windows": [
           {
             "label": "M3.1 5h 滚动窗口",
-            "remainingPct": 73,
-            "usedPct": 27,
-            "resetStr": "3h1m后 (10-24 18:00)",
-            "detail": "剩余 73% (已用 27%)",
-            "updatedAt": "14:58:44"
+            "remainingPct": 61,
+            "usedPct": 39,
+            "resetStr": "1h35m后 (10-24 18:00)",
+            "detail": "剩余 61% (已用 39%)",
+            "updatedAt": "16:24:48"
           },
           {
             "label": "M3.1 7d 周配额窗口",
             "remainingPct": 100,
             "usedPct": 0,
-            "resetStr": "1d17h后 (10-26 08:00)",
+            "resetStr": "1d15h后 (10-26 08:00)",
             "detail": "剩余 100% (已用 0%)",
-            "updatedAt": "14:58:44"
+            "updatedAt": "16:24:48"
           }
         ],
         "boundRoles": []
@@ -9351,34 +9332,34 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "color": "#22c55e",
         "purpose": "D 池 · OpenCode Free 0扣费高智商矩阵 (DeepSeek-V4.1-Flash / MiMo / Nemotron)",
         "roleCount": 0,
-        "minRemainingPct": 57,
+        "minRemainingPct": 50,
         "totalApiCalls": 0,
         "totalInputTokens": 0,
         "totalOutputTokens": 0,
         "windows": [
           {
             "label": "5h 滚动窗口",
-            "remainingPct": 57,
-            "usedPct": 43,
-            "resetStr": "2h38m后 (10-24 17:37)",
-            "detail": "剩余 57% · 状态 ok",
-            "updatedAt": "14:58:44"
+            "remainingPct": 50,
+            "usedPct": 50,
+            "resetStr": "1h12m后 (10-24 17:37)",
+            "detail": "剩余 50% · 状态 ok",
+            "updatedAt": "16:24:48"
           },
           {
             "label": "7d 周配额窗口",
-            "remainingPct": 81,
-            "usedPct": 19,
-            "resetStr": "1d17h后 (10-26 08:00)",
-            "detail": "剩余 81% · 状态 ok",
-            "updatedAt": "14:58:44"
+            "remainingPct": 78,
+            "usedPct": 22,
+            "resetStr": "1d15h后 (10-26 08:00)",
+            "detail": "剩余 78% · 状态 ok",
+            "updatedAt": "16:24:48"
           },
           {
             "label": "30d 月度窗口",
-            "remainingPct": 63,
-            "usedPct": 37,
-            "resetStr": "21d2h后 (11-14 17:07)",
-            "detail": "剩余 63% · 状态 ok",
-            "updatedAt": "14:58:44"
+            "remainingPct": 61,
+            "usedPct": 39,
+            "resetStr": "21d0h后 (11-14 17:07)",
+            "detail": "剩余 61% · 状态 ok",
+            "updatedAt": "16:24:48"
           }
         ],
         "boundRoles": []
@@ -9400,19 +9381,19 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "windows": [
           {
             "label": "Cursor Models 内部池 (Composer + Cursor Grok)",
-            "remainingPct": 83.4,
-            "usedPct": 16.6,
-            "resetStr": "20d11h后 (11-14 02:28)",
-            "detail": "剩余 83.4% (实测已用 16.61% · UI显示 1% used · 优先使用不扣第三方池)",
-            "updatedAt": "14:58:44"
+            "remainingPct": 82.5,
+            "usedPct": 17.5,
+            "resetStr": "20d10h后 (11-14 02:28)",
+            "detail": "剩余 82.5% (实测已用 17.55% · UI显示 1% used · 优先使用不扣第三方池)",
+            "updatedAt": "16:24:48"
           },
           {
             "label": "Other Models 第三方池 (Claude / Gemini / GPT)",
             "remainingPct": 0,
             "usedPct": 100,
-            "resetStr": "20d11h后 (11-14 02:28)",
+            "resetStr": "20d10h后 (11-14 02:28)",
             "detail": "剩余 0.0% (实测已用 100.00% · UI显示 2% used · S1/S2导师满血替补)",
-            "updatedAt": "14:58:44"
+            "updatedAt": "16:24:48"
           },
           {
             "label": "Cursor ULTRA 总包额度 & CLI 凭证 (已备.bak)",
@@ -9420,7 +9401,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 5.3,
             "resetStr": "凭证剩 51d",
             "detail": "剩 $378.95 / $400 (已用 $400.00) · 单次调用约1.4w壳开销，宜整包派大活",
-            "updatedAt": "14:58:44"
+            "updatedAt": "16:24:48"
           }
         ],
         "boundRoles": []
@@ -9446,7 +9427,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 0,
             "resetStr": "0 Credits 扣费",
             "detail": "1M 上下文 + Text/Image 多模态 + max 推理 · 完全不扣 Pro Credits",
-            "updatedAt": "14:58:44"
+            "updatedAt": "16:24:48"
           },
           {
             "label": "WorkBuddy Pro Credits 异构池 (GPT-6-Astra / Grok-4.7 / GLM-5.3 / Hy4)",
@@ -9454,7 +9435,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
             "usedPct": 96.78,
             "resetStr": "每日签到+50",
             "detail": "已用 2342.15 / 2420 credits (剩 3.2% · 账号 skylar@moltgit.net)",
-            "updatedAt": "14:58:44"
+            "updatedAt": "16:24:48"
           }
         ],
         "boundRoles": []
@@ -9465,37 +9446,55 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "profileId": "bl-curriculum-engineer",
         "modelId": "code",
         "providerId": "glm-coding-existing",
-        "sessionsCount": 94,
-        "apiCalls": 2637,
-        "inputTokens": 133073356,
-        "outputTokens": 3925459
+        "sessionsCount": 96,
+        "apiCalls": 2720,
+        "inputTokens": 154010164,
+        "outputTokens": 4053132
       },
       {
         "profileId": "bl-miniprogram-engineer",
         "modelId": "code",
         "providerId": "glm-coding-existing",
         "sessionsCount": 1,
-        "apiCalls": 1706,
-        "inputTokens": 105711572,
-        "outputTokens": 2097848
+        "apiCalls": 1765,
+        "inputTokens": 121449622,
+        "outputTokens": 2185121
       },
       {
         "profileId": "bl-design-experience",
         "modelId": "council",
         "providerId": "glm-coding-existing",
         "sessionsCount": 1,
-        "apiCalls": 1536,
-        "inputTokens": 85143555,
-        "outputTokens": 1131635
+        "apiCalls": 1642,
+        "inputTokens": 111277933,
+        "outputTokens": 1207024
       },
       {
         "profileId": "bl-coding-plan-dispatcher",
         "modelId": "council",
         "providerId": "glm-coding-existing",
-        "sessionsCount": 38,
-        "apiCalls": 2277,
-        "inputTokens": 74148322,
-        "outputTokens": 2606293
+        "sessionsCount": 40,
+        "apiCalls": 2315,
+        "inputTokens": 79403720,
+        "outputTokens": 2667233
+      },
+      {
+        "profileId": "bl-product-lead",
+        "modelId": "council",
+        "providerId": "devin-acp",
+        "sessionsCount": 1,
+        "apiCalls": 925,
+        "inputTokens": 75581825,
+        "outputTokens": 872302
+      },
+      {
+        "profileId": "bl-qa-engineer",
+        "modelId": "council",
+        "providerId": "glm-coding-existing",
+        "sessionsCount": 1,
+        "apiCalls": 1609,
+        "inputTokens": 65568448,
+        "outputTokens": 1513050
       },
       {
         "profileId": "bl-harness-lead",
@@ -9507,40 +9506,22 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "outputTokens": 4435685
       },
       {
-        "profileId": "bl-product-lead",
-        "modelId": "council",
-        "providerId": "devin-acp",
+        "profileId": "bl-pedagogy-reviewer",
+        "modelId": "upstage/solar-mini4:free",
+        "providerId": "antigravity-subscription-directsdk",
         "sessionsCount": 1,
-        "apiCalls": 869,
-        "inputTokens": 59638170,
-        "outputTokens": 808614
-      },
-      {
-        "profileId": "bl-qa-engineer",
-        "modelId": "council",
-        "providerId": "glm-coding-existing",
-        "sessionsCount": 1,
-        "apiCalls": 1564,
-        "inputTokens": 58570831,
-        "outputTokens": 1448034
+        "apiCalls": 1351,
+        "inputTokens": 31346179,
+        "outputTokens": 1305195
       },
       {
         "profileId": "bl-release-engineer",
         "modelId": "MiniMax-M3.1-Flash-Preview",
         "providerId": "minimax-coding-existing",
         "sessionsCount": 3,
-        "apiCalls": 4718,
-        "inputTokens": 28847863,
-        "outputTokens": 3479838
-      },
-      {
-        "profileId": "bl-pedagogy-reviewer",
-        "modelId": "upstage/solar-mini4:free",
-        "providerId": "antigravity-subscription-directsdk",
-        "sessionsCount": 1,
-        "apiCalls": 1328,
-        "inputTokens": 30572588,
-        "outputTokens": 1287907
+        "apiCalls": 4770,
+        "inputTokens": 28946911,
+        "outputTokens": 3543320
       },
       {
         "profileId": "bl-pedagogy-reviewer",
@@ -9556,18 +9537,18 @@ export const HERMES_INITIAL_WAR_ROOM = {
         "modelId": "MiniMax-M3.1-Flash-Preview",
         "providerId": "glm-coding-existing",
         "sessionsCount": 1,
-        "apiCalls": 1881,
-        "inputTokens": 23002805,
-        "outputTokens": 2970255
+        "apiCalls": 1928,
+        "inputTokens": 23717681,
+        "outputTokens": 3055922
       },
       {
         "profileId": "bl-ai-tutor-engineer",
         "modelId": "MiniMax-M3.1-Flash-Preview",
         "providerId": "glm-coding-existing",
         "sessionsCount": 1,
-        "apiCalls": 1970,
-        "inputTokens": 19623649,
-        "outputTokens": 1719573
+        "apiCalls": 2058,
+        "inputTokens": 20169011,
+        "outputTokens": 1801621
       }
     ],
     "benchmarks": [
@@ -9700,7 +9681,7 @@ export const HERMES_INITIAL_WAR_ROOM = {
     ]
   },
   "feishuTasklist": {
-    "snapshotUpdatedAt": "10-24 14:59",
+    "snapshotUpdatedAt": "10-24 16:27",
     "total": 101,
     "openCount": 35,
     "closedCount": 66,
@@ -9962,58 +9943,22 @@ export const HERMES_INITIAL_WAR_ROOM = {
   },
   "workstations": [
     {
-      "id": "bl-ai-tutor-engineer",
-      "presetId": "hermes-bl-ai-tutor-engineer",
-      "title": "伴学 · AI陪练",
+      "id": "bl-product-lead",
+      "presetId": "hermes-bl-product-lead",
+      "title": "伴学 · 产品负责人",
       "sectionPath": "个人 / 伴学",
       "department": "伴学教育事业部",
       "projectRoot": "E:/6_learn_space",
-      "model": "MiniMax-M3.1-Flash-Preview",
+      "model": "council",
       "status": "WORKING",
-      "sessionCount": 3,
-      "totalMessages": 770,
-      "totalToolCalls": 284,
-      "activeLeases": 1,
-      "lastActiveAt": "10-24 15:00",
-      "lastActiveEpoch": 1792825207.1646936,
-      "lastSessionTitle": "语音陪学试用版本反馈复核与遗留问题",
-      "lastPreview": "{\"output\": \"baby_learn/miniprogram/cloudfunctions/tutor/voice_probe_constraints.json:49: \\\"teaching_allowlist\\\": [],\\nbaby_learn/miniprogram"
-    },
-    {
-      "id": "bl-release-engineer",
-      "presetId": "hermes-bl-release-engineer",
-      "title": "伴学 · 发布与运维",
-      "sectionPath": "个人 / 伴学",
-      "department": "伴学教育事业部",
-      "projectRoot": "E:/6_learn_space",
-      "model": "MiniMax-M3.1-Flash-Preview",
-      "status": "WORKING",
-      "sessionCount": 4,
-      "totalMessages": 1105,
-      "totalToolCalls": 487,
-      "activeLeases": 1,
-      "lastActiveAt": "10-24 15:00",
-      "lastActiveEpoch": 1792825204.819919,
-      "lastSessionTitle": "确认并恢复小程序云环境配置",
-      "lastPreview": "{\"status\": \"success\", \"output\": \"audit ok | size: 629271\\n安全回写: [拒绝] 合并后长度 2835 > 上限 2800 ⇒ 不写回（避免撞 code 1470400）\\n卡: {\\\"ok\\\": true, \\\"ident"
-    },
-    {
-      "id": "bl-content-engineer",
-      "presetId": "hermes-bl-content-engineer",
-      "title": "伴学 · 内容管线",
-      "sectionPath": "个人 / 伴学",
-      "department": "伴学教育事业部",
-      "projectRoot": "E:/6_learn_space",
-      "model": "MiniMax-M3.1-Flash-Preview",
-      "status": "WORKING",
-      "sessionCount": 7,
-      "totalMessages": 1219,
-      "totalToolCalls": 458,
-      "activeLeases": 1,
-      "lastActiveAt": "10-24 15:00",
-      "lastActiveEpoch": 1792825201.5996234,
-      "lastSessionTitle": "修复 brilliant 课程媒体/截图缺口",
-      "lastPreview": "{\"status\": \"success\", \"output\": \"=== 写入 done ===\\n done[file] = fileID;\\n\\n=== uploadFile 调用 ===\\n// USER_DATA_PATH 再 wx.cloud.uploadFile。用的"
+      "sessionCount": 8,
+      "totalMessages": 1276,
+      "totalToolCalls": 683,
+      "activeLeases": 0,
+      "lastActiveAt": "10-24 16:25",
+      "lastActiveEpoch": 1792830353.3948183,
+      "lastSessionTitle": "定版试用方案与通过标准",
+      "lastPreview": "已修正[审查入口的缺口筛选](E:/6_learn_space/05_quality_gates/m134-product-review-20261021/current-review-handoff.html)：将“隔离证据已完成”与“验收义务未闭合”分列，避免隐藏后续 QA "
     },
     {
       "id": "bl-curriculum-engineer",
@@ -10024,68 +9969,68 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "projectRoot": "E:/6_learn_space",
       "model": "code",
       "status": "WORKING",
-      "sessionCount": 123,
-      "totalMessages": 4781,
-      "totalToolCalls": 2692,
+      "sessionCount": 125,
+      "totalMessages": 4954,
+      "totalToolCalls": 2771,
       "activeLeases": 1,
-      "lastActiveAt": "10-24 14:58",
-      "lastActiveEpoch": 1792825136.6815739,
-      "lastSessionTitle": "Subagent: 只读独审v153，不prepare/finish/写文件飞书关单。核b08figs以外全课字段完…",
-      "lastPreview": "只读独审完成：**v153 的 b08 固定图图义与限定工程核验成立；参数化与教学验收仍有缺口，不作整课 PASS。task／RD-SB03／b06 图问题保持 OPEN。** - **版本范围已核实**：13拍、16个图引用、16张唯一PNG、磁盘16张PNG。相对v149，实"
+      "lastActiveAt": "10-24 15:23",
+      "lastActiveEpoch": 1792826614.1510515,
+      "lastSessionTitle": "Subagent: 只读独审v155，不prepare/finish/写文件/飞书关单。核代码composition…",
+      "lastPreview": "**overall REVISE（v155 授权范围内的只读独审）**。包继承、composition 和现有浏览器证据相符；未亲自运行浏览器，以下运行结论限于代码及既有 receipt。 | 核查项 | 结果与边界 | 局部结论 | |---|---|---| | compos"
     },
     {
-      "id": "bl-coding-plan-dispatcher",
-      "presetId": "hermes-bl-coding-plan-dispatcher",
-      "title": "伴学 · Coding Plan调度员",
-      "sectionPath": "个人 / 伴学",
-      "department": "伴学教育事业部",
-      "projectRoot": "E:/6_learn_space",
-      "model": "council",
-      "status": "WORKING",
-      "sessionCount": 50,
-      "totalMessages": 2121,
-      "totalToolCalls": 1081,
-      "activeLeases": 1,
-      "lastActiveAt": "10-24 14:42",
-      "lastActiveEpoch": 1792824144.1223834,
-      "lastSessionTitle": "Subagent: 只读独审 E:/6_learn_space/02_design_system/design-co… #18",
-      "lastPreview": "独审完成，结论：**阻止保留**，维持 `blocked_pending_matching_original`。 - **11 文件**前后 SHA-256 均一致，且全部匹配请求声明。 - 实际仅调用一次 `vision_analyze`：单个标 `11` 的题目正方形，`11"
-    },
-    {
-      "id": "bl-miniprogram-engineer",
-      "presetId": "hermes-bl-miniprogram-engineer",
-      "title": "伴学 · 小程序前端",
+      "id": "bl-qa-engineer",
+      "presetId": "hermes-bl-qa-engineer",
+      "title": "伴学 · 独立QA",
       "sectionPath": "个人 / 伴学",
       "department": "伴学教育事业部",
       "projectRoot": "E:/6_learn_space",
       "model": "MiniMax-M3.1-Flash-Preview",
       "status": "WORKING",
-      "sessionCount": 15,
-      "totalMessages": 2306,
-      "totalToolCalls": 1130,
+      "sessionCount": 12,
+      "totalMessages": 2090,
+      "totalToolCalls": 983,
       "activeLeases": 1,
-      "lastActiveAt": "10-20 11:33",
-      "lastActiveEpoch": 1792467204.4986093,
-      "lastSessionTitle": "实现小程序完成态按家庭成员分域存储并改写隔离契约单测 #2",
-      "lastPreview": "任务 t_9d4dc590 已完成并关单。总结： 本轮做了什么 1. 接手前序 run 的交接：数据层 5 文件（learner.js / look.js / textbook-local.js / api.js / 隔离测试）的分域存储已落地，逐一实读文件+复跑测试确认，未重做"
+      "lastActiveAt": "10-20 12:32",
+      "lastActiveEpoch": 1792470742.4200997,
+      "lastSessionTitle": "独立验收家庭成员进度隔离契约测试与LP视图回归测试 #2",
+      "lastPreview": "Task `t_14c9d8d9` completed with a **negative** verdict: `NOT_ACCEPTED`. ## What I found **Implementation quality: PASS.** I re-verified eve"
     },
     {
-      "id": "bl-product-lead",
-      "presetId": "hermes-bl-product-lead",
-      "title": "伴学 · 产品负责人",
+      "id": "bl-content-engineer",
+      "presetId": "hermes-bl-content-engineer",
+      "title": "伴学 · 内容管线",
       "sectionPath": "个人 / 伴学",
       "department": "伴学教育事业部",
       "projectRoot": "E:/6_learn_space",
-      "model": "council",
+      "model": "MiniMax-M3.1-Flash-Preview",
       "status": "RECENT",
-      "sessionCount": 8,
-      "totalMessages": 1158,
-      "totalToolCalls": 632,
+      "sessionCount": 7,
+      "totalMessages": 942,
+      "totalToolCalls": 327,
       "activeLeases": 0,
-      "lastActiveAt": "10-24 14:56",
-      "lastActiveEpoch": 1792824999.1883554,
-      "lastSessionTitle": "定版试用方案与通过标准",
-      "lastPreview": "已完成 [R44 模型进度独立副本复跑](E:/6_learn_space/05_quality_gates/m134-product-review-20261021/r44-product-note-1792824767093.html)：五个新子进程整体 exit 0，教材卡"
+      "lastActiveAt": "10-24 16:23",
+      "lastActiveEpoch": 1792830196.3639185,
+      "lastSessionTitle": "修复 brilliant 课程媒体/截图缺口",
+      "lastPreview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
+    },
+    {
+      "id": "bl-ai-tutor-engineer",
+      "presetId": "hermes-bl-ai-tutor-engineer",
+      "title": "伴学 · AI陪练",
+      "sectionPath": "个人 / 伴学",
+      "department": "伴学教育事业部",
+      "projectRoot": "E:/6_learn_space",
+      "model": "MiniMax-M3.1-Flash-Preview",
+      "status": "RECENT",
+      "sessionCount": 3,
+      "totalMessages": 630,
+      "totalToolCalls": 226,
+      "activeLeases": 0,
+      "lastActiveAt": "10-24 16:23",
+      "lastActiveEpoch": 1792830189.710559,
+      "lastSessionTitle": "语音陪学试用版本反馈复核与遗留问题",
+      "lastPreview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
     },
     {
       "id": "bl-super-secretary",
@@ -10097,13 +10042,67 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "swe-2-high",
       "status": "RECENT",
       "sessionCount": 5,
-      "totalMessages": 484,
-      "totalToolCalls": 232,
+      "totalMessages": 468,
+      "totalToolCalls": 222,
       "activeLeases": 0,
-      "lastActiveAt": "10-24 14:53",
-      "lastActiveEpoch": 1792824787.7857122,
+      "lastActiveAt": "10-24 16:20",
+      "lastActiveEpoch": 1792830019.8587375,
       "lastSessionTitle": "竞品复核与AI资源维护",
-      "lastPreview": "本轮任务已完成并如实回写： - 已核对 Stage 0/Stage 1 设计输入、原版素材及交互式产物。 - 设计图结果为缓存验证：`units=10 passed=10 cached=10 executed=0`。 - 标准库 `unittest` 共 264 项通过；未声称 "
+      "lastPreview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
+    },
+    {
+      "id": "bl-release-engineer",
+      "presetId": "hermes-bl-release-engineer",
+      "title": "伴学 · 发布与运维",
+      "sectionPath": "个人 / 伴学",
+      "department": "伴学教育事业部",
+      "projectRoot": "E:/6_learn_space",
+      "model": "MiniMax-M3.1-Flash-Preview",
+      "status": "RECENT",
+      "sessionCount": 4,
+      "totalMessages": 1216,
+      "totalToolCalls": 534,
+      "activeLeases": 0,
+      "lastActiveAt": "10-24 16:20",
+      "lastActiveEpoch": 1792830013.2968035,
+      "lastSessionTitle": "确认并恢复小程序云环境配置",
+      "lastPreview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
+    },
+    {
+      "id": "bl-coding-plan-dispatcher",
+      "presetId": "hermes-bl-coding-plan-dispatcher",
+      "title": "伴学 · Coding Plan调度员",
+      "sectionPath": "个人 / 伴学",
+      "department": "伴学教育事业部",
+      "projectRoot": "E:/6_learn_space",
+      "model": "council",
+      "status": "RECENT",
+      "sessionCount": 52,
+      "totalMessages": 1831,
+      "totalToolCalls": 959,
+      "activeLeases": 0,
+      "lastActiveAt": "10-24 15:28",
+      "lastActiveEpoch": 1792826885.123185,
+      "lastSessionTitle": "Subagent: 只读独立执行审查上述16文件前后SHA。亲跑test_check.py+test_validat…",
+      "lastPreview": "- 16个绑定文件均匹配请求 SHA，执行前后 SHA 全部一致，正式文件未修改。 - 实跑两个测试文件共 **6方法，全部通过**。7个结构拒绝子例均给出具体字段路径的 `ValueError`，`Path.write_bytes` 调用数为0，已有 HTML/result 哨"
+    },
+    {
+      "id": "magpie-devin-pilot",
+      "presetId": "hermes-magpie-devin-pilot",
+      "title": "本机 · Hermes与工具基建负责人",
+      "sectionPath": "本机",
+      "department": "本机 · 开源与工具基建组",
+      "projectRoot": "F:/3_open_source",
+      "model": "devin/swe-2",
+      "status": "RECENT",
+      "sessionCount": 4,
+      "totalMessages": 199,
+      "totalToolCalls": 106,
+      "activeLeases": 0,
+      "lastActiveAt": "10-24 15:24",
+      "lastActiveEpoch": 1792826656.4314063,
+      "lastSessionTitle": "【任务：让 DSH Web GUI 界面常驻显示\"当前对话实际使用的模型\"——真正改代码并热更新…",
+      "lastPreview": "一个测试暴露真实行为差异：`state.current` 缺 `reasoningEffort`（默认 fixture 是裸 `{provider, model}`），而 `lastUsed` 带 `reasoningEffort:'high'`，触发\"待生效\"。修正测试 fix"
     },
     {
       "id": "bl-harness-plugin-ui",
@@ -10178,24 +10177,6 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "lastPreview": "{\"output\": \"File \\\"<string>\\\", line 1\\r\\n import sqlite3; conn = sqlite3.connect('C:/Users/Administrator/AppData/Local/hermes/profiles/bl-co"
     },
     {
-      "id": "magpie-devin-pilot",
-      "presetId": "hermes-magpie-devin-pilot",
-      "title": "本机 · Hermes与工具基建负责人",
-      "sectionPath": "本机",
-      "department": "本机 · 开源与工具基建组",
-      "projectRoot": "F:/3_open_source",
-      "model": "devin/swe-2",
-      "status": "ONLINE",
-      "sessionCount": 3,
-      "totalMessages": 96,
-      "totalToolCalls": 46,
-      "activeLeases": 0,
-      "lastActiveAt": "10-23 11:05",
-      "lastActiveEpoch": 1792724736.3803282,
-      "lastSessionTitle": "Bot Chat",
-      "lastPreview": "协调消息已发出（异步，回复稍后到）。现在建本机改进需求台账（优先级4），同时收尾插件真机验证。 先看桌面端 `/steward` 当前实际渲染状态——刚才截图显示 iframe 已嵌入渲染。再确认一次拿到完整渲染证据，然后把台账建到 steward-console 目录。"
-    },
-    {
       "id": "bl-hr-org",
       "presetId": "hermes-bl-hr-org",
       "title": "伴学 · 人力与组织",
@@ -10259,8 +10240,8 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "gemini-4-argon-high",
       "status": "ONLINE",
       "sessionCount": 58,
-      "totalMessages": 2394,
-      "totalToolCalls": 1400,
+      "totalMessages": 2448,
+      "totalToolCalls": 1419,
       "activeLeases": 0,
       "lastActiveAt": "10-22 18:04",
       "lastActiveEpoch": 1792663457.384761,
@@ -10349,8 +10330,8 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "devin/swe-2",
       "status": "ONLINE",
       "sessionCount": 16,
-      "totalMessages": 747,
-      "totalToolCalls": 395,
+      "totalMessages": 777,
+      "totalToolCalls": 403,
       "activeLeases": 0,
       "lastActiveAt": "10-21 17:14",
       "lastActiveEpoch": 1792574096.2923474,
@@ -10385,8 +10366,8 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "model": "glm-5.3",
       "status": "ONLINE",
       "sessionCount": 15,
-      "totalMessages": 1754,
-      "totalToolCalls": 797,
+      "totalMessages": 1971,
+      "totalToolCalls": 898,
       "activeLeases": 0,
       "lastActiveAt": "10-21 14:44",
       "lastActiveEpoch": 1792565080.3777916,
@@ -10394,22 +10375,22 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "lastPreview": "{\"content\": \"1|\\\"\\\"\\\"Check report completeness/provenance, never grant product acceptance.\\\"\\\"\\\"\\n2|\\n3|import argparse\\n4|import hashlib\\n5"
     },
     {
-      "id": "bl-qa-engineer",
-      "presetId": "hermes-bl-qa-engineer",
-      "title": "伴学 · 独立QA",
+      "id": "bl-miniprogram-engineer",
+      "presetId": "hermes-bl-miniprogram-engineer",
+      "title": "伴学 · 小程序前端",
       "sectionPath": "个人 / 伴学",
       "department": "伴学教育事业部",
       "projectRoot": "E:/6_learn_space",
       "model": "MiniMax-M3.1-Flash-Preview",
       "status": "ONLINE",
-      "sessionCount": 12,
-      "totalMessages": 1999,
-      "totalToolCalls": 945,
+      "sessionCount": 15,
+      "totalMessages": 2427,
+      "totalToolCalls": 1183,
       "activeLeases": 0,
-      "lastActiveAt": "10-20 12:32",
-      "lastActiveEpoch": 1792470742.4200997,
-      "lastSessionTitle": "独立验收家庭成员进度隔离契约测试与LP视图回归测试 #2",
-      "lastPreview": "Task `t_14c9d8d9` completed with a **negative** verdict: `NOT_ACCEPTED`. ## What I found **Implementation quality: PASS.** I re-verified eve"
+      "lastActiveAt": "10-20 11:33",
+      "lastActiveEpoch": 1792467204.4986093,
+      "lastSessionTitle": "实现小程序完成态按家庭成员分域存储并改写隔离契约单测 #2",
+      "lastPreview": "任务 t_9d4dc590 已完成并关单。总结： 本轮做了什么 1. 接手前序 run 的交接：数据层 5 文件（learner.js / look.js / textbook-local.js / api.js / 隔离测试）的分域存储已落地，逐一实读文件+复跑测试确认，未重做"
     },
     {
       "id": "bl-architect",
@@ -11458,74 +11439,84 @@ export const HERMES_INITIAL_WAR_ROOM = {
   ],
   "recentStream": [
     {
-      "ts": 1792825207.1646936,
-      "time": "10-24 15:00",
-      "agentId": "bl-ai-tutor-engineer",
-      "agentTitle": "伴学 · AI陪练",
-      "sectionPath": "个人 / 伴学",
-      "role": "tool",
-      "toolName": "terminal",
-      "preview": "{\"output\": \"baby_learn/miniprogram/cloudfunctions/tutor/voice_probe_constraints.json:49: \\\"teaching_allowlist\\\": [],\\nbaby_learn/miniprogram"
-    },
-    {
-      "ts": 1792825204.819919,
-      "time": "10-24 15:00",
-      "agentId": "bl-release-engineer",
-      "agentTitle": "伴学 · 发布与运维",
-      "sectionPath": "个人 / 伴学",
-      "role": "tool",
-      "toolName": "execute_code",
-      "preview": "{\"status\": \"success\", \"output\": \"audit ok | size: 629271\\n安全回写: [拒绝] 合并后长度 2835 > 上限 2800 ⇒ 不写回（避免撞 code 1470400）\\n卡: {\\\"ok\\\": true, \\\"ident"
-    },
-    {
-      "ts": 1792825201.5996234,
-      "time": "10-24 15:00",
-      "agentId": "bl-content-engineer",
-      "agentTitle": "伴学 · 内容管线",
-      "sectionPath": "个人 / 伴学",
-      "role": "tool",
-      "toolName": "execute_code",
-      "preview": "{\"status\": \"success\", \"output\": \"=== 写入 done ===\\n done[file] = fileID;\\n\\n=== uploadFile 调用 ===\\n// USER_DATA_PATH 再 wx.cloud.uploadFile。用的"
-    },
-    {
-      "ts": 1792825136.623383,
-      "time": "10-24 14:58",
-      "agentId": "bl-curriculum-engineer",
-      "agentTitle": "伴学 · 课程工程",
-      "sectionPath": "个人 / 伴学",
-      "role": "assistant",
-      "toolName": null,
-      "preview": "只读独审完成：**v153 的 b08 固定图图义与限定工程核验成立；参数化与教学验收仍有缺口，不作整课 PASS。task／RD-SB03／b06 图问题保持 OPEN。** - **版本范围已核实**：13拍、16个图引用、16张唯一PNG、磁盘16张PNG。相对v149，实"
-    },
-    {
-      "ts": 1792824999.1883554,
-      "time": "10-24 14:56",
+      "ts": 1792830353.3948183,
+      "time": "10-24 16:25",
       "agentId": "bl-product-lead",
       "agentTitle": "伴学 · 产品负责人",
       "sectionPath": "个人 / 伴学",
       "role": "assistant",
       "toolName": null,
-      "preview": "已完成 [R44 模型进度独立副本复跑](E:/6_learn_space/05_quality_gates/m134-product-review-20261021/r44-product-note-1792824767093.html)：五个新子进程整体 exit 0，教材卡"
+      "preview": "已修正[审查入口的缺口筛选](E:/6_learn_space/05_quality_gates/m134-product-review-20261021/current-review-handoff.html)：将“隔离证据已完成”与“验收义务未闭合”分列，避免隐藏后续 QA "
     },
     {
-      "ts": 1792824787.7857122,
-      "time": "10-24 14:53",
+      "ts": 1792830196.3639185,
+      "time": "10-24 16:23",
+      "agentId": "bl-content-engineer",
+      "agentTitle": "伴学 · 内容管线",
+      "sectionPath": "个人 / 伴学",
+      "role": "assistant",
+      "toolName": null,
+      "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
+    },
+    {
+      "ts": 1792830189.710559,
+      "time": "10-24 16:23",
+      "agentId": "bl-ai-tutor-engineer",
+      "agentTitle": "伴学 · AI陪练",
+      "sectionPath": "个人 / 伴学",
+      "role": "assistant",
+      "toolName": null,
+      "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
+    },
+    {
+      "ts": 1792830019.8587375,
+      "time": "10-24 16:20",
       "agentId": "bl-super-secretary",
       "agentTitle": "伴学 · 总裁办执行秘书",
       "sectionPath": "个人 / 伴学",
       "role": "assistant",
       "toolName": null,
-      "preview": "本轮任务已完成并如实回写： - 已核对 Stage 0/Stage 1 设计输入、原版素材及交互式产物。 - 设计图结果为缓存验证：`units=10 passed=10 cached=10 executed=0`。 - 标准库 `unittest` 共 264 项通过；未声称 "
+      "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
     },
     {
-      "ts": 1792824144.03923,
-      "time": "10-24 14:42",
+      "ts": 1792830013.2968035,
+      "time": "10-24 16:20",
+      "agentId": "bl-release-engineer",
+      "agentTitle": "伴学 · 发布与运维",
+      "sectionPath": "个人 / 伴学",
+      "role": "assistant",
+      "toolName": null,
+      "preview": "This turn did not complete. Some actions may already have run; verify their effects before resending."
+    },
+    {
+      "ts": 1792826885.0694518,
+      "time": "10-24 15:28",
       "agentId": "bl-coding-plan-dispatcher",
       "agentTitle": "伴学 · Coding Plan调度员",
       "sectionPath": "个人 / 伴学",
       "role": "assistant",
       "toolName": null,
-      "preview": "独审完成，结论：**阻止保留**，维持 `blocked_pending_matching_original`。 - **11 文件**前后 SHA-256 均一致，且全部匹配请求声明。 - 实际仅调用一次 `vision_analyze`：单个标 `11` 的题目正方形，`11"
+      "preview": "- 16个绑定文件均匹配请求 SHA，执行前后 SHA 全部一致，正式文件未修改。 - 实跑两个测试文件共 **6方法，全部通过**。7个结构拒绝子例均给出具体字段路径的 `ValueError`，`Path.write_bytes` 调用数为0，已有 HTML/result 哨"
+    },
+    {
+      "ts": 1792826656.4314063,
+      "time": "10-24 15:24",
+      "agentId": "magpie-devin-pilot",
+      "agentTitle": "本机 · Hermes与工具基建负责人",
+      "sectionPath": "本机",
+      "role": "assistant",
+      "toolName": null,
+      "preview": "一个测试暴露真实行为差异：`state.current` 缺 `reasoningEffort`（默认 fixture 是裸 `{provider, model}`），而 `lastUsed` 带 `reasoningEffort:'high'`，触发\"待生效\"。修正测试 fix"
+    },
+    {
+      "ts": 1792826614.10283,
+      "time": "10-24 15:23",
+      "agentId": "bl-curriculum-engineer",
+      "agentTitle": "伴学 · 课程工程",
+      "sectionPath": "个人 / 伴学",
+      "role": "assistant",
+      "toolName": null,
+      "preview": "**overall REVISE（v155 授权范围内的只读独审）**。包继承、composition 和现有浏览器证据相符；未亲自运行浏览器，以下运行结论限于代码及既有 receipt。 | 核查项 | 结果与边界 | 局部结论 | |---|---|---| | compos"
     },
     {
       "ts": 1792817568.48281,
@@ -11566,16 +11557,6 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "role": "tool",
       "toolName": "terminal",
       "preview": "{\"output\": \"File \\\"<string>\\\", line 1\\r\\n import sqlite3; conn = sqlite3.connect('C:/Users/Administrator/AppData/Local/hermes/profiles/bl-co"
-    },
-    {
-      "ts": 1792724736.3803282,
-      "time": "10-23 11:05",
-      "agentId": "magpie-devin-pilot",
-      "agentTitle": "本机 · Hermes与工具基建负责人",
-      "sectionPath": "本机",
-      "role": "assistant",
-      "toolName": null,
-      "preview": "协调消息已发出（异步，回复稍后到）。现在建本机改进需求台账（优先级4），同时收尾插件真机验证。 先看桌面端 `/steward` 当前实际渲染状态——刚才截图显示 iframe 已嵌入渲染。再确认一次拿到完整渲染证据，然后把台账建到 steward-console 目录。"
     },
     {
       "ts": 1792722069.5423317,
@@ -11703,17 +11684,17 @@ export const HERMES_INITIAL_WAR_ROOM = {
       "relPath": "design-competitor-center/index.html",
       "fullPath": "E:/6_learn_space/docs/teams/hermes-m1-autonomy-20261014/design-competitor-center/index.html",
       "label": "48,414张 Brilliant 原版实拍竞品分镜中心",
-      "sizeKb": 130,
-      "updatedAt": "10-24 14:56",
-      "mtimeSec": 1792824985.4291902
+      "sizeKb": 130.1,
+      "updatedAt": "10-24 16:24",
+      "mtimeSec": 1792830271.0226135
     },
     {
       "relPath": "daily-mp-evolution.html",
       "fullPath": "E:/6_learn_space/docs/teams/hermes-m1-autonomy-20261014/daily-mp-evolution.html",
       "label": "小程序天级进化真机验收台 (HTML)",
       "sizeKb": 31.3,
-      "updatedAt": "10-24 14:31",
-      "mtimeSec": 1792823478.2924025
+      "updatedAt": "10-24 16:01",
+      "mtimeSec": 1792828910.8085868
     },
     {
       "relPath": "design-system/index.html",
