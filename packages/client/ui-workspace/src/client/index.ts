@@ -47,6 +47,14 @@ import { createWorkspaceShortcutControls, installWorkspaceShortcuts } from './sh
 import { UiWorkspaceService } from './navigation.ts'
 import { createWorkspaceViewStore } from './stores.ts'
 import { WorkspaceBrowser } from './rows/WorkspaceBrowser.tsx'
+import {
+  findExistingAgentSession,
+  HermesCommandCenterPage,
+  type HermesCommandCenterInjected,
+  HermesPanelIcon,
+  writePersistedAgentSession,
+} from './HermesOrgView.tsx'
+import type { MainPanelId } from '@deepseek-ai/dsh-client-ui-layout/client'
 import { ArchiveSessionMenuItem, ArchiveSessionRowButton, SessionArchiveConfirmDialog } from './session-actions/ArchiveSession.tsx'
 import { derive } from './session-actions/derived.ts'
 import { ForkSessionMenuItem } from './session-actions/ForkSession.tsx'
@@ -281,8 +289,86 @@ export function apply(ctx: Context): void {
     requestAddWorkspace: shortcutControls.add,
     closeAddWorkspace: shortcutControls.closeAdd,
     setDirectoryBusy: shortcutControls.directoryBusy,
+    openHermesPanel: () => { ctx.layout.selectPanel('hermes-org' as MainPanelId) },
     hooks: { directoryFlow: browserFlowSource, hostInfo, workspaceShortcuts: shortcutControls.state, shortcuts: ctx.shortcuts.catalog },
   })
+  const HERMES_PANEL_ID = 'hermes-org' as MainPanelId
+  const hermesCommandInjected = (): HermesCommandCenterInjected => ({
+    startAgentSession: (agent, customPrompt, forceNew) => {
+      if (typeof document !== 'undefined') {
+        document.documentElement.dataset.dshChatMode = 'hermes'
+        document.documentElement.dataset.dshActiveAgent = `${agent.title} (${agent.id})`
+      }
+      if (typeof window !== 'undefined') {
+        try {
+          window.localStorage.setItem('dsh-hermes-last-agent-id', agent.id)
+        } catch {
+          // ignore
+        }
+        window.dispatchEvent(new CustomEvent('dsh-hermes-chat-mode', {
+          detail: { mode: 'hermes', agentId: agent.id, agentTitle: agent.title },
+        }))
+      }
+      if (!forceNew && customPrompt === undefined) {
+        const snap = sessions.list.getSnapshot()
+        const archived = workspaces.list.getSnapshot().archivedSessionIds
+        const existing = findExistingAgentSession(snap, archived, agent)
+        if (existing !== undefined) {
+          writePersistedAgentSession(agent.id, existing.id, !existing.blank)
+          ctx.layout.selectPanel(null)
+          uiWorkspace.openSession(existing.id)
+          return
+        }
+      }
+      const presetId = agent.presetId || `hermes-${agent.id}`
+      const promptText = customPrompt?.trim() ? customPrompt.trim() : undefined
+      const wsItems = workspaces.list.getSnapshot().items
+      const normRoot = String(agent.projectRoot || '').replaceAll('\\', '/').replace(/\/+$/, '').toLowerCase()
+      const matched = wsItems.find((w) => {
+        const wp = String(w.path || '').replaceAll('\\', '/').replace(/\/+$/, '').toLowerCase()
+        return wp !== '' && (wp === normRoot || normRoot.startsWith(`${wp}/`))
+      })
+      if (matched !== undefined) {
+        ctx.layout.selectPanel(null)
+        uiWorkspace.startSession(matched.workspaceId, {
+          agentPreset: presetId,
+          ...(promptText !== undefined ? { prompt: promptText, clearPreviousDraft: false } : { clearPreviousDraft: true }),
+        })
+        return
+      }
+      if (agent.projectRoot) {
+        void workspaces.create({ path: agent.projectRoot }).then((created) => {
+          ctx.layout.selectPanel(null)
+          uiWorkspace.startSession(created.workspaceId, {
+            agentPreset: presetId,
+            ...(promptText !== undefined ? { prompt: promptText, clearPreviousDraft: false } : { clearPreviousDraft: true }),
+          })
+        }).catch(() => {
+          const fallbackWs = workspaces.list.getSnapshot().items[0]
+          ctx.layout.selectPanel(null)
+          uiWorkspace.startSession(fallbackWs?.workspaceId, {
+            agentPreset: presetId,
+            ...(promptText !== undefined ? { prompt: promptText, clearPreviousDraft: false } : { clearPreviousDraft: true }),
+          })
+        })
+      }
+    },
+    closePanel: () => { ctx.layout.selectPanel(null) },
+  })
+  const tWorkspace = ctx.locale.bind(NS)
+  ctx.slots.inject('main', () => ctx.slots.register({
+    name: 'main',
+    key: HERMES_PANEL_ID,
+    locale: NS,
+    inject: hermesCommandInjected,
+  }, HermesCommandCenterPage))
+  ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({
+    name: 'sidebar.panellist',
+    id: HERMES_PANEL_ID,
+    order: 5,
+    locale: NS,
+    label: () => tWorkspace('hermes.panel'),
+  }, HermesPanelIcon))
   const pickerInjected = (): WorkspacePickerInjected => ({
     createWorkspace: input => workspaces.create(input),
     hooks: { directoryFlow: pickerFlowSource },

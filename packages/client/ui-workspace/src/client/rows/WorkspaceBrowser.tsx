@@ -40,6 +40,7 @@ import { ProjectRowItem, SearchResultItem, SessionNodeItem } from './Rows.tsx'
 import { AnimatedRows } from './AnimatedRows.tsx'
 import { FLAT_SESSION_ORDER_KEY, type SessionGroupBy } from '../stores.ts'
 import { WorkspacePickFlow } from '../WorkspacePicker.tsx'
+import { HermesSidebarOrgTree } from '../HermesOrgView.tsx'
 import css from './WorkspaceBrowser.module.css'
 
 /**
@@ -921,9 +922,33 @@ export function WorkspaceBrowser({
   requestAddWorkspace,
   closeAddWorkspace,
   setDirectoryBusy,
+  openHermesPanel,
   renderSlot,
   t,
 }: WorkspaceBrowserProps) {
+  const [sidebarMode, setSidebarMode] = useState<'hermes' | 'sessions'>(() => {
+    const saved = typeof document !== 'undefined' ? document.documentElement.dataset.dshChatMode : undefined
+    return saved === 'sessions' ? 'sessions' : 'hermes'
+  })
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.dataset.dshChatMode = sidebarMode
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('dsh-hermes-chat-mode', { detail: { mode: sidebarMode } }))
+    }
+  }, [sidebarMode])
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const onExternalMode = (e: Event): void => {
+      const next = (e as CustomEvent<{ mode?: string }>).detail?.mode
+      if (next === 'hermes' || next === 'sessions') {
+        setSidebarMode(prev => (prev === next ? prev : next))
+      }
+    }
+    window.addEventListener('dsh-hermes-chat-mode', onExternalMode)
+    return () => { window.removeEventListener('dsh-hermes-chat-mode', onExternalMode) }
+  }, [])
   const home = useHostInfo(info => info.home)
   const shortcuts = useShortcuts(rows => rows)
   const searchShortcut = shortcuts.find(row => row.id === 'session.search')
@@ -1397,10 +1422,88 @@ export function WorkspaceBrowser({
         </Tooltip>
       </div>}
 
+      {/* Hermes × DSH Dual-Mode Switcher in Left Sidebar */}
+      {wide && (
+        <div
+          style={{
+            display: 'flex',
+            gap: 4,
+            padding: '2px 4px 6px',
+            flex: 'none',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => {
+              setSidebarMode('hermes')
+              if (typeof document !== 'undefined') document.documentElement.dataset.dshChatMode = 'hermes'
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('dsh-hermes-chat-mode', { detail: { mode: 'hermes' } }))
+              }
+            }}
+            title="与 Agent 对话极简模式：仅保留对话框与 + / 🎙️ / ↑ 三个按钮，Agent 按预设设定自动运行"
+            style={{
+              flex: 1,
+              padding: '4px 6px',
+              borderRadius: 6,
+              border: sidebarMode === 'hermes'
+                ? '1px solid #0284c7'
+                : '1px solid var(--dsw-alias-border-l2, rgba(148,163,184,0.28))',
+              background: sidebarMode === 'hermes' ? 'rgba(2, 132, 199, 0.16)' : 'transparent',
+              color: 'var(--dsw-alias-label-primary)',
+              fontSize: 11.5,
+              fontWeight: sidebarMode === 'hermes' ? 700 : 500,
+              cursor: 'pointer',
+            }}
+          >
+            🤖 Agent 对话 (83)
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setSidebarMode('sessions')
+              if (typeof document !== 'undefined') document.documentElement.dataset.dshChatMode = 'sessions'
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('dsh-hermes-chat-mode', { detail: { mode: 'sessions' } }))
+              }
+            }}
+            title="与具体 Session 对话模式：展示工作区、预设、权限与模型等完整配置选项"
+            style={{
+              flex: 1,
+              padding: '4px 6px',
+              borderRadius: 6,
+              border: sidebarMode === 'sessions'
+                ? '1px solid #0284c7'
+                : '1px solid var(--dsw-alias-border-l2, rgba(148,163,184,0.28))',
+              background: sidebarMode === 'sessions' ? 'rgba(2, 132, 199, 0.16)' : 'transparent',
+              color: 'var(--dsw-alias-label-primary)',
+              fontSize: 11.5,
+              fontWeight: sidebarMode === 'sessions' ? 700 : 500,
+              cursor: 'pointer',
+            }}
+          >
+            ⚙️ Session 选项
+          </button>
+        </div>
+      )}
+
       {/* Always-mounted seat keeps the region's flex slot while the list
           itself is wide-only. */}
       <div className={css.listArea}>
-        {wide && (normalizedQuery !== ''
+        {wide && (sidebarMode === 'hermes' && normalizedQuery === ''
+          ? (
+            <HermesSidebarOrgTree
+              workspaces={workspaces}
+              sessions={list}
+              archivedSessionIds={archivedSessionIds}
+              openSession={guardedOpen}
+              startSession={startSession}
+              createWorkspace={createWorkspace}
+              onOpenCommandCenter={openHermesPanel}
+              t={t}
+            />
+          )
+          : normalizedQuery !== ''
           ? (
             <SearchResults
               usePanelInfo={usePanelInfo}

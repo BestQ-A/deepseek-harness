@@ -59,6 +59,20 @@ export const InputBar = memo(function InputBar({
   void useLexicon // hook seat stays bound by the inject compartment; text-ref decoration rides the shell's editor transforms
   const commandMenuOpen = useMenuLauncher(source => source === 'command')
   const [activity, setActivity] = useState(false)
+  const [agentChatMode, setAgentChatMode] = useState<boolean>(() => {
+    if (typeof document === 'undefined') return true
+    return document.documentElement.dataset.dshChatMode !== 'sessions'
+  })
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const onModeChange = (e: Event): void => {
+      const next = (e as CustomEvent<{ mode?: string }>).detail?.mode
+        ?? document.documentElement.dataset.dshChatMode
+      setAgentChatMode(next !== 'sessions')
+    }
+    window.addEventListener('dsh-hermes-chat-mode', onModeChange)
+    return () => { window.removeEventListener('dsh-hermes-chat-mode', onModeChange) }
+  }, [])
   useEffect(() => { setActivity(false) }, [sessionId])
   const promptError = useSession(s => s.promptError) ?? null
   const running = useSession(s => s.running) ?? false
@@ -460,16 +474,16 @@ export const InputBar = memo(function InputBar({
               hidden
               onChange={onPickFiles}
             />
-            <div className={css.modes}>
+            <div className={css.modes} style={agentChatMode ? { display: 'none' } : undefined}>
               {sessionId === undefined ? null : renderSlot('conversation.input.permission', { locked })}
               {sessionId === undefined ? null : renderSlot('conversation.input.plan', { locked })}
             </div>
             {input === undefined || sessionId === undefined
               ? null
-              : renderSlot('conversation.input.left', {})}
+              : <div style={agentChatMode ? { display: 'none' } : undefined}>{renderSlot('conversation.input.left', {})}</div>}
           </div>
           <div className={clsx(css.trailing, activity && css.trailingActive)}>
-            <div className={css.standardControls} hidden={activity}>
+            <div className={css.standardControls} hidden={activity} style={agentChatMode ? { display: 'none' } : undefined}>
               {input === undefined || sessionId === undefined
                 ? null
                 : renderSlot('conversation.input.right', {})}
@@ -517,7 +531,7 @@ export const InputBar = memo(function InputBar({
           </div>
         </div>
       </div>
-      <div className={css.dock} data-composer-dock>
+      <div className={css.dock} data-composer-dock style={agentChatMode ? { display: 'none' } : undefined}>
         {variant === 'composer' && input !== undefined && sessionId !== undefined
           ? renderSlot('conversation.composer.dock', {})
           : null}

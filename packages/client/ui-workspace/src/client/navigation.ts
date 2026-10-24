@@ -217,19 +217,41 @@ class UiWorkspaceService extends Service implements UiWorkspace {
     return attempt
   }
 
-  private createInWorkspace(workspace: WorkspaceView, options: Pick<StartSessionOptions, 'agentPreset'>): Promise<SessionId> {
+  private async createInWorkspace(workspace: WorkspaceView, options: Pick<StartSessionOptions, 'agentPreset'>): Promise<SessionId> {
     const archived = this.workspaces.list.getSnapshot().archivedSessionIds
     const sessions = this.sessions.list.getSnapshot()
     const blank = sessions.ids.find((id) => {
       const summary = sessions.byId[id]
-      return summary !== undefined && summary.blank && summary.cwd === workspace.path
-        && workspace.sessionIds.includes(id) && !archived.includes(id)
+      if (summary === undefined || !summary.blank || summary.cwd !== workspace.path) return false
+      if (!workspace.sessionIds.includes(id) || archived.includes(id)) return false
+      if (options.agentPreset !== undefined) {
+        const recordedPreset = summary.projectionValues?.agentPreset
+        if (typeof recordedPreset === 'string' && recordedPreset !== options.agentPreset) return false
+      }
+      return true
     })
-    return this.createNamed({
+    const baseRequest = {
       workspaceId: workspace.workspaceId,
       ...(blank === undefined ? {} : { sessionId: blank }),
-      ...(options.agentPreset === undefined ? {} : { agentPreset: options.agentPreset }),
-    })
+    }
+    const recordedBlankPreset = blank === undefined
+      ? undefined
+      : sessions.byId[blank]?.projectionValues?.agentPreset
+    const effectivePreset = options.agentPreset
+      ?? (typeof recordedBlankPreset === 'string' && recordedBlankPreset !== '' ? recordedBlankPreset : undefined)
+    if (effectivePreset === undefined) {
+      return this.createNamed(baseRequest)
+    }
+    try {
+      return await this.createNamed({
+        ...baseRequest,
+        agentPreset: effectivePreset,
+      })
+    } catch (error: unknown) {
+      const code = sessionCreateErrorOf(error)?.rpcError.code
+      if (code !== 'agent-preset/not-found' && code !== 'agent-preset/invalid') throw error
+      return this.createNamed(baseRequest)
+    }
   }
 
   /**
@@ -301,6 +323,38 @@ class UiWorkspaceService extends Service implements UiWorkspace {
       throw error
     }
     if (navigation.aborted) return
+    if (reuse?.agentPreset !== undefined && typeof window !== 'undefined') {
+      try {
+        const raw = window.localStorage.getItem('dsh-hermes-agent-session-map-v1')
+        const map = raw ? JSON.parse(raw) as Record<string, string> : {}
+        const rawRev = window.localStorage.getItem('dsh-hermes-session-to-agent-v1')
+        const revMap = rawRev ? JSON.parse(rawRev) as Record<string, string> : {}
+        const agentId = reuse.agentPreset.startsWith('hermes-')
+          ? reuse.agentPreset.slice('hermes-'.length)
+          : reuse.agentPreset
+        revMap[sessionId] = agentId
+        window.localStorage.setItem('dsh-hermes-session-to-agent-v1', JSON.stringify(revMap))
+        window.localStorage.setItem('dsh-hermes-last-agent-id', agentId)
+
+        const snap = this.sessions.list.getSnapshot()
+        const archived = new Set(this.workspaces.list.getSnapshot().archivedSessionIds)
+        const existingId = map[agentId] ?? map[reuse.agentPreset]
+        const existingSummary = existingId === undefined ? undefined : snap.byId[existingId as SessionId]
+        const nextSummary = snap.byId[sessionId]
+        // Only overwrite the agent's canonical session mapping if there is no existing
+        // non-blank conversation session, or if the new session itself is non-blank.
+        if (existingSummary === undefined || archived.has(existingSummary.id) || existingSummary.blank || (nextSummary !== undefined && !nextSummary.blank)) {
+          map[agentId] = sessionId
+          map[reuse.agentPreset] = sessionId
+          window.localStorage.setItem('dsh-hermes-agent-session-map-v1', JSON.stringify(map))
+        }
+        window.dispatchEvent(new CustomEvent('dsh-hermes-session-bound', {
+          detail: { agentId, agentPreset: reuse.agentPreset, sessionId },
+        }))
+      } catch {
+        // ignore storage errors
+      }
+    }
     this.replaceMain(sessionId, navigation, 'reveal', beforeOpen)
   }
 
@@ -344,8 +398,9 @@ class UiWorkspaceService extends Service implements UiWorkspace {
       ? this.openWorkspaceSession(target, undefined, undefined)
       : this.openWorkspace(target, initializeDraft ? (id) => {
         const binding = this.sessions.binding(id)
-        if (binding === undefined) this.draftPreparationFailed()
-        this.prepareDraft(binding, draftOptions)
+        if (binding !== undefined) {
+          this.prepareDraft(binding, draftOptions)
+        }
       } : undefined, agentPreset === undefined ? {} : { agentPreset })
     void opening.catch(
       (reason: unknown) => { console.warn('new session failed:', reason) },
@@ -354,14 +409,8 @@ class UiWorkspaceService extends Service implements UiWorkspace {
 
   private prepareDraft(binding: SessionBinding, options: DraftInitializationOptions): void {
     const conversation = this.ctx.get('conversation')
-    if (conversation === undefined) this.draftPreparationFailed()
-    if (conversation.input.requestDraftInitialization(binding, options) === 'blocked') this.draftPreparationFailed()
-  }
-
-  private draftPreparationFailed(): never {
-    const message = this.ctx.locale.bind('workspace')('draft.initializationFailed')
-    this.notify({ kind: 'createFailed', message })
-    throw new Error(message)
+    if (conversation === undefined) return
+    conversation.input.requestDraftInitialization(binding, options)
   }
 
   async archiveSession(sessionId: SessionId, options: { readonly stopActivity?: boolean } = {}): Promise<void> {
@@ -439,6 +488,64 @@ class UiWorkspaceService extends Service implements UiWorkspace {
     }
   }
 
+  private findLastCommunicatedNonBlankSession(
+    workspaces: WorkspaceSnapshot,
+    sessions: SessionListState,
+    currentBlankSummary: SessionListState['byId'][SessionId] | undefined,
+  ): SessionId | undefined {
+    const archived = new Set(workspaces.archivedSessionIds)
+    const nonBlank = Object.values(sessions.byId).filter(
+      (s): s is NonNullable<typeof s> =>
+        s !== undefined && !s.blank && !archived.has(s.id) && this.sessions.subagentAddress(s.id) === undefined,
+    )
+    if (nonBlank.length === 0) return undefined
+
+    if (typeof window !== 'undefined') {
+      try {
+        const lastSessId = window.localStorage.getItem('dsh-hermes-last-session-id')
+        if (lastSessId) {
+          const foundLast = nonBlank.find(s => s.id === lastSessId)
+          if (foundLast !== undefined) return foundLast.id
+        }
+        const lastAgentId = window.localStorage.getItem('dsh-hermes-last-agent-id')
+        if (lastAgentId) {
+          const rawMap = window.localStorage.getItem('dsh-hermes-agent-session-map-v1')
+          const map = rawMap ? JSON.parse(rawMap) as Record<string, string> : {}
+          const mappedId = map[lastAgentId] ?? map[`hermes-${lastAgentId}`]
+          if (mappedId) {
+            const foundMapped = nonBlank.find(s => s.id === mappedId)
+            if (foundMapped !== undefined) return foundMapped.id
+          }
+          const byAgentPreset = nonBlank
+            .filter(s => s.projectionValues?.agentPreset === `hermes-${lastAgentId}` || s.projectionValues?.agentPreset === lastAgentId)
+            .sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0))
+          if (byAgentPreset.length > 0) return byAgentPreset[0]!.id
+        }
+      } catch {
+        // ignore storage errors
+      }
+    }
+
+    if (currentBlankSummary !== undefined) {
+      const blankPreset = currentBlankSummary.projectionValues?.agentPreset
+      if (typeof blankPreset === 'string' && blankPreset !== '') {
+        const samePreset = nonBlank
+          .filter(s => s.projectionValues?.agentPreset === blankPreset)
+          .sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0))
+        if (samePreset.length > 0) return samePreset[0]!.id
+      }
+      if (currentBlankSummary.cwd) {
+        const sameCwd = nonBlank
+          .filter(s => s.cwd === currentBlankSummary.cwd)
+          .sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0))
+        if (sameCwd.length > 0) return sameCwd[0]!.id
+      }
+    }
+
+    const sortedAll = [...nonBlank].sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0))
+    return sortedAll[0]?.id
+  }
+
   private async restoreSelection(workspaces: WorkspaceSnapshot, sessions: SessionListState): Promise<void> {
     const saved = this.selection.getSnapshot()
     if (saved.subagentAddress !== undefined) {
@@ -448,8 +555,13 @@ class UiWorkspaceService extends Service implements UiWorkspace {
     const summary = saved.sessionId === undefined ? undefined : sessions.byId[saved.sessionId]
     const workspace = summary === undefined ? undefined
       : workspaces.items.find(item => item.sessionIds.includes(summary.id))
-    if (summary !== undefined && (!summary.blank || workspace === undefined)) {
+    if (summary !== undefined && !workspaces.archivedSessionIds.includes(summary.id) && (!summary.blank || workspace === undefined)) {
       this.replaceMain(summary.id, this.lifetime.signal, 'preserve')
+      return
+    }
+    const lastNonBlank = this.findLastCommunicatedNonBlankSession(workspaces, sessions, summary)
+    if (lastNonBlank !== undefined) {
+      this.replaceMain(lastNonBlank, this.lifetime.signal, 'preserve')
       return
     }
     const navigation = AbortSignal.any([this.ctx.layout.beginNavigation(), this.lifetime.signal])
@@ -518,6 +630,26 @@ class UiWorkspaceService extends Service implements UiWorkspace {
         sessionId: reference.sessionId,
         ...(subagentAddress === undefined ? {} : { subagentAddress }),
       })
+      if (typeof window !== 'undefined') {
+        try {
+          const summary = this.sessions.list.getSnapshot().byId[reference.sessionId]
+          if (summary !== undefined && !summary.blank) {
+            window.localStorage.setItem('dsh-hermes-last-session-id', reference.sessionId)
+            const preset = summary.projectionValues?.agentPreset
+            if (typeof preset === 'string' && preset.startsWith('hermes-')) {
+              const agentId = preset.slice('hermes-'.length)
+              window.localStorage.setItem('dsh-hermes-last-agent-id', agentId)
+              const rawMap = window.localStorage.getItem('dsh-hermes-agent-session-map-v1')
+              const map = rawMap ? JSON.parse(rawMap) as Record<string, string> : {}
+              map[agentId] = reference.sessionId
+              map[preset] = reference.sessionId
+              window.localStorage.setItem('dsh-hermes-agent-session-map-v1', JSON.stringify(map))
+            }
+          }
+        } catch {
+          // ignore storage errors
+        }
+      }
     } catch (error: unknown) {
       reference.release()
       throw error

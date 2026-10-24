@@ -31,6 +31,10 @@ Use the sidebar to browse Workspaces and their Sessions, reorder them, and start
 
 History rows without a stored title use the localized unnamed label (未命名 / Untitled), rather than a directory name. The current blank row remains New Session; other blank rows remain hidden. Rename drafts use the stored title, or start empty when unnamed; unnamed rows do not offer title copying.
 
+### Hermes model routing
+
+The Hermes sidebar parameters and command center share a searchable model picker grouped by catalog provider. Each entry shows its model name, catalog channel, and complete request model ID; current settings retain their raw provider/model values even when absent from the catalog. Source details distinguish the catalog name and channel, Provider ID, request model ID, and routing prefix. `group/` names a routing group whose actual model is assigned by the gateway. Catalog context-window and effort declarations are folded under an explicit verification disclaimer; this display neither tests connectivity nor verifies upstream deployment. Choosing an entry forwards its original provider/model pair to the existing save operation.
+
 ### Reordering and view options
 
 Pinned Sessions lead ordinary Sessions in both grouped and flat views. **Last updated** sorts each partition strictly by the latest user prompt or steer time, newest first; pin time does not affect it. **Manual** uses the relative positions in one complete Session sequence, including hidden archives. Returning to Last updated discards the manual layout, and entering Manual again freezes the then-current chronological order. The browser defaults to Last updated and remembers the selected mode across reloads.

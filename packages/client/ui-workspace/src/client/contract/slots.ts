@@ -272,6 +272,8 @@ export type WorkspaceBrowserInjected = {
   unarchiveSession: (sessionId: SessionId) => Promise<void>
   /** Adopt a picked host directory as a real Workspace before targeting a Session. */
   createWorkspace: (input: { path: string }) => Promise<WorkspaceView>
+  /** Open the full-screen Hermes × DSH Command Center panel in the main area. */
+  openHermesPanel?: (() => void) | undefined
 }
 
 /** The browser's declared viewing store handle, shared with the row actions that write view state. */

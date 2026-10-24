@@ -1,0 +1,250 @@
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+  color: var(--dsw-alias-label-primary, #17212f);
+  font: 12px / 1.5 var(--dsw-font-family, system-ui, sans-serif);
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.picker *,
+.picker *::before,
+.picker *::after {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.picker code {
+  font-family: var(--ds-font-family-code, ui-monospace, monospace);
+  font-size: 0.95em;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.label {
+  font-weight: 600;
+}
+
+.trigger,
+.option,
+.clear,
+.searchRow input {
+  font: inherit;
+  color: inherit;
+  border-radius: var(--dsw-radius-sm, 8px);
+}
+
+.trigger,
+.option {
+  display: flex;
+  width: 100%;
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.trigger {
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 0.5px solid var(--dsw-alias-border-l3, #64748b);
+  background: var(--dsw-alias-bg-base, #fff);
+}
+
+.triggerContent,
+.option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.secondary,
+.notice,
+.details dt {
+  color: var(--dsw-alias-label-secondary, #64748b);
+}
+
+.trigger:hover,
+.option:hover,
+.clear:hover {
+  background: var(--dsw-alias-interactive-bg-hover, #f5f7fa);
+}
+
+.picker button:focus-visible,
+.picker input:focus-visible,
+.picker summary:focus-visible {
+  outline: 2px solid var(--dsw-alias-link, #0284c7);
+  outline-offset: 2px;
+}
+
+.catalog {
+  border: 0.5px solid var(--dsw-alias-border-l3, #64748b);
+  border-radius: var(--dsw-radius-sm, 8px);
+  background: var(--dsw-alias-bg-layer-1, #fff);
+  padding: 8px;
+}
+
+.searchRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.searchRow input {
+  flex: 1 1 160px;
+  width: 100%;
+  padding: 7px 8px;
+  border: 0.5px solid var(--dsw-alias-border-l3, #64748b);
+  background: var(--dsw-alias-bg-base, #fff);
+}
+
+.clear {
+  border: 0;
+  background: transparent;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.results {
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.group + .group {
+  margin-top: 12px;
+}
+
+.groupHeading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 8px;
+  margin: 0 0 4px;
+  padding: 4px;
+  font-size: inherit;
+}
+
+.groupHeading code {
+  color: var(--dsw-alias-label-secondary, #64748b);
+  font-weight: 400;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.option {
+  border: 0;
+  background: transparent;
+  padding: 8px;
+}
+
+.option[aria-pressed='true'] {
+  background: var(--dsw-alias-interactive-bg-active, #f5f7fa);
+}
+
+.optionTitle {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 8px;
+  width: 100%;
+}
+
+.selected {
+  color: var(--dsw-alias-link, #0284c7);
+  font-size: 11px;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 6px 16px;
+  margin: 0;
+}
+
+.details > div {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr);
+  gap: 8px;
+  align-content: start;
+}
+
+.details dd {
+  margin: 0;
+}
+
+.notice {
+  margin: 0;
+  font-size: 11px;
+}
+
+.declarations summary {
+  cursor: pointer;
+  color: var(--dsw-alias-label-secondary, #64748b);
+}
+
+.declarations .details {
+  margin-top: 8px;
+}
+
+.compact {
+  font-size: 11px;
+  gap: 6px;
+}
+
+.compact .trigger {
+  padding: 7px 8px;
+}
+
+.compact .details {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.compact .details > div {
+  grid-template-columns: 84px minmax(0, 1fr);
+}
+
+.parameterLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.parameterGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+
+.parameterGrid > label,
+.parameterGrid select {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.ensembleLayout {
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+  gap: 18px;
+  min-height: 540px;
+  overflow-wrap: anywhere;
+}
+
+.ensembleLayout > * {
+  min-width: 0;
+}
+
+@media (max-width: 1100px) {
+  .ensembleLayout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

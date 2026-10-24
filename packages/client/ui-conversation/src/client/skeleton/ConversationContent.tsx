@@ -41,6 +41,20 @@ export function ConversationContent(props: ConversationContentProps) {
   const [pickerOpen, setPickerOpen] = useState(false)
   const [pendingWorkspaceId, setPendingWorkspaceId] = useState<WorkspaceId | undefined>()
   const pickerAnchor = useRef<HTMLButtonElement>(null)
+  const [agentChatMode, setAgentChatMode] = useState<boolean>(() => {
+    if (typeof document === 'undefined') return true
+    return document.documentElement.dataset.dshChatMode !== 'sessions'
+  })
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const onModeChange = (e: Event): void => {
+      const next = (e as CustomEvent<{ mode?: string }>).detail?.mode
+        ?? document.documentElement.dataset.dshChatMode
+      setAgentChatMode(next !== 'sessions')
+    }
+    window.addEventListener('dsh-hermes-chat-mode', onModeChange)
+    return () => { window.removeEventListener('dsh-hermes-chat-mode', onModeChange) }
+  }, [])
 
   // Publishes the two live measurements floating View chrome reads off the
   // scroll body: the seat's height as --dsh-composer-height, so controls clear
@@ -163,8 +177,8 @@ export function ConversationContent(props: ConversationContentProps) {
 
   const composerBar = (
     <div className={clsx(css.composerStack, hero && css.composerHero)}>
-      {hero && <HeroShell t={t} renderSlot={renderSlot} />}
-      {hero && heroWorkspaceRow}
+      {hero && <div style={agentChatMode ? { display: 'none' } : undefined}><HeroShell t={t} renderSlot={renderSlot} /></div>}
+      {hero && <div style={agentChatMode ? { display: 'none' } : undefined}>{heroWorkspaceRow}</div>}
       {zone !== undefined && renderSlot('conversation.input.dock', zone)}
       {inputBar}
     </div>

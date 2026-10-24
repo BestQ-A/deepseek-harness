@@ -1,10 +1,13 @@
 /** Declarative Agent capability sets, activation and session binding. */
+import { existsSync, readFileSync } from 'node:fs'
+import { homedir } from 'node:os'
+import { join } from 'node:path'
 import { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
 import { Remote, RemoteError, TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol'
 import { bindScopeParent, createScope, scopeOf, scopeParentOf, type Scope, type ScopeKey, type ScopeParentBinding } from '@deepseek-ai/dsh-scope'
 import { entryListSchema } from '@deepseek-ai/cordis-plugin-include'
-import { dump } from 'js-yaml'
+import { dump, load } from 'js-yaml'
 import type { Agent } from '@deepseek-ai/dsh-agent'
 // Type-only: the optional `settings` service this registry keeps off the generated pages.
 import type {} from '@deepseek-ai/dsh-settings'
@@ -74,6 +77,62 @@ export class AgentPresetRegistry extends TypertRemoteService {
   /** Default preset for a subsequently created session. */
   get defaultId(): string { return this.config.selectedDefault.get() ?? this.config.default }
 
+  private readonly diskLoading = new Map<string, Promise<Definition | undefined>>()
+
+  /**
+   * Auto-load a preset definition from `$DSH_HOME/.agent-presets/<id>` (supporting both `hermes-<id>` and `<id>`).
+   */
+  private async ensureDiskPreset(wanted: string): Promise<Definition | undefined> {
+    const existing = this.definitions.get(wanted)
+    if (existing !== undefined) return existing
+    const inflight = this.diskLoading.get(wanted)
+    if (inflight !== undefined) return inflight
+
+    const task = (async (): Promise<Definition | undefined> => {
+      try {
+        const dshHome = process.env.DSH_HOME ?? join(homedir(), '.dsh')
+        const presetsRoot = join(dshHome, '.agent-presets')
+        const stripped = wanted.startsWith('hermes-') ? wanted.slice('hermes-'.length) : wanted
+        const candidates = wanted === stripped ? [wanted] : [wanted, stripped]
+        for (const folder of candidates) {
+          if (!/^[a-zA-Z0-9._-]+$/.test(folder)) continue
+          const dir = join(presetsRoot, folder)
+          const cordisFile = join(dir, 'agent.cordis.yml')
+          if (!existsSync(cordisFile)) continue
+          const presetFile = join(dir, 'preset.yml')
+          let meta: { name?: string; description?: string; order?: number } = {}
+          if (existsSync(presetFile)) {
+            const parsedMeta = load(readFileSync(presetFile, 'utf8'))
+            if (typeof parsedMeta === 'object' && parsedMeta !== null && !Array.isArray(parsedMeta)) {
+              const rec = parsedMeta as Record<string, unknown>
+              if (typeof rec.name === 'string') meta = { ...meta, name: rec.name }
+              if (typeof rec.description === 'string') meta = { ...meta, description: rec.description }
+              if (typeof rec.order === 'number' && Number.isFinite(rec.order)) meta = { ...meta, order: rec.order }
+            }
+          }
+          const rawPlugins = load(readFileSync(cordisFile, 'utf8'), { schema: entryListSchema })
+          if (!Array.isArray(rawPlugins)) continue
+          if (!this.definitions.has(wanted)) {
+            await this.register({
+              id: wanted,
+              ...meta,
+              plugins: rawPlugins as PresetDefinition['plugins'],
+            })
+          }
+          return this.definitions.get(wanted)
+        }
+      } catch (error) {
+        this.owner.logger.warn(`agent preset disk autoload failed for ${wanted}: ${String(error)}`)
+      }
+      return this.definitions.get(wanted)
+    })().finally(() => {
+      this.diskLoading.delete(wanted)
+    })
+
+    this.diskLoading.set(wanted, task)
+    return task
+  }
+
   /** Register and eagerly load a definition; activation failure remains visible in the roster.
    * @param definition Parsed configuration supplied by the declaring plugin.
    * @returns Definition disposer after activation or its diagnostic settles; the declaring plugin owns it.
@@ -106,7 +165,11 @@ export class AgentPresetRegistry extends TypertRemoteService {
     try {
       const problem = entryListProblem(record.config.plugins)
       if (problem !== undefined) throw new Error(problem)
-      const context = scope.ctx.extend({ baseUrl: record.context.baseUrl })
+      const rawBaseUrl = record.context.baseUrl
+      const effectiveBaseUrl = typeof rawBaseUrl === 'string' && rawBaseUrl.includes('@deepseek-ai')
+        ? rawBaseUrl
+        : this.owner.baseUrl
+      const context = scope.ctx.extend({ baseUrl: effectiveBaseUrl })
       const mount = await mountPreset(context, record.config.id, record.config.plugins)
       const generation: Generation = { scope, key, mount, users: 0, retired: false }
       context.effect(() => {
@@ -175,6 +238,9 @@ export class AgentPresetRegistry extends TypertRemoteService {
    * @returns Display metadata and loading diagnostics.
    */
   async list(): Promise<AgentPreset[]> {
+    for (const coreId of ['hermes-default', 'hermes-fit-lead-1013', 'hermes-bl-company-coordinator', 'hermes-wj-m01-producer']) {
+      if (!this.definitions.has(coreId)) await this.ensureDiskPreset(coreId)
+    }
     const rows = await Promise.all([...this.definitions.values()].map(async (record) => {
       const broken = await this.diagnostic(record)
       return {
@@ -203,7 +269,7 @@ export class AgentPresetRegistry extends TypertRemoteService {
    */
   async resolve(id?: string): Promise<AgentPreset> {
     const wanted = id ?? this.defaultId
-    const record = this.definitions.get(wanted)
+    const record = (await this.ensureDiskPreset(wanted)) ?? this.definitions.get(wanted)
     if (record === undefined) throw new RemoteError('agent-preset/not-found', `Unknown agent preset: ${wanted}`,
       { agentPreset: wanted, available: [...this.definitions.keys()] })
     const broken = await this.diagnostic(record)
@@ -215,22 +281,23 @@ export class AgentPresetRegistry extends TypertRemoteService {
    * @returns The declared composition beside its published metadata.
    */
   @Remote('read')
-  readDocument(agentPreset: string): Promise<AgentPresetDocument> {
-    const record = this.definitions.get(agentPreset)
+  async readDocument(agentPreset: string): Promise<AgentPresetDocument> {
+    const record = (await this.ensureDiskPreset(agentPreset)) ?? this.definitions.get(agentPreset)
     if (record === undefined) {
-      return Promise.reject(new RemoteError('agent-preset/not-found', `Unknown agent preset: ${agentPreset}`,
-        { agentPreset, available: [...this.definitions.keys()] }))
+      throw new RemoteError('agent-preset/not-found', `Unknown agent preset: ${agentPreset}`,
+        { agentPreset, available: [...this.definitions.keys()] })
     }
     const { id, name, description, plugins } = record.config
     // The Loader's own dialect, so `!!js` conditions read as declared rather than as expression objects.
     const content = dump(plugins, { schema: entryListSchema, noRefs: true, lineWidth: -1 })
-    return Promise.resolve({
+    return {
       agentPreset: id, content, ...(name === undefined ? {} : { name }), ...(description === undefined ? {} : { description }),
-    })
+    }
   }
 
   private async retain(id?: string): Promise<Generation> {
     const wanted = id ?? this.defaultId
+    await this.ensureDiskPreset(wanted)
     while (true) {
       const record = this.definitions.get(wanted)
       if (record === undefined) throw new RemoteError('agent-preset/not-found', `Unknown agent preset: ${wanted}`,
