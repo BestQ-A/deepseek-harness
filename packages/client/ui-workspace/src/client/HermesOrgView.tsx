@@ -2487,7 +2487,7 @@ export function HermesSidebarOrgTree({
                     cheap: { name: '⚡ cheap 0扣费快参' },
                   }).map(([k, p]: [string, any]) => (
                     <option key={k} value={k}>
-                      {String(p?.name || k)}
+                      {`${String(p?.name || k)}${p?.lineup ? ` — ${String(p.lineup)}` : ''}`}
                     </option>
                   ))}
                 </select>
@@ -2542,7 +2542,7 @@ export function HermesSidebarOrgTree({
                     code_fusion: { name: '⚔️ code_fusion 双轨补丁竞速融合' },
                   }).map(([k, p]: [string, any]) => (
                     <option key={k} value={k}>
-                      {String(p?.name || k)}
+                      {`${String(p?.name || k)}${p?.lineup ? ` — ${String(p.lineup)}` : ''}`}
                     </option>
                   ))}
                 </select>
